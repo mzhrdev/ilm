@@ -10,9 +10,10 @@ import 'package:lms/features/auth/presentation/screens/signin_screen.dart';
 import 'package:lms/features/auth/presentation/screens/signup_screen.dart';
 import 'package:lms/features/auth/presentation/screens/user_type_selection_screen.dart';
 import 'package:lms/features/chat/presentation/screen/chat_screen.dart';
+import 'package:lms/features/chat/presentation/screen/conversation_screen.dart';
+import 'package:lms/features/courses/presentation/screen/course_detail_screen.dart';
 import 'package:lms/features/courses/presentation/screen/course_screen.dart';
 import 'package:lms/features/enrollment/presentation/screen/enrollment_screen.dart';
-import 'package:lms/features/courses/presentation/screen/course_detail_screen.dart';
 import 'package:lms/features/home/presentation/screens/home_screen.dart';
 import 'package:lms/features/notification/presentation/screen/notification_screen.dart';
 import 'package:lms/features/onboard/presentation/screens/onboard_screen.dart';
@@ -37,6 +38,7 @@ class Routes {
   static const String profile = '/profile';
   static const String chat = '/chat';
   static const String course = '/course';
+  static const String conversation = '/conversation';
 }
 
 // Global navigator key
@@ -85,6 +87,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.chat, builder: (context, state) => const ChatScreen()),
       // Course Screen
       GoRoute(path: Routes.course, builder: (context, state) => const MyCoursesScreen()),
+      // Conversation Screen
+      GoRoute(
+        path: Routes.conversation,
+        builder: (context, state) {
+          // Extract the 'name' query parameter from the URL
+          final name = state.uri.queryParameters['name'] ?? 'User';
+          return ConversationScreen(userName: name);
+        },
+      ),
     ],
   );
 });
