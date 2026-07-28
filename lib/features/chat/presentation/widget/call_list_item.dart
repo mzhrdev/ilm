@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lms/features/call/data/model/call_model.dart';
+import 'package:lms/features/chat/data/model/call_model.dart';
 
 class CallListItem extends StatelessWidget {
   final CallModel call;
@@ -11,15 +11,19 @@ class CallListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[200]!, width: 1)),
+      ),
       child: Row(
         children: [
           // Avatar
           Container(
             width: 50,
             height: 50,
-            decoration: BoxDecoration(color: Colors.grey[300], shape: BoxShape.circle),
+            decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(25)),
             child: call.contactAvatar != null
-                ? ClipOval(
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
                     child: Image.network(
                       call.contactAvatar!,
                       fit: BoxFit.cover,
@@ -36,41 +40,43 @@ class CallListItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        call.contactName + (call.callCount > 1 ? ' (${call.callCount})' : ''),
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: call.isMissed ? Colors.red : Colors.white,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                // Name with call count
+                Text(
+                  call.contactName + (call.callCount > 1 ? ' (${call.callCount})' : ''),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: call.isMissed ? Colors.red : Colors.black87,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
+                // Time and direction
                 Row(
                   children: [
                     Icon(call.directionIcon, size: 14, color: call.isMissed ? Colors.red : Colors.green),
                     const SizedBox(width: 4),
-                    Text(call.formattedTime, style: TextStyle(fontSize: 14, color: Colors.grey[400])),
+                    Text(call.formattedTime, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                   ],
                 ),
               ],
             ),
           ),
-          // Call Icon
-          IconButton(
-            icon: Icon(
-              call.callType == CallType.video ? Icons.videocam : Icons.call,
-              color: Colors.white,
-              size: 24,
+          const SizedBox(width: 8),
+          // Call Button
+          GestureDetector(
+            onTap: onCallBack,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(20)),
+              child: Icon(
+                call.callType == CallType.video ? Icons.videocam : Icons.call,
+                color: Colors.black87,
+                size: 20,
+              ),
             ),
-            onPressed: onCallBack,
-            padding: const EdgeInsets.all(8),
           ),
         ],
       ),

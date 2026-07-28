@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/chat/data/provider/call_provider.dart';
 import 'package:lms/features/chat/data/provider/chat_provider.dart';
+import 'package:lms/features/chat/presentation/widget/call_list_item.dart';
 import 'package:lms/features/chat/presentation/widget/chat_list_item.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
@@ -14,6 +16,7 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _MessagesScreenState extends ConsumerState<ChatScreen> {
   final _searchController = TextEditingController();
+  String _selectedTab = 'Chat'; // 'Chat' or 'Calls'
 
   @override
   void dispose() {
@@ -24,7 +27,9 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final messagesState = ref.watch(messagesProvider);
+    final callsState = ref.watch(callsProvider);
     final messages = messagesState.filteredMessages;
+    final calls = callsState.filteredCalls;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -59,7 +64,11 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               onChanged: (value) {
-                ref.read(messagesProvider.notifier).setSearchQuery(value);
+                if (_selectedTab == 'Chat') {
+                  ref.read(messagesProvider.notifier).setSearchQuery(value);
+                } else {
+                  ref.read(callsProvider.notifier).setSearchQuery(value);
+                }
               },
             ),
           ),
@@ -75,13 +84,13 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        ref.read(messagesProvider.notifier).switchTab(MessageTab.chat);
+                        setState(() {
+                          _selectedTab = 'Chat';
+                        });
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: messagesState.currentTab == MessageTab.chat
-                              ? Colors.black
-                              : Colors.transparent,
+                          color: _selectedTab == 'Chat' ? Colors.black : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
@@ -90,9 +99,7 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: messagesState.currentTab == MessageTab.chat
-                                  ? Colors.white
-                                  : Colors.grey[700],
+                              color: _selectedTab == 'Chat' ? Colors.white : Colors.grey[700],
                             ),
                           ),
                         ),
@@ -102,13 +109,13 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        ref.read(messagesProvider.notifier).switchTab(MessageTab.calls);
+                        setState(() {
+                          _selectedTab = 'Calls';
+                        });
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: messagesState.currentTab == MessageTab.calls
-                              ? Colors.black
-                              : Colors.transparent,
+                          color: _selectedTab == 'Calls' ? Colors.black : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
@@ -117,9 +124,7 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: messagesState.currentTab == MessageTab.calls
-                                  ? Colors.white
-                                  : Colors.grey[700],
+                              color: _selectedTab == 'Calls' ? Colors.white : Colors.grey[700],
                             ),
                           ),
                         ),
@@ -133,32 +138,11 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
 
           const SizedBox(height: 16),
 
-          // Messages List
+          // Content based on selected tab
           Expanded(
-            child: messagesState.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : messages.isEmpty
-                ? _buildEmptyState()
-                : ListView.separated(
-                    padding: const EdgeInsets.only(bottom: 80), // Space for bottom nav
-                    itemCount: messages.length,
-                    separatorBuilder: (context, index) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      return ChatListItem(
-                        message: message,
-                        onTap: () {
-                          // 1. Mark as read
-                          ref.read(messagesProvider.notifier).markAsRead(message.id);
-
-                          // 2. Navigate using your Routes constant and pass the name as a query parameter
-                          context.push(
-                            '${Routes.conversation}?name=${Uri.encodeComponent(message.senderName)}',
-                          );
-                        },
-                      );
-                    },
-                  ),
+            child: _selectedTab == 'Chat'
+                ? _buildChatList(messagesState, messages)
+                : _buildCallsList(callsState, calls),
           ),
         ],
       ),
@@ -166,20 +150,67 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildChatList(messagesState, messages) {
+    return messagesState.isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : messages.isEmpty
+        ? _buildEmptyState('No messages yet', 'When you receive messages, they will appear here')
+        : ListView.separated(
+            padding: const EdgeInsets.only(bottom: 80),
+            itemCount: messages.length,
+            separatorBuilder: (context, index) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final message = messages[index];
+              return ChatListItem(
+                message: message,
+                onTap: () {
+                  ref.read(messagesProvider.notifier).markAsRead(message.id);
+                  context.push('${Routes.conversation}?name=${Uri.encodeComponent(message.senderName)}');
+                },
+              );
+            },
+          );
+  }
+
+  Widget _buildCallsList(callsState, calls) {
+    return callsState.isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : calls.isEmpty
+        ? _buildEmptyState('No recent calls', 'Calls you make or receive will appear here')
+        : ListView.separated(
+            padding: const EdgeInsets.only(bottom: 80),
+            itemCount: calls.length,
+            separatorBuilder: (context, index) => Divider(color: Colors.grey[200], height: 1),
+            itemBuilder: (context, index) {
+              final call = calls[index];
+              return CallListItem(
+                call: call,
+                onCallBack: () {
+                  // Initiate callback
+                },
+              );
+            },
+          );
+  }
+
+  Widget _buildEmptyState(String title, String subtitle) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline, size: 80, color: Colors.grey[300]),
+          Icon(
+            _selectedTab == 'Chat' ? Icons.chat_bubble_outline : Icons.call_end,
+            size: 80,
+            color: Colors.grey[300],
+          ),
           const SizedBox(height: 16),
-          const Text(
-            'No messages yet',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey),
           ),
           const SizedBox(height: 8),
           Text(
-            'When you receive messages, they will appear here',
+            subtitle,
             style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
@@ -218,8 +249,7 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
             context.go(Routes.home);
             break;
           case 1:
-            // TO DO: Home to Courses
-            context.go(Routes.home);
+            context.go(Routes.course);
             break;
           case 2:
             // Already on messages

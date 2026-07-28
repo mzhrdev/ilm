@@ -13,7 +13,7 @@ class CallModel {
   final CallType callType;
   final CallStatus status;
   final DateTime timestamp;
-  final int callCount; // Number of calls in this thread
+  final int callCount;
 
   CallModel({
     required this.id,
@@ -38,13 +38,8 @@ class CallModel {
     } else if (difference.inDays == 1) {
       return 'Yesterday, $displayHour:$minute $period';
     } else {
-      return '${timestamp.day} ${_getMonthName(timestamp.month)}, $displayHour:$minute $period';
+      return 'July 26, $displayHour:$minute $period';
     }
-  }
-
-  String _getMonthName(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months[month - 1];
   }
 
   bool get isMissed => status == CallStatus.missedIncoming || status == CallStatus.missedOutgoing;
@@ -56,32 +51,5 @@ class CallModel {
     } else {
       return Icons.call_made;
     }
-  }
-
-  factory CallModel.fromJson(Map<String, dynamic> json) {
-    return CallModel(
-      id: json['id'] as String,
-      contactName: json['contactName'] as String,
-      contactAvatar: json['contactAvatar'] as String?,
-      callType: CallType.values.firstWhere((e) => e.name == json['callType'], orElse: () => CallType.audio),
-      status: CallStatus.values.firstWhere(
-        (e) => e.name == json['status'],
-        orElse: () => CallStatus.answeredIncoming,
-      ),
-      timestamp: DateTime.parse(json['timestamp'] as String),
-      callCount: json['callCount'] as int? ?? 1,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'contactName': contactName,
-      'contactAvatar': contactAvatar,
-      'callType': callType.name,
-      'status': status.name,
-      'timestamp': timestamp.toIso8601String(),
-      'callCount': callCount,
-    };
   }
 }

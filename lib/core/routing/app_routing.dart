@@ -1,5 +1,4 @@
 import 'dart:core';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -39,6 +38,7 @@ class Routes {
   static const String chat = '/chat';
   static const String course = '/course';
   static const String conversation = '/conversation';
+  static const String call = '/calls';
 }
 
 // Global navigator key
@@ -96,6 +96,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ConversationScreen(userName: name);
         },
       ),
+      
     ],
   );
 });
