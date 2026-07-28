@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
 import 'package:lms/features/settings/presentation/widget/settings_menu_item_widget.dart';
 
 import '../../data/provider/settings_provider.dart';
@@ -55,8 +56,32 @@ class SettingsScreen extends ConsumerWidget {
                             return SettingsMenuItemTile(
                               item: item,
                               onTap: () {
-                                ref.read(settingsProvider.notifier).handleMenuItemTap(item.type);
-                                context.push(Routes.editProfile);
+                                // ✅ Use a switch statement to handle each item individually
+                                switch (item.type) {
+                                  case SettingsMenuItemType.profile:
+                                    context.push(Routes.editProfile);
+                                    break;
+
+                                  case SettingsMenuItemType.payment:
+                                    //context.push(Routes.paymentMethod); // Make sure to add this route
+                                    break;
+
+                                  case SettingsMenuItemType.terms:
+                                    //context.push(Routes.termsAndConditions); // Make sure to add this route
+                                    break;
+
+                                  case SettingsMenuItemType.help:
+                                    //context.push(Routes.helpCenter); // Make sure to add this route
+                                    break;
+
+                                  case SettingsMenuItemType.invite:
+                                    //_shareInvite(context);
+                                    break;
+
+                                  case SettingsMenuItemType.logout:
+                                    //_showLogoutDialog(context, ref);
+                                    break;
+                                }
                               },
                             );
                           }).toList(),
