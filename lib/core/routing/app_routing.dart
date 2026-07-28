@@ -14,7 +14,7 @@ import 'package:lms/features/chat/presentation/screen/chat_screen.dart';
 import 'package:lms/features/chat/presentation/screen/conversation_screen.dart';
 import 'package:lms/features/chat/presentation/screen/video_call_screen.dart';
 import 'package:lms/features/courses/presentation/screen/course_detail_screen.dart';
-import 'package:lms/features/courses/presentation/screen/course_screen.dart';
+import 'package:lms/features/courses/presentation/screen/my_course_screen.dart';
 import 'package:lms/features/enrollment/presentation/screen/enrollment_screen.dart';
 import 'package:lms/features/home/presentation/screens/home_screen.dart';
 import 'package:lms/features/notification/presentation/screen/notification_screen.dart';

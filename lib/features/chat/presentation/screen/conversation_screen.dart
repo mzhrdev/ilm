@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/chat/data/provider/direct_message_provider.dart';
 
@@ -78,13 +79,19 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           ],
         ),
         actions: [
+          // Audio Call Button
           IconButton(
             icon: const Icon(Icons.call, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              context.push(Routes.audioCall);
+            },
           ),
+          // Video Call Button
           IconButton(
             icon: const Icon(Icons.videocam, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              context.push(Routes.videoCall);
+            },
           ),
           const SizedBox(width: 8),
         ],

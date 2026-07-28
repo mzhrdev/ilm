@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/provider/active_call_provider.dart';
 
@@ -35,7 +36,10 @@ class AudioCallScreen extends ConsumerWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                      onPressed: () => ref.read(activeCallProvider.notifier).endCall(),
+                      onPressed: () {
+                        ref.read(activeCallProvider.notifier).endCall();
+                        context.pop();
+                      },
                     ),
                     const Icon(Icons.person_add, color: Colors.white, size: 28),
                   ],
@@ -138,7 +142,10 @@ class AudioCallScreen extends ConsumerWidget {
                           onTap: () {},
                         ),
                         GestureDetector(
-                          onTap: () => ref.read(activeCallProvider.notifier).endCall(),
+                          onTap: () {
+                            ref.read(activeCallProvider.notifier).endCall();
+                            context.pop();
+                          },
                           child: Column(
                             children: [
                               Container(
