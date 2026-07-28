@@ -122,7 +122,7 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
                           child: Text(
                             'Calls',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: _selectedTab == 'Calls' ? Colors.white : Colors.grey[700],
                             ),
