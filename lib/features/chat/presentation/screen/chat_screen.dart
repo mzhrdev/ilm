@@ -148,9 +148,13 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
                       return ChatListItem(
                         message: message,
                         onTap: () {
+                          // 1. Mark as read
                           ref.read(messagesProvider.notifier).markAsRead(message.id);
-                          // Navigate to chat screen
-                          // context.push(Routes.chat, extra: {'messageId': message.id});
+
+                          // 2. Navigate using your Routes constant and pass the name as a query parameter
+                          context.push(
+                            '${Routes.conversation}?name=${Uri.encodeComponent(message.senderName)}',
+                          );
                         },
                       );
                     },
