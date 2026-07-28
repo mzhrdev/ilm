@@ -1,14 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:lms/features/chat/data/model/call_model.dart';
+// lib/features/calls/presentation/widgets/call_list_item.dart
 
-class CallListItem extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/chat/data/model/call_model.dart';
+import 'package:lms/features/chat/data/provider/active_call_provider.dart';
+
+// ✅ CHANGE 1: Extend ConsumerWidget instead of StatelessWidget
+class CallListItem extends ConsumerWidget {
   final CallModel call;
   final VoidCallback onCallBack;
 
   const CallListItem({super.key, required this.call, required this.onCallBack});
 
+  // ✅ CHANGE 2: ConsumerWidget's build method correctly accepts (context, ref)
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -16,7 +24,6 @@ class CallListItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Avatar
           Container(
             width: 50,
             height: 50,
@@ -35,12 +42,10 @@ class CallListItem extends StatelessWidget {
                 : const Icon(Icons.person, color: Colors.grey, size: 30),
           ),
           const SizedBox(width: 12),
-          // Call Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Name with call count
                 Text(
                   call.contactName + (call.callCount > 1 ? ' (${call.callCount})' : ''),
                   style: TextStyle(
@@ -52,7 +57,6 @@ class CallListItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                // Time and direction
                 Row(
                   children: [
                     Icon(call.directionIcon, size: 14, color: call.isMissed ? Colors.red : Colors.green),
@@ -64,9 +68,18 @@ class CallListItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // Call Button
           GestureDetector(
-            onTap: onCallBack,
+            onTap: () {
+              // Start the call using existing CallModel
+              ref.read(activeCallProvider.notifier).startCall(call);
+
+              // Navigate to appropriate screen
+              if (call.callType == CallType.video) {
+                context.go(Routes.videoCall);
+              } else {
+                context.go(Routes.audioCall);
+              }
+            },
             child: Container(
               width: 40,
               height: 40,

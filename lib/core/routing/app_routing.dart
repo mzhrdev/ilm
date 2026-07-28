@@ -1,4 +1,5 @@
 import 'dart:core';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,8 +9,10 @@ import 'package:lms/features/auth/presentation/screens/reset_password/reset_pass
 import 'package:lms/features/auth/presentation/screens/signin_screen.dart';
 import 'package:lms/features/auth/presentation/screens/signup_screen.dart';
 import 'package:lms/features/auth/presentation/screens/user_type_selection_screen.dart';
+import 'package:lms/features/chat/presentation/screen/audio_call_screen.dart';
 import 'package:lms/features/chat/presentation/screen/chat_screen.dart';
 import 'package:lms/features/chat/presentation/screen/conversation_screen.dart';
+import 'package:lms/features/chat/presentation/screen/video_call_screen.dart';
 import 'package:lms/features/courses/presentation/screen/course_detail_screen.dart';
 import 'package:lms/features/courses/presentation/screen/course_screen.dart';
 import 'package:lms/features/enrollment/presentation/screen/enrollment_screen.dart';
@@ -39,6 +42,8 @@ class Routes {
   static const String course = '/course';
   static const String conversation = '/conversation';
   static const String call = '/calls';
+  static const String audioCall = '/audioCall';
+  static const String videoCall = '/videoCall';
 }
 
 // Global navigator key
@@ -96,7 +101,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ConversationScreen(userName: name);
         },
       ),
-      
+      // Audio Call Screen
+      GoRoute(path: Routes.audioCall, builder: (context, state) => const AudioCallScreen()),
+      // Video Call Screen
+      GoRoute(path: Routes.videoCall, builder: (context, state) => const VideoCallScreen()),
     ],
   );
 });
