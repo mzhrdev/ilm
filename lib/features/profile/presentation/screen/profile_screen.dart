@@ -1,5 +1,3 @@
-// lib/features/profile/presentation/screens/profile_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -69,7 +67,7 @@ class ProfileScreen extends ConsumerWidget {
         SliverToBoxAdapter(
           child: Padding(
             // ✅ FIX: Increased top padding from 16 to 32 to create a gap below the AppBar
-            padding: const EdgeInsets.fromLTRB(16, 70, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 60, 16, 16),
             child: Column(
               children: [
                 Stack(
@@ -87,9 +85,22 @@ class ProfileScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 60), // Space for profile picture
-                            const SizedBox(height: 16),
-
+                            // ✅ NEW: Edit Button using IconButton (Top Right)
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: IconButton(
+                                onPressed: () {
+                                  context.push(Routes.editProfile);
+                                },
+                                icon: const Icon(Icons.edit, size: 18, color: Colors.black87),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  shape: const CircleBorder(), // Makes it perfectly circular
+                                  padding: const EdgeInsets.all(8),
+                                  elevation: 2, // This adds the subtle shadow automatically!
+                                ),
+                              ),
+                            ),
                             // Name
                             Center(
                               child: Text(

@@ -19,6 +19,7 @@ import 'package:lms/features/enrollment/presentation/screen/enrollment_screen.da
 import 'package:lms/features/home/presentation/screens/home_screen.dart';
 import 'package:lms/features/notification/presentation/screen/notification_screen.dart';
 import 'package:lms/features/onboard/presentation/screens/onboard_screen.dart';
+import 'package:lms/features/profile/presentation/screen/edit_profile_screen.dart';
 import 'package:lms/features/profile/presentation/screen/profile_screen.dart';
 import 'package:lms/features/settings/presentation/screen/setting_screen.dart';
 import 'package:lms/features/splash/presentation/screens/splash_screen.dart';
@@ -44,6 +45,7 @@ class Routes {
   static const String call = '/calls';
   static const String audioCall = '/audioCall';
   static const String videoCall = '/videoCall';
+  static const String editProfile = '/editProfile';
 }
 
 // Global navigator key
@@ -105,6 +107,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.audioCall, builder: (context, state) => const AudioCallScreen()),
       // Video Call Screen
       GoRoute(path: Routes.videoCall, builder: (context, state) => const VideoCallScreen()),
+      // Edit Profile Screen
+      GoRoute(path: Routes.editProfile, builder: (context, state) => const EditProfileScreen()),
     ],
   );
 });
