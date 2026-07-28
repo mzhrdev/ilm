@@ -75,9 +75,9 @@ class CallListItem extends ConsumerWidget {
 
               // Navigate to appropriate screen
               if (call.callType == CallType.video) {
-                context.go(Routes.videoCall);
+                context.push(Routes.videoCall);
               } else {
-                context.go(Routes.audioCall);
+                context.push(Routes.audioCall);
               }
             },
             child: Container(
