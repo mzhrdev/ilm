@@ -24,6 +24,25 @@ class CallModel {
     required this.timestamp,
     this.callCount = 1,
   });
+  CallModel copyWith({
+    String? id,
+    String? contactName,
+    String? contactAvatar,
+    CallType? callType,
+    CallStatus? status,
+    DateTime? timestamp,
+    int? callCount,
+  }) {
+    return CallModel(
+      id: id ?? this.id,
+      contactName: contactName ?? this.contactName,
+      contactAvatar: contactAvatar ?? this.contactAvatar,
+      callType: callType ?? this.callType,
+      status: status ?? this.status,
+      timestamp: timestamp ?? this.timestamp,
+      callCount: callCount ?? this.callCount,
+    );
+  }
 
   String get formattedTime {
     final now = DateTime.now();
