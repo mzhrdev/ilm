@@ -67,7 +67,7 @@ class SettingsScreen extends ConsumerWidget {
                                     break;
 
                                   case SettingsMenuItemType.terms:
-                                    //context.push(Routes.termsAndConditions); // Make sure to add this route
+                                    context.push(Routes.terms); 
                                     break;
 
                                   case SettingsMenuItemType.help:
