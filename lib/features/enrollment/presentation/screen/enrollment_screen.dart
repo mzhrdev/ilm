@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_assets.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 import 'package:lms/features/enrollment/data/provider/enrollment_provider.dart';
 import 'package:lms/features/enrollment/presentation/widget/progress_stepper.dart';
 import 'package:lms/features/enrollment/presentation/widget/purchase_details_card.dart';
+import 'package:lms/features/payment/data/provider/payment_method_provider.dart';
 
 class EnrollmentScreen extends ConsumerStatefulWidget {
   const EnrollmentScreen({super.key});
@@ -21,7 +23,10 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
   final _cardNumberController = TextEditingController();
   final _cvcController = TextEditingController();
   final _expiryDateController = TextEditingController();
-  String _selectedPaymentMethod = 'Add Credit Card';
+
+  // ✅ Track selected payment method (null means "Add New Credit Card")
+  String? _selectedPaymentMethodId;
+  String selectedPaymentMethodLabel = 'Add New Credit Card';
 
   @override
   void dispose() {
@@ -58,6 +63,10 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
             }
           },
         ),
+        title: const Text(
+          'Enrollment',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
       ),
       body: SafeArea(
         child: Column(
@@ -80,7 +89,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     );
   }
 
-  Widget _buildStepContent(enrollment) {
+  Widget _buildStepContent(EnrollmentModel enrollment) {
     switch (enrollment.currentStep) {
       case 1:
         return _buildOverviewStep(enrollment);
@@ -93,7 +102,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     }
   }
 
-  Widget _buildOverviewStep(enrollment) {
+  Widget _buildOverviewStep(EnrollmentModel enrollment) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -180,7 +189,10 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     );
   }
 
-  Widget _buildPaymentMethodStep(enrollment) {
+  Widget _buildPaymentMethodStep(EnrollmentModel enrollment) {
+    // ✅ Watch saved payment methods
+    final savedMethods = ref.watch(paymentMethodsProvider).methods;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Form(
@@ -191,17 +203,101 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
             const Text('Select Payment Method', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 24),
 
-            // Payment Method Selection
-            _buildPaymentOption('EasyPaisa', Icons.account_balance_wallet),
-            const SizedBox(height: 12),
-            _buildPaymentOption('Add Credit Card', Icons.credit_card),
-            const SizedBox(height: 12),
-            _buildPaymentOption('JazzCash', Icons.account_balance_wallet),
+            // ✅ 1. Show Saved Payment Methods (if any)
+            if (savedMethods.isNotEmpty) ...[
+              const Text(
+                'Saved Methods',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey),
+              ),
+              const SizedBox(height: 12),
+              ...savedMethods.map((method) {
+                final isSelected = _selectedPaymentMethodId == method.id;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedPaymentMethodId = method.id;
+                      selectedPaymentMethodLabel = method.typeLabel;
+                    });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.blue[50] : Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: isSelected ? Colors.blue : Colors.transparent, width: 1.5),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(method.icon, color: Colors.black87, size: 24),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                method.typeLabel,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                method.displayName,
+                                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isSelected) const Icon(Icons.check_circle, color: Colors.blue, size: 24),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(height: 16),
+            ],
+
+            // ✅ 2. "Add New Credit Card" Option (Always visible)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedPaymentMethodId = null;
+                  selectedPaymentMethodLabel = 'Add New Credit Card';
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: _selectedPaymentMethodId == null ? Colors.blue[50] : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _selectedPaymentMethodId == null ? Colors.blue : Colors.transparent,
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.add_circle_outline, color: Colors.black87, size: 24),
+                    const SizedBox(width: 16),
+                    const Text(
+                      'Add New Credit Card',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                    ),
+                    const Spacer(),
+                    if (_selectedPaymentMethodId == null)
+                      const Icon(Icons.check_circle, color: Colors.blue, size: 24),
+                  ],
+                ),
+              ),
+            ),
 
             const SizedBox(height: 24),
 
-            // Credit Card Form (only shown if "Add Credit Card" is selected)
-            if (_selectedPaymentMethod == 'Add Credit Card') ...[
+            // ✅ 3. Credit Card Form (Only shown if "Add New Credit Card" is selected)
+            if (_selectedPaymentMethodId == null) ...[
               const Text('Card Details', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 16),
 
@@ -211,9 +307,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                 label: 'Name on Card',
                 icon: Icons.person_outline,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter cardholder name';
-                  }
+                  if (value == null || value.trim().isEmpty) return 'Please enter cardholder name';
                   return null;
                 },
               ),
@@ -228,12 +322,8 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                 maxLength: 19,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly, CardNumberInputFormatter()],
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter card number';
-                  }
-                  if (value.replaceAll(' ', '').length < 16) {
-                    return 'Please enter a valid card number';
-                  }
+                  if (value == null || value.trim().isEmpty) return 'Please enter card number';
+                  if (value.replaceAll(' ', '').length < 16) return 'Please enter a valid card number';
                   return null;
                 },
               ),
@@ -251,12 +341,8 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                       maxLength: 3,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Required';
-                        }
-                        if (value.length < 3) {
-                          return 'Invalid CVC';
-                        }
+                        if (value == null || value.trim().isEmpty) return 'Required';
+                        if (value.length < 3) return 'Invalid CVC';
                         return null;
                       },
                     ),
@@ -272,12 +358,8 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                       maxLength: 5,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly, ExpiryDateInputFormatter()],
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Required';
-                        }
-                        if (value.length < 5) {
-                          return 'Invalid date';
-                        }
+                        if (value == null || value.trim().isEmpty) return 'Required';
+                        if (value.length < 5) return 'Invalid date';
                         return null;
                       },
                     ),
@@ -334,44 +416,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     );
   }
 
-  Widget _buildPaymentOption(String title, IconData icon) {
-    final isSelected = _selectedPaymentMethod == title;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedPaymentMethod = title;
-        });
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.blue[50] : Colors.grey[200],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? Colors.blue : Colors.transparent, width: 1),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: isSelected ? Colors.black : Colors.grey[700], size: 24),
-            const SizedBox(width: 16),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: Colors.black87,
-              ),
-            ),
-            const Spacer(),
-            if (isSelected) Icon(Icons.check_circle, color: Colors.blue, size: 24),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTransactionCompletedStep(enrollment) {
+  Widget _buildTransactionCompletedStep(EnrollmentModel enrollment) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -383,7 +428,6 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
           ),
           const SizedBox(height: 40),
-
           Center(child: Image(image: AssetImage(AppIcons.transactionSuccess))),
         ],
       ),
@@ -405,7 +449,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     );
   }
 
-  Widget _buildBottomButton(enrollment) {
+  Widget _buildBottomButton(EnrollmentModel enrollment) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -420,28 +464,23 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
           height: 50,
           child: ElevatedButton(
             onPressed: () {
-              // Step 1: Overview → Go to Step 2 (Payment)
               if (enrollment.currentStep == 1) {
+                // Step 1: Overview → Go to Step 2 (Payment)
                 ref.read(enrollmentProvider.notifier).nextStep();
-              }
-              // Step 2: Payment → Validate and go to Step 3 (Success)
-              else if (enrollment.currentStep == 2) {
-                if (_selectedPaymentMethod == 'Add Credit Card') {
+              } else if (enrollment.currentStep == 2) {
+                // Step 2: Payment → Validate and go to Step 3 (Success)
+                if (_selectedPaymentMethodId == null) {
+                  // Adding a new card, validate the form
                   if (_formKey.currentState!.validate()) {
                     ref.read(enrollmentProvider.notifier).nextStep();
                   }
                 } else {
-                  // For EasyPaisa/JazzCash, just move to next step
+                  // Using a saved card, skip validation and proceed
                   ref.read(enrollmentProvider.notifier).nextStep();
                 }
-              }
-              // Step 3: Success → Go to Dashboard/Home
-              else if (enrollment.currentStep == 3) {
-                // 1. Navigate away FIRST
+              } else if (enrollment.currentStep == 3) {
+                // Step 3: Success → Go to Home
                 context.go(Routes.home);
-
-                // 2. Then reset the state (the widget will be disposed anyway)
-                // Using Future.delayed ensures it happens after the route transition starts
                 Future.delayed(const Duration(milliseconds: 100), () {
                   if (mounted) {
                     ref.read(enrollmentProvider.notifier).reset();
