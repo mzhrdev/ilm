@@ -23,6 +23,7 @@ import 'package:lms/features/profile/presentation/screen/edit_profile_screen.dar
 import 'package:lms/features/profile/presentation/screen/profile_screen.dart';
 import 'package:lms/features/settings/presentation/screen/setting_screen.dart';
 import 'package:lms/features/splash/presentation/screens/splash_screen.dart';
+import 'package:lms/features/termsncondition/presentation/screen/termsncondition_screen.dart';
 
 class Routes {
   static const String splash = '/';
@@ -46,6 +47,7 @@ class Routes {
   static const String audioCall = '/audioCall';
   static const String videoCall = '/videoCall';
   static const String editProfile = '/editProfile';
+  static const String terms = '/termsnconditions';
 }
 
 // Global navigator key
@@ -109,6 +111,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.videoCall, builder: (context, state) => const VideoCallScreen()),
       // Edit Profile Screen
       GoRoute(path: Routes.editProfile, builder: (context, state) => const EditProfileScreen()),
+      // Terms and Condition Screen Added
+      GoRoute(path: Routes.terms, builder: (context, state) => const TermsAndConditionsScreen()),
     ],
   );
 });
