@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/chat/data/model/call_model.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
+import 'package:lms/features/chat/data/provider/active_call_provider.dart';
 import 'package:lms/features/chat/data/provider/direct_message_provider.dart';
 
 // Renamed from ChatScreen to ConversationScreen
@@ -83,6 +85,16 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           IconButton(
             icon: const Icon(Icons.call, color: Colors.black),
             onPressed: () {
+              // 1. Create a CallModel for this session
+              final callModel = CallModel(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                contactName: widget.userName,
+                callType: CallType.audio,
+                status: CallStatus.answeredOutgoing,
+                timestamp: DateTime.now(),
+              );
+              // 2. Start the call in the provider (this removes the 'null' state)
+              ref.read(activeCallProvider.notifier).startCall(callModel);
               context.push(Routes.audioCall);
             },
           ),
@@ -90,6 +102,17 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           IconButton(
             icon: const Icon(Icons.videocam, color: Colors.black),
             onPressed: () {
+              // 1. Create a CallModel for this session
+              final callModel = CallModel(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                contactName: widget.userName,                
+                callType: CallType.video,
+                status: CallStatus.answeredOutgoing,
+                timestamp: DateTime.now(),
+              );
+
+              // 2. Start the call in the provider
+              ref.read(activeCallProvider.notifier).startCall(callModel);
               context.push(Routes.videoCall);
             },
           ),
