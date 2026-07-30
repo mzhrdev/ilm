@@ -102,7 +102,7 @@ class SettingsScreen extends ConsumerWidget {
                               border: Border.all(color: Colors.white, width: 4),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withAlpha(100),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),
