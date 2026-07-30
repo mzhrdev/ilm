@@ -63,15 +63,15 @@ class SettingsScreen extends ConsumerWidget {
                                     break;
 
                                   case SettingsMenuItemType.payment:
-                                    //context.push(Routes.paymentMethod); // Make sure to add this route
+                                    context.push(Routes.payment); // Make sure to add this route
                                     break;
 
                                   case SettingsMenuItemType.terms:
-                                    context.push(Routes.terms); 
+                                    context.push(Routes.terms);
                                     break;
 
                                   case SettingsMenuItemType.help:
-                                    //context.push(Routes.helpCenter); // Make sure to add this route
+                                    context.push(Routes.helpCenter); // Make sure to add this route
                                     break;
 
                                   case SettingsMenuItemType.invite:
@@ -79,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                                     break;
 
                                   case SettingsMenuItemType.logout:
-                                    //_showLogoutDialog(context, ref);
+                                    _showLogoutDialog(context, ref);
                                     break;
                                 }
                               },
@@ -134,6 +134,51 @@ class SettingsScreen extends ConsumerWidget {
         errorBuilder: (context, error, stackTrace) {
           return const Icon(Icons.person, size: 50, color: Colors.grey);
         },
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        content: const Text(
+          'Are you sure you want to log out of your account?',
+          style: TextStyle(color: Colors.grey),
+        ),
+        actions: [
+          // Cancel Button
+          TextButton(
+            onPressed: () => context.pop(), // Closes the dialog
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
+            ),
+          ),
+          // Log Out Button (Destructive)
+          TextButton(
+            onPressed: () {
+              context.pop(); // Close dialog first
+
+              // 1. Clear auth state / tokens here
+              ref.read(settingsProvider.notifier).logout();
+
+              // 2. Navigate to Login screen and clear the stack
+              context.go(Routes.signin);
+
+              // Optional: Show a quick success message
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Logged out successfully')));
+            },
+            child: const Text(
+              'Log Out',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
   }

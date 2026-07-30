@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/core/routing/app_routing.dart';
 
 class TermsAndConditionsScreen extends ConsumerWidget {
   const TermsAndConditionsScreen({super.key});
@@ -67,7 +66,6 @@ class TermsAndConditionsScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -91,50 +89,6 @@ class TermsAndConditionsScreen extends ConsumerWidget {
           height: 1.6, // Better line height for readability
         ),
       ),
-    );
-  }
-
-  // Standard Bottom Navigation
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: 3, // Profile is active (since it's accessed from Settings)
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.school_outlined),
-          activeIcon: Icon(Icons.school),
-          label: 'Courses',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat_bubble_outline),
-          activeIcon: Icon(Icons.chat_bubble),
-          label: 'Messages',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          activeIcon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go(Routes.home);
-            break;
-          case 1:
-            context.go(Routes.course);
-            break;
-          case 2:
-            context.go(Routes.chat);
-            break;
-          case 3:
-            context.go(Routes.profile);
-            break;
-        }
-      },
     );
   }
 }

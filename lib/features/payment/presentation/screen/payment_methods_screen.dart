@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/features/payment/data/provider/payment_method_provider.dart';
 import 'package:lms/features/payment/presentation/widget/payment_method_tile_widget.dart';
-
 
 class PaymentMethodsScreen extends ConsumerWidget {
   const PaymentMethodsScreen({super.key});
@@ -69,7 +68,7 @@ class PaymentMethodsScreen extends ConsumerWidget {
                       icon: const Icon(Icons.add, color: Colors.white),
                       label: const Text(
                         'Add New Payment Method',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.kWhite),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -80,7 +79,6 @@ class PaymentMethodsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -119,49 +117,6 @@ class PaymentMethodsScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: 3,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.school_outlined),
-          activeIcon: Icon(Icons.school),
-          label: 'Courses',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat_bubble_outline),
-          activeIcon: Icon(Icons.chat_bubble),
-          label: 'Messages',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          activeIcon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go(Routes.home);
-            break;
-          case 1:
-            context.go(Routes.course);
-            break;
-          case 2:
-            context.go(Routes.chat);
-            break;
-          case 3:
-            context.go(Routes.profile);
-            break;
-        }
-      },
     );
   }
 }

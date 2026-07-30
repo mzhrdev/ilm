@@ -19,8 +19,10 @@ import 'package:lms/features/enrollment/presentation/screen/enrollment_screen.da
 import 'package:lms/features/home/presentation/screens/home_screen.dart';
 import 'package:lms/features/notification/presentation/screen/notification_screen.dart';
 import 'package:lms/features/onboard/presentation/screens/onboard_screen.dart';
+import 'package:lms/features/payment/presentation/screen/payment_methods_screen.dart';
 import 'package:lms/features/profile/presentation/screen/edit_profile_screen.dart';
 import 'package:lms/features/profile/presentation/screen/profile_screen.dart';
+import 'package:lms/features/helpCenter/presentation/screen/help_center_screen.dart';
 import 'package:lms/features/settings/presentation/screen/setting_screen.dart';
 import 'package:lms/features/splash/presentation/screens/splash_screen.dart';
 import 'package:lms/features/termsncondition/presentation/screen/termsncondition_screen.dart';
@@ -48,6 +50,8 @@ class Routes {
   static const String videoCall = '/videoCall';
   static const String editProfile = '/editProfile';
   static const String terms = '/termsnconditions';
+  static const String payment = '/payment';
+  static const String helpCenter = '/helpCenter';
 }
 
 // Global navigator key
@@ -113,6 +117,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.editProfile, builder: (context, state) => const EditProfileScreen()),
       // Terms and Condition Screen Added
       GoRoute(path: Routes.terms, builder: (context, state) => const TermsAndConditionsScreen()),
+      // Payment Screen
+      GoRoute(path: Routes.payment, builder: (context, state) => const PaymentMethodsScreen()),
+      // Help Center Screen
+      GoRoute(path: Routes.helpCenter, builder: (context, state) => const HelpCenterScreen()),
     ],
   );
 });
