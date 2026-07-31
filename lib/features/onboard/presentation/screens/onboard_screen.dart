@@ -71,7 +71,7 @@ class OnboardScreen extends ConsumerWidget {
                         title: 'CONTINUE',
                         onPress: () {
                           if (isLast) {
-                            context.go(Routes.userType);
+                            context.go(Routes.signin);
                           } else {
                             onboardNotifier.nextPage();
                           }

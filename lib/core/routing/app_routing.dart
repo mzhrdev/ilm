@@ -8,7 +8,6 @@ import 'package:lms/features/auth/presentation/screens/reset_password/reset_pass
 import 'package:lms/features/auth/presentation/screens/reset_password/reset_password_success_screen.dart';
 import 'package:lms/features/auth/presentation/screens/signin_screen.dart';
 import 'package:lms/features/auth/presentation/screens/signup_screen.dart';
-import 'package:lms/features/auth/presentation/screens/user_type_selection_screen.dart';
 import 'package:lms/features/chat/presentation/screen/audio_call_screen.dart';
 import 'package:lms/features/chat/presentation/screen/chat_screen.dart';
 import 'package:lms/features/chat/presentation/screen/conversation_screen.dart';
@@ -16,13 +15,14 @@ import 'package:lms/features/chat/presentation/screen/video_call_screen.dart';
 import 'package:lms/features/courses/presentation/screen/course_detail_screen.dart';
 import 'package:lms/features/courses/presentation/screen/my_course_screen.dart';
 import 'package:lms/features/enrollment/presentation/screen/enrollment_screen.dart';
+import 'package:lms/features/helpCenter/presentation/screen/help_center_screen.dart';
 import 'package:lms/features/home/presentation/screens/home_screen.dart';
+import 'package:lms/features/mainTab/presentation/screen/main_tab_screen.dart';
 import 'package:lms/features/notification/presentation/screen/notification_screen.dart';
 import 'package:lms/features/onboard/presentation/screens/onboard_screen.dart';
 import 'package:lms/features/payment/presentation/screen/payment_methods_screen.dart';
 import 'package:lms/features/profile/presentation/screen/edit_profile_screen.dart';
 import 'package:lms/features/profile/presentation/screen/profile_screen.dart';
-import 'package:lms/features/helpCenter/presentation/screen/help_center_screen.dart';
 import 'package:lms/features/settings/presentation/screen/setting_screen.dart';
 import 'package:lms/features/splash/presentation/screens/splash_screen.dart';
 import 'package:lms/features/termsncondition/presentation/screen/termsncondition_screen.dart';
@@ -31,7 +31,6 @@ class Routes {
   static const String splash = '/';
   static const String onBoard = '/onboard_screen';
   static const String signin = '/signin_screen';
-  static const String userType = '/user_type_Selection_screen';
   static const String signup = '/signup_screen';
   static const String resetPassEmail = '/forgot_password_screen';
   static const String resetPass = '/reset_password_screen';
@@ -66,8 +65,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.splash, builder: (context, index) => SplashScreen()),
       // OnBoard
       GoRoute(path: Routes.onBoard, builder: (context, index) => OnboardScreen()),
-      // UserTypeSelection
-      GoRoute(path: Routes.userType, builder: (context, index) => UserTypeSelectionScreen()),
       // Signin
       GoRoute(path: Routes.signin, builder: (context, index) => SigninScreen()),
       // Signup
@@ -87,6 +84,43 @@ final routerProvider = Provider<GoRouter>((ref) {
           final courseId = state.pathParameters['id']!;
           return CourseDetailScreen(courseId: courseId);
         },
+      ),
+      // -------Screens with Persistent View-------
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainTabScreen(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              // Home
+              GoRoute(path: Routes.home, builder: (context, state) => HomeScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              // My Courses Screen
+              GoRoute(path: Routes.course, builder: (context, state) => MyCoursesScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              // Chat
+              GoRoute(
+                path: Routes.chat,
+                builder: (context, state) {
+                  return ChatScreen();
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              // Profile
+              GoRoute(path: Routes.profile, builder: (context, state) => ProfileScreen()),
+            ],
+          ),
+        ],
       ),
       // Enrollment Screen
       GoRoute(path: Routes.enrollmentScreen, builder: (context, state) => const EnrollmentScreen()),

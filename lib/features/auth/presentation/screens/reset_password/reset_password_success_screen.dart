@@ -36,7 +36,7 @@ class ResetPasswordSuccessScreen extends StatelessWidget {
               borderRadius: context.w(3),
               height: context.h(6.75),
               title: "DONE",
-              onPress: () => context.go(Routes.userType),
+              onPress: () => context.go(Routes.signin),
               buttonColor: AppColors.kPrimary,
             ),
           ],
