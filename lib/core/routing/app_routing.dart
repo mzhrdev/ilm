@@ -76,7 +76,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Reset Password Success Screen
       GoRoute(path: Routes.resetPassSuccess, builder: (context, index) => ResetPasswordSuccessScreen()),
       // Home Screen
-      GoRoute(path: Routes.home, builder: (context, index) => HomeScreen()),
+      // GoRoute(path: Routes.home, builder: (context, index) => HomeScreen()),
       // Course Detailed Screen
       GoRoute(
         path: Routes.courseDetail,
@@ -129,11 +129,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Settings Screen
       GoRoute(path: Routes.settings, builder: (context, state) => const SettingsScreen()),
       // Profile Screen
-      GoRoute(path: Routes.profile, builder: (context, state) => const ProfileScreen()),
+      //GoRoute(path: Routes.profile, builder: (context, state) => const ProfileScreen()),
       // Chat Screen
-      GoRoute(path: Routes.chat, builder: (context, state) => const ChatScreen()),
+      //GoRoute(path: Routes.chat, builder: (context, state) => const ChatScreen()),
       // Course Screen
-      GoRoute(path: Routes.course, builder: (context, state) => const MyCoursesScreen()),
+      // GoRoute(path: Routes.course, builder: (context, state) => const MyCoursesScreen()),
       // Conversation Screen
       GoRoute(
         path: Routes.conversation,
