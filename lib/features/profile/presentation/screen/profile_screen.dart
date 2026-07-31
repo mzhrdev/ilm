@@ -23,7 +23,6 @@ class ProfileScreen extends ConsumerWidget {
           : userProfile == null
           ? const Center(child: Text('No profile data'))
           : _buildProfileContent(context, userProfile),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -202,50 +201,6 @@ class ProfileScreen extends ConsumerWidget {
           return const Icon(Icons.person, size: 50, color: Colors.grey);
         },
       ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: 3, // Profile is active
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.school_outlined),
-          activeIcon: Icon(Icons.school),
-          label: 'Courses',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat_bubble_outline),
-          activeIcon: Icon(Icons.chat_bubble),
-          label: 'Messages',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          activeIcon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go(Routes.home);
-            break;
-          case 1:
-            // TO DO:  Should convert it into courses
-            context.go(Routes.courseDetail);
-            break;
-          case 2:
-            context.go(Routes.chat);
-            break;
-          case 3:
-            // Already on profile
-            break;
-        }
-      },
     );
   }
 }

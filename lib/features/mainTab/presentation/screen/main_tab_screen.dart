@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/features/mainTab/data/list/destination_list.dart';
 
 class MainTabScreen extends ConsumerWidget {
@@ -11,29 +13,41 @@ class MainTabScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar:
-          // Bottom Navigation Bar
-          NavigationBar(
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-            surfaceTintColor: AppColors.kBlack,
-            indicatorShape: CircleBorder(),
-            indicatorColor: AppColors.kTransparent,
-            backgroundColor: AppColors.kSecondary,
-            height: context.h(7.5),
-            destinations: destination
-                .map(
-                  (d) => NavigationDestination(
-                    label: d.label,
-                    icon: Icon(d.icon, color: AppColors.kWhite, size: context.w(8)).centerWidget,
-                  ),
-                )
-                .toList(),
-            onDestinationSelected: (index) =>
-                navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
-            selectedIndex: navigationShell.currentIndex,
-          ),
+    return CustomSafeArea(
+      child: Scaffold(
+        body: navigationShell,
+        bottomNavigationBar:
+            // Bottom Navigation Bar
+            NavigationBar(
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              labelPadding: EdgeInsets.only(bottom: context.h(2)),
+              surfaceTintColor: AppColors.kTransparent,
+              indicatorShape: CircleBorder(),
+              indicatorColor: AppColors.kTransparent,
+              backgroundColor: AppColors.kPrimary,
+              height: context.h(7.5),
+
+              // Control label colors
+              labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return AppTextStyle.kBodyMedium.copyWith(color: AppColors.kWhite);
+                }
+                return TextStyle(color: AppColors.kGrey.withAlpha(100));
+              }),
+              destinations: destination
+                  .map(
+                    (d) => NavigationDestination(
+                      selectedIcon: Icon(d.icon, color: AppColors.kWhite, size: context.h(3.5)),
+                      label: d.label,
+                      icon: Icon(d.icon, color: AppColors.kGrey.withAlpha(170), size: context.h(3.5)),
+                    ).padTop(context.h(2)),
+                  )
+                  .toList(),
+              onDestinationSelected: (index) =>
+                  navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
+              selectedIndex: navigationShell.currentIndex,
+            ),
+      ),
     );
   }
 }
