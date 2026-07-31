@@ -1,12 +1,14 @@
 // lib/features/messages/data/provider/messages_provider.dart
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lms/features/chat/data/dummy_data/mock_messages.dart';
 
 import '../model/chat_model.dart';
 
 enum MessageTab { chat, calls }
 
-final messagesProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {
+final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {
   return ChatNotifier();
 });
 
@@ -15,9 +17,11 @@ class ChatState {
   final MessageTab currentTab;
   final bool isLoading;
   final String searchQuery;
+  final TextEditingController searchController;
 
   ChatState({
     required this.messages,
+    required this.searchController,
     this.currentTab = MessageTab.chat,
     this.isLoading = false,
     this.searchQuery = '',
@@ -41,8 +45,11 @@ class ChatState {
     MessageTab? currentTab,
     bool? isLoading,
     String? searchQuery,
+    TextEditingController? searchController,
+    String? selectedTab,
   }) {
     return ChatState(
+      searchController: searchController ?? this.searchController,
       messages: messages ?? this.messages,
       currentTab: currentTab ?? this.currentTab,
       isLoading: isLoading ?? this.isLoading,
@@ -52,73 +59,23 @@ class ChatState {
 }
 
 class ChatNotifier extends StateNotifier<ChatState> {
-  ChatNotifier() : super(ChatState(messages: _mockMessages, isLoading: true)) {
-    _loadMessages();
+  ChatNotifier()
+    : super(ChatState(messages: mockMessages, isLoading: true, searchController: TextEditingController())) {
+    loadMessages();
   }
 
-  static final List<ChatModel> _mockMessages = [
-    ChatModel(
-      id: '1',
-      senderId: 'user_2',
-      senderName: 'Ateeq Taj',
-      senderAvatar: null,
-      lastMessage: "Hi, How's you? How's everything?",
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      unreadCount: 3,
-      isOnline: true,
-    ),
-    ChatModel(
-      id: '2',
-      senderId: 'user_3',
-      senderName: 'Ateeq Taj',
-      senderAvatar: null,
-      lastMessage: "Hi, How's you? How's everything?",
-      timestamp: DateTime.now().subtract(const Duration(minutes: 30)),
-      unreadCount: 3,
-      isOnline: false,
-    ),
-    ChatModel(
-      id: '3',
-      senderId: 'user_4',
-      senderName: 'Ateeq Taj',
-      senderAvatar: null,
-      lastMessage: "Hi, How's you? How's everything?",
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      unreadCount: 3,
-      isOnline: true,
-    ),
-    ChatModel(
-      id: '4',
-      senderId: 'user_5',
-      senderName: 'John Doe',
-      senderAvatar: null,
-      lastMessage: 'Thanks for the update!',
-      timestamp: DateTime.now().subtract(const Duration(hours: 5)),
-      unreadCount: 0,
-      isOnline: false,
-    ),
-    ChatModel(
-      id: '5',
-      senderId: 'user_6',
-      senderName: 'Sarah Smith',
-      senderAvatar: null,
-      lastMessage: 'See you tomorrow',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      unreadCount: 1,
-      isOnline: true,
-    ),
-  ];
-
-  Future<void> _loadMessages() async {
+  Future<void> loadMessages() async {
     state = state.copyWith(isLoading: true);
 
     // Simulate API call
     await Future.delayed(const Duration(milliseconds: 500));
 
-    state = state.copyWith(messages: _mockMessages, isLoading: false);
+    state = state.copyWith(messages: mockMessages, isLoading: false);
   }
 
-  void switchTab(MessageTab tab) {
+    // tab switching handled here
+    void switchTab(MessageTab tab) {
+    if (state.currentTab == tab) return; 
     state = state.copyWith(currentTab: tab);
   }
 
@@ -146,6 +103,6 @@ class ChatNotifier extends StateNotifier<ChatState> {
   }
 
   Future<void> refreshMessages() async {
-    await _loadMessages();
+    await loadMessages();
   }
 }

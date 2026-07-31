@@ -1,6 +1,10 @@
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/chat/data/provider/call_provider.dart';
 import 'package:lms/features/chat/data/provider/chat_provider.dart';
@@ -26,122 +30,112 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final messagesState = ref.watch(messagesProvider);
+    final chatState = ref.watch(chatProvider);
+    final chatNotifier = ref.read(chatProvider.notifier);
     final callsState = ref.watch(callsProvider);
-    final messages = messagesState.filteredMessages;
+    final messages = chatState.filteredMessages;
     final calls = callsState.filteredCalls;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.kWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.kWhite,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.kBlack),
           onPressed: () => context.go(Routes.home),
         ),
-        title: const Text(
-          'Inbox',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
+        title: const Text('Inbox', style: AppTextStyle.kHeading),
       ),
       body: Column(
         children: [
           // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search Here',
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              onChanged: (value) {
-                if (_selectedTab == 'Chat') {
-                  ref.read(messagesProvider.notifier).setSearchQuery(value);
-                } else {
-                  ref.read(callsProvider.notifier).setSearchQuery(value);
-                }
-              },
-            ),
+          CustomTextField(
+            controller: chatState.searchController,
+            hintText: 'Search Here',
+            labelText: null,
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.search,
+            validator: FieldValidator.alphaNumeric(),
+            preFixIcon: Icons.search,
+            isPrefixIconEnabled: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: context.w(3), vertical: context.h(2)),
+            onSubmitted: (value) {
+              if (_selectedTab == 'Chat') {
+                ref.read(chatProvider.notifier).setSearchQuery(value!);
+              } else {
+                ref.read(callsProvider.notifier).setSearchQuery(value!);
+              }
+            },
           ),
 
           // Tabs
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              height: 44,
-              decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedTab = 'Chat';
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: _selectedTab == 'Chat' ? Colors.black : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Chat',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: _selectedTab == 'Chat' ? Colors.white : Colors.grey[700],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedTab = 'Calls';
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: _selectedTab == 'Calls' ? Colors.black : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Calls',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              color: _selectedTab == 'Calls' ? Colors.white : Colors.grey[700],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          Container(
+            height: context.h(9),
+            decoration: BoxDecoration(
+              color: AppColors.kGrey,
+              borderRadius: BorderRadius.circular(context.w(6)),
             ),
-          ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      // TO DO: Changing selected tab value to chat
+                      chatNotifier.switchTab;
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: chatState.selectedTab == 'Chat' ? AppColors.kBlack : AppColors.kTransparent,
+                        borderRadius: BorderRadius.circular(context.w(4)),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Chat',
+                          style: AppTextStyle.kBodyMedium.copyWith(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: chatState.selectedTab == 'Chat' ? AppColors.kWhite : AppColors.kGrey,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      // TO DO: Changing selected tab value to calls
+                      chatNotifier.switchTab;
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _selectedTab == 'Calls' ? Colors.black : Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Calls',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: _selectedTab == 'Calls' ? Colors.white : Colors.grey[700],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ).padHrz(context.w(3)),
 
           const SizedBox(height: 16),
 
           // Content based on selected tab
           Expanded(
-            child: _selectedTab == 'Chat'
-                ? _buildChatList(messagesState, messages)
+            child: chatState.selectedTab == 'Chat'
+                ? _buildChatList(chatState, messages)
                 : _buildCallsList(callsState, calls),
           ),
         ],
@@ -163,7 +157,7 @@ class _MessagesScreenState extends ConsumerState<ChatScreen> {
               return ChatListItem(
                 message: message,
                 onTap: () {
-                  ref.read(messagesProvider.notifier).markAsRead(message.id);
+                  ref.read(chatProvider.notifier).markAsRead(message.id);
                   context.push('${Routes.conversation}?name=${Uri.encodeComponent(message.senderName)}');
                 },
               );
