@@ -1,6 +1,9 @@
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/courses/data/provider/course_provider.dart';
 import 'package:lms/features/courses/presentation/widget/my_course_card.dart';
@@ -13,20 +16,17 @@ class MyCoursesScreen extends ConsumerWidget {
     final coursesAsync = ref.watch(coursesProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.kWhite,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.kWhite,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.kBlack),
           onPressed: () {
             context.go(Routes.home);
           },
         ),
-        title: const Text(
-          'My Courses',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
+        title: const Text('My Courses', style: AppTextStyle.kHeading),
       ),
       body: coursesAsync.when(
         data: (allCourses) {
@@ -38,9 +38,9 @@ class MyCoursesScreen extends ConsumerWidget {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.only(top: 16, bottom: 80), // Space for bottom nav
+            //padding: EdgeInsets.only(top: context.h(1.75), bottom: context.h(2)),
             itemCount: myCourses.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 4),
+            separatorBuilder: (context, index) => SizedBox(height: context.h(0.5)),
             itemBuilder: (context, index) {
               return MyCourseCard(course: myCourses[index]);
             },
@@ -51,11 +51,14 @@ class MyCoursesScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 48),
-              const SizedBox(height: 16),
+              Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(5)),
+              SizedBox(height: context.h(2)),
               Text('Error: $error'),
-              const SizedBox(height: 16),
-              ElevatedButton(onPressed: () => ref.invalidate(coursesProvider), child: const Text('Retry')),
+              SizedBox(height: context.h(2)),
+              ElevatedButton(
+                onPressed: () => ref.invalidate(coursesProvider),
+                child: const Text('Retry', style: AppTextStyle.kBodyLarge),
+              ),
             ],
           ),
         ),
@@ -68,20 +71,31 @@ class MyCoursesScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.school_outlined, size: 80, color: Colors.grey[300]),
+          Icon(Icons.school_outlined, size: 80, color: AppColors.kGrey),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No courses yet',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey),
+            style: AppTextStyle.kBodyLarge.copyWith(
+              fontSize: context.h(3.5),
+              fontWeight: FontWeight.w600,
+              color: AppColors.kGrey,
+            ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: context.h(1)),
           Text(
             'Enroll in courses to see them here',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            style: AppTextStyle.kBodyLarge.copyWith(
+              fontSize: context.h(3.5),
+              fontWeight: FontWeight.w600,
+              color: AppColors.kGrey,
+            ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
-          ElevatedButton(onPressed: () => context.go(Routes.home), child: const Text('Browse Courses')),
+          SizedBox(height: context.h(3)),
+          ElevatedButton(
+            onPressed: () => context.go(Routes.home),
+            child: const Text('Browse Courses', style: AppTextStyle.kBodyLarge),
+          ),
         ],
       ),
     );

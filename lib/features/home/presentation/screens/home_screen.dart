@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/presentation/widgets/custom_text_button.dart';
 import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
@@ -27,10 +28,10 @@ class HomeScreen extends ConsumerWidget {
     final categories = ref.watch(categoriesProvider);
     final coursesAsync = ref.watch(coursesProvider);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: CustomScrollView(
+    return CustomSafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: CustomScrollView(
           slivers: [
             // Header
             SliverToBoxAdapter(child: _buildHeader(context, user.name)),
@@ -49,7 +50,7 @@ class HomeScreen extends ConsumerWidget {
                   Text('Continue Watching', style: AppTextStyle.kBodyLarge),
                   CustomTextButton(text: 'See All', onPressed: null),
                 ],
-              ).padOnly(left: context.w(8), right: context.w(8), top: context.h(4), bottom: context.h(2)),
+              ).padOnly(top: context.h(1), bottom: context.h(2)),
             ),
 
             // Course Grid
@@ -92,40 +93,34 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
-      ),
+      ).padHrz(context.w(3.5)),
     );
   }
 
   // Home Screen Header
   Widget _buildHeader(BuildContext context, String userName) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Welcome, $userName',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
-          ),
-          Row(
-            children: [
-              // Settings Button
-              CustomIconButton(
-                onTap: () => context.push(Routes.settings),
-                icon: Icons.settings,
-                iconColor: AppColors.kPrimary,
-              ),
-              // Notification Button
-              CustomIconButton(
-                onTap: () => context.push(Routes.notification),
-                icon: Icons.notifications,
-                iconColor: AppColors.kPrimary,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('Welcome, $userName', style: AppTextStyle.kHeading),
+        Row(
+          children: [
+            // Settings Button
+            CustomIconButton(
+              onTap: () => context.push(Routes.settings),
+              icon: Icons.settings,
+              iconColor: AppColors.kPrimary,
+            ),
+            // Notification Button
+            CustomIconButton(
+              onTap: () => context.push(Routes.notification),
+              icon: Icons.notifications,
+              iconColor: AppColors.kPrimary,
+            ),
+          ],
+        ),
+      ],
+    ).padAll(context.w(2.5));
   }
 
   // Search Bar
@@ -141,6 +136,8 @@ class HomeScreen extends ConsumerWidget {
       borderRadius: context.w(5),
       fillColor: AppColors.kWhite.withAlpha(100),
       validator: FieldValidator.alphaNumeric(),
+      enabledBorderColor: AppColors.kGrey,
+      focusedBorderColor: AppColors.kGrey,
     );
   }
 
@@ -152,7 +149,7 @@ class HomeScreen extends ConsumerWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => SizedBox(width: context.w(2)),
         itemBuilder: (context, index) {
           return CategoryChip(label: categories[index], isSelected: index < 3, onTap: () {});
         },
@@ -162,20 +159,17 @@ class HomeScreen extends ConsumerWidget {
 
   // Build Course Grid Method
   Widget _buildCourseGrid(List<CourseModel> courses, BuildContext context) {
-    return SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: context.w(5)),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        delegate: SliverChildBuilderDelegate((context, index) {
-          final course = courses[index];
-          return CourseCard(course: course);
-        }, childCount: courses.length),
+    return SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
       ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final course = courses[index];
+        return CourseCard(course: course);
+      }, childCount: courses.length),
     );
   }
 }

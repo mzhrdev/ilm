@@ -1,8 +1,11 @@
 // lib/features/home/presentation/widgets/course_card.dart
 
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_assets.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/routing/app_routing.dart';
 
 import '../../data/model/course_model.dart';
@@ -22,7 +25,7 @@ class CourseCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2)),
+            BoxShadow(color: AppColors.kBlack.withAlpha(30), blurRadius: 10, offset: const Offset(0, 2)),
           ],
         ),
         child: Column(
@@ -32,60 +35,54 @@ class CourseCard extends StatelessWidget {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: BoxDecoration(color: Colors.grey[300]),
+                decoration: BoxDecoration(color: AppColors.kGrey),
                 child: _buildThumbnail(),
               ),
             ),
             // Course Info
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    course.title,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'By ${course.instructorName}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  // Rating and Progress
-                  Row(
-                    children: [
-                      Icon(Icons.star, size: 16, color: Colors.amber[700]),
-                      const SizedBox(width: 4),
-                      Text(
-                        course.rating.toString(),
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                      ),
-                      const Spacer(),
-                      Text(
-                        '${(course.progress * 100).toInt()}% Done',
-                        style: TextStyle(fontSize: 10, color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  // Progress Bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: course.progress,
-                      minHeight: 4,
-                      backgroundColor: Colors.grey[200],
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  course.title,
+                  style: AppTextStyle.kBodyMedium.copyWith(fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: context.h(0.35)),
+                Text(
+                  'By ${course.instructorName}',
+                  style: AppTextStyle.kBodySmall.copyWith(fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: context.h(1.25)),
+                // Rating and Progress
+                Row(
+                  children: [
+                    Icon(Icons.star, size: 16, color: AppColors.kAmber),
+                    SizedBox(width: context.w(2)),
+                    Text(course.rating.toString(), style: AppTextStyle.kBodySmall),
+                    const Spacer(),
+                    Text(
+                      '${(course.progress * 100).toInt()}% Done',
+                      style: AppTextStyle.kBodySmall.copyWith(fontSize: context.h(1.25)),
                     ),
+                  ],
+                ),
+                SizedBox(height: context.h(0.5)),
+                // Progress Bar
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: LinearProgressIndicator(
+                    value: course.progress,
+                    minHeight: 4,
+                    backgroundColor: AppColors.kGrey.withAlpha(400),
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.kBlack),
                   ),
-                ],
-              ),
-            ),
+                ),
+              ],
+            ).padAll(context.w(3)),
           ],
         ),
       ),

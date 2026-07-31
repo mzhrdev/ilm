@@ -1,35 +1,33 @@
 // lib/features/home/presentation/widgets/category_chip.dart
 
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 
 class CategoryChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const CategoryChip({
-    super.key,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const CategoryChip({super.key, required this.label, required this.isSelected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: context.w(2), vertical: context.h(.75)),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.grey[100],
+          color: isSelected ? AppColors.kBlue : AppColors.kGrey,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+          style: AppTextStyle.kBodyMedium.copyWith(
+            color: isSelected ? AppColors.kWhite : AppColors.kBlack,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            fontSize: 14,
+            fontSize: context.h(1.75),
           ),
         ),
       ),
