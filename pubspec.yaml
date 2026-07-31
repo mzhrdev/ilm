@@ -21,6 +21,8 @@ dependencies:
   cached_network_image: ^3.4.1
   step_progress_indicator: ^1.0.2
   go_router: ^17.0.0
+  firebase_core: ^4.12.1
+  firebase_auth: ^6.5.6
 
 dev_dependencies:
   flutter_test:
