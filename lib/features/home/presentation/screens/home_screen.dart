@@ -2,8 +2,14 @@ import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
+import 'package:lms/core/presentation/widgets/custom_text_button.dart';
+import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/home/data/providers/home_provider.dart';
 
 import '../../../courses/data/provider/course_provider.dart';
 import '../../../courses/presentation/widget/course_card.dart';
@@ -16,6 +22,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final home = ref.watch(homeProvider);
     final user = ref.watch(userProvider);
     final categories = ref.watch(categoriesProvider);
     final coursesAsync = ref.watch(coursesProvider);
@@ -29,23 +36,20 @@ class HomeScreen extends ConsumerWidget {
             SliverToBoxAdapter(child: _buildHeader(context, user.name)),
 
             // Search Bar
-            SliverToBoxAdapter(child: _buildSearchBar()),
+            SliverToBoxAdapter(child: _buildSearchBar(home.homeSearchController, context)),
 
             // Categories
             SliverToBoxAdapter(child: _buildCategories(categories, context)),
 
             // Continue Watching Section
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Continue Watching', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                    TextButton(onPressed: null, child: Text('See All')),
-                  ],
-                ),
-              ),
+            SliverToBoxAdapter(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Continue Watching', style: AppTextStyle.kBodyLarge),
+                  CustomTextButton(text: 'See All', onPressed: null),
+                ],
+              ).padOnly(left: context.w(8), right: context.w(8), top: context.h(4), bottom: context.h(2)),
             ),
 
             // Course Grid
@@ -54,32 +58,29 @@ class HomeScreen extends ConsumerWidget {
                 final continueWatching = allCourses.where((course) => course.progress > 0).toList();
 
                 if (continueWatching.isEmpty) {
-                  return const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Text('No courses in progress yet.', style: TextStyle(color: Colors.grey)),
-                      ),
+                  return SliverToBoxAdapter(
+                    child: Center(
+                      child: Text(
+                        'No courses in progress yet.',
+                        style: AppTextStyle.kBodyLarge,
+                      ).padAll(context.h(4)),
                     ),
                   );
                 }
 
-                return _buildCourseGrid(continueWatching);
+                return _buildCourseGrid(continueWatching, context);
               },
-              loading: () => const SliverToBoxAdapter(
-                child: Center(
-                  child: Padding(padding: EdgeInsets.all(32.0), child: CircularProgressIndicator()),
-                ),
-              ),
+              loading: () =>
+                  SliverToBoxAdapter(child: Center(child: CircularProgressIndicator().padAll(context.h(9)))),
               error: (error, stack) => SliverToBoxAdapter(
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                      const SizedBox(height: 8),
+                      SizedBox(height: context.h(4)),
                       Text('Error: $error'),
-                      const SizedBox(height: 16),
+                      SizedBox(height: context.h(8)),
                       ElevatedButton(
                         onPressed: () => ref.invalidate(coursesProvider),
                         child: const Text('Retry'),
@@ -95,6 +96,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  // Home Screen Header
   Widget _buildHeader(BuildContext context, String userName) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -107,13 +109,17 @@ class HomeScreen extends ConsumerWidget {
           ),
           Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.settings_outlined),
-                onPressed: () => context.push(Routes.settings),
+              // Settings Button
+              CustomIconButton(
+                onTap: () => context.push(Routes.settings),
+                icon: Icons.settings,
+                iconColor: AppColors.kPrimary,
               ),
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () => context.push(Routes.notification),
+              // Notification Button
+              CustomIconButton(
+                onTap: () => context.push(Routes.notification),
+                icon: Icons.notifications,
+                iconColor: AppColors.kPrimary,
               ),
             ],
           ),
@@ -122,21 +128,23 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Search Here',
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-          filled: true,
-          fillColor: Colors.grey[100],
-        ),
-      ),
+  // Search Bar
+  Widget _buildSearchBar(TextEditingController controller, BuildContext context) {
+    return CustomTextField(
+      controller: controller,
+      hintText: 'Search Here',
+      labelText: null,
+      keyboardType: TextInputType.text,
+      textInputAction: TextInputAction.search,
+      isPrefixIconEnabled: true,
+      preFixIcon: Icons.search,
+      borderRadius: context.w(5),
+      fillColor: AppColors.kWhite.withAlpha(100),
+      validator: FieldValidator.alphaNumeric(),
     );
   }
 
+  // Categories Method
   Widget _buildCategories(List<String> categories, BuildContext context) {
     return SizedBox(
       height: context.h(7),
@@ -152,9 +160,10 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCourseGrid(List<CourseModel> courses) {
+  // Build Course Grid Method
+  Widget _buildCourseGrid(List<CourseModel> courses, BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: context.w(5)),
       sliver: SliverGrid(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,

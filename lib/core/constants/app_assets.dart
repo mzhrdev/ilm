@@ -23,4 +23,12 @@ class AppIcons {
   static const googleIcon = "assets/icons/google_logo.png";
   static const appleIcon = "assets/icons/apple_logo.png";
   static const facebookIcon = "assets/icons/facebook_logo.png";
+
+  // Bottom Nav Bar
+  static const profile = 'assets/icons/profile.png';
+  static const chat = 'assets/icons/chat.png';
+  static const home = 'assets/icons/home.png';
+  static const settings = 'assets/icons/settings.png';
+  static const notification = 'assets/icons/notification.png';
+  static const course = 'assets/icons/course.png';
 }

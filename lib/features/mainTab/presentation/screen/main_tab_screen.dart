@@ -37,9 +37,13 @@ class MainTabScreen extends ConsumerWidget {
               destinations: destination
                   .map(
                     (d) => NavigationDestination(
-                      selectedIcon: Icon(d.icon, color: AppColors.kWhite, size: context.h(3.5)),
+                      selectedIcon: Image.asset(d.icon, color: AppColors.kWhite, height: context.h(3.5)),
                       label: d.label,
-                      icon: Icon(d.icon, color: AppColors.kGrey.withAlpha(170), size: context.h(3.5)),
+                      icon: Image.asset(
+                        d.icon,
+                        color: AppColors.kGrey.withAlpha(170),
+                        height: context.h(3.5),
+                      ),
                     ).padTop(context.h(2)),
                   )
                   .toList(),
