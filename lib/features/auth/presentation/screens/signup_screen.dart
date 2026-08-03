@@ -20,13 +20,14 @@ class SignupScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(authProvider);
+    final auth = ref.watch(authProvider);
+    final authNotifier = ref.read(authProvider.notifier);
     return CustomSafeArea(
       child: Scaffold(
         backgroundColor: AppColors.kWhite,
         body: SingleChildScrollView(
           child: Form(
-            key: state.signUpFormKey,
+            key: auth.signUpFormKey,
             child: Column(
               children: [
                 Row(
@@ -58,7 +59,7 @@ class SignupScreen extends ConsumerWidget {
                   borderWidth: context.w(0.5),
                   focusedBorderColor: AppColors.kPrimary.withAlpha(100),
                   enabledBorderColor: AppColors.kPrimary.withAlpha(100),
-                  controller: state.userNameController,
+                  controller: auth.userNameController,
                   hintText: 'Enter Your Name',
                   labelText: null,
                   keyboardType: TextInputType.text,
@@ -76,7 +77,7 @@ class SignupScreen extends ConsumerWidget {
                   borderWidth: context.w(0.5),
                   focusedBorderColor: AppColors.kPrimary.withAlpha(100),
                   enabledBorderColor: AppColors.kPrimary.withAlpha(100),
-                  controller: state.authEmailController,
+                  controller: auth.authEmailController,
                   hintText: "...@gmail.com",
                   labelText: null,
                   keyboardType: TextInputType.emailAddress,
@@ -92,7 +93,7 @@ class SignupScreen extends ConsumerWidget {
                 CustomPasswordTextField(
                   cursorColor: AppColors.kPrimary,
                   borderWidth: context.w(0.5),
-                  controller: state.authPasswordController,
+                  controller: auth.authPasswordController,
                   hintText: "xX1@....",
                   labelText: null,
                   focusedBorderColor: AppColors.kPrimary.withAlpha(100),
@@ -110,23 +111,29 @@ class SignupScreen extends ConsumerWidget {
                 CustomPasswordTextField(
                   cursorColor: AppColors.kPrimary,
                   borderWidth: context.w(0.5),
-                  controller: state.confirmPassController,
+                  controller: auth.confirmPassController,
                   hintText: null,
                   labelText: null,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.done,
-                  validator: FieldValidator.equalTo(state.authPasswordController),
+                  validator: FieldValidator.equalTo(auth.authPasswordController),
                   focusedBorderColor: AppColors.kPrimary.withAlpha(100),
                   enabledBorderColor: AppColors.kPrimary.withAlpha(100),
                 ).padBottom(context.h(3)),
                 // signup button
                 CustomElevatedButton(
+                  loading: auth.isLoading,
                   elevation: 0,
                   bWidth: double.infinity,
                   borderRadius: context.w(3),
                   height: context.h(6.5),
                   title: "SIGN UP",
-                  onPress: () => context.go(Routes.home),
+                  onPress: () async {
+                    final success = await authNotifier.signUp();
+                    if (success) {
+                      context.go(Routes.home);
+                    }
+                  },
                   buttonColor: AppColors.kPrimary,
                 ).padBottom(15),
                 // Screen Divider

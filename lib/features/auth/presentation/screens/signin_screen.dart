@@ -84,6 +84,7 @@ class SigninScreen extends ConsumerWidget {
 
                 // Signin Button
                 CustomElevatedButton(
+                  loading: auth.isLoading,
                   elevation: 0,
                   bWidth: context.w(95),
                   borderRadius: context.w(3),

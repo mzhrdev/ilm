@@ -103,8 +103,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   // SIGN UP
-  Future<void> signUp() async {
-    if (!state.signUpFormKey.currentState!.validate()) return;
+  Future<bool> signUp() async {
+    if (!state.signUpFormKey.currentState!.validate()) return false;
 
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
@@ -115,9 +115,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
 
       state = state.copyWith(isLoading: false, user: result.user);
+      return true;
     } on FirebaseAuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
     }
+    return false;
   }
 
   // SIGN IN
