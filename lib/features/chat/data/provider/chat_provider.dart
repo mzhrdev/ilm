@@ -1,10 +1,7 @@
-// lib/features/messages/data/provider/messages_provider.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/features/chat/data/dummy_data/mock_messages.dart';
-
-import '../model/chat_model.dart';
+import 'package:lms/features/chat/data/model/chat_model.dart';
 
 enum MessageTab { chat, calls }
 
@@ -28,16 +25,18 @@ class ChatState {
   });
 
   List<ChatModel> get filteredMessages {
-    if (searchQuery.isEmpty) {
-      return messages;
+    final filtered = searchQuery.isEmpty
+        ? messages
+        : messages.where((message) {
+            return message.senderName.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                message.lastMessage.toLowerCase().contains(searchQuery.toLowerCase());
+          }).toList();
+
+    if (currentTab == MessageTab.calls) {
+      return filtered.where((m) => m.type == MessageType.call).toList();
     }
-    return messages
-        .where(
-          (message) =>
-              message.senderName.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              message.lastMessage.toLowerCase().contains(searchQuery.toLowerCase()),
-        )
-        .toList();
+
+    return filtered;
   }
 
   ChatState copyWith({
@@ -73,9 +72,9 @@ class ChatNotifier extends StateNotifier<ChatState> {
     state = state.copyWith(messages: mockMessages, isLoading: false);
   }
 
-    // tab switching handled here
-    void switchTab(MessageTab tab) {
-    if (state.currentTab == tab) return; 
+  // tab switching handled here
+  void switchTab(MessageTab tab) {
+    if (state.currentTab == tab) return;
     state = state.copyWith(currentTab: tab);
   }
 

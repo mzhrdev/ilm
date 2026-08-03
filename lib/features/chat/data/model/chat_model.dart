@@ -1,4 +1,4 @@
-// lib/features/messages/data/model/message_model.dart
+enum MessageType { chat, call }
 
 class ChatModel {
   final String id;
@@ -9,6 +9,7 @@ class ChatModel {
   final DateTime timestamp;
   final int unreadCount;
   final bool isOnline;
+  final MessageType type;
 
   ChatModel({
     required this.id,
@@ -19,6 +20,7 @@ class ChatModel {
     required this.timestamp,
     this.unreadCount = 0,
     this.isOnline = false,
+    this.type = MessageType.chat,
   });
 
   String get formattedTime {
@@ -52,6 +54,7 @@ class ChatModel {
       timestamp: DateTime.parse(json['timestamp'] as String),
       unreadCount: json['unreadCount'] as int? ?? 0,
       isOnline: json['isOnline'] as bool? ?? false,
+      type: json['type'] == 'call' ? MessageType.call : MessageType.chat,
     );
   }
 
@@ -65,6 +68,7 @@ class ChatModel {
       'timestamp': timestamp.toIso8601String(),
       'unreadCount': unreadCount,
       'isOnline': isOnline,
+      'type': type == MessageType.call ? 'call' : 'chat',
     };
   }
 
@@ -77,6 +81,7 @@ class ChatModel {
     DateTime? timestamp,
     int? unreadCount,
     bool? isOnline,
+    MessageType? type,
   }) {
     return ChatModel(
       id: id ?? this.id,
@@ -87,6 +92,7 @@ class ChatModel {
       timestamp: timestamp ?? this.timestamp,
       unreadCount: unreadCount ?? this.unreadCount,
       isOnline: isOnline ?? this.isOnline,
+      type: type ?? this.type,
     );
   }
 }
