@@ -7,7 +7,6 @@ import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/home/presentation/widgets/skill_chip.dart';
-
 import '../../data/provider/profile_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
