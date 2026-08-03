@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier();
@@ -140,6 +141,47 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
     }
     return false;
+  }
+
+  // Google Sign In
+  Future<bool> signInWithGoogle() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    try {
+      // 1. Reference the initialized singleton instance
+      final googleSignIn = GoogleSignIn.instance;
+
+      // 2. Authentication (Identity Flow)
+      // This triggers the modern Credential Manager sheet / Account Picker
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
+
+      // 3. Authorization (Permissions Flow)
+      // Explicitly request scopes to safely extract the modern Access Token
+      final List<String> scopes = ['email', 'profile'];
+      final clientAuth = await googleUser.authorizationClient.authorizeScopes(scopes);
+
+      // 4. Retrieve Identity Details
+      final authDetails = googleUser.authentication;
+
+      // 5. Create the Firebase Credential using tokens from both steps
+      final credential = GoogleAuthProvider.credential(
+        idToken: authDetails.idToken, // From the identity authentication layer
+        accessToken: clientAuth.accessToken, // From the explicit authorization layer
+      );
+
+      // 6. Sign in to Firebase Auth
+      await _auth.signInWithCredential(credential);
+
+      state = state.copyWith(isLoading: false);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.message);
+      return false;
+    } catch (e) {
+      // Catch generic/platform exceptions thrown by the Google SDK
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
+    }
   }
 
   // RESET PASSWORD

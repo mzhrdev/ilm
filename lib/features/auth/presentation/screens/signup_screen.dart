@@ -174,7 +174,12 @@ class SignupScreen extends ConsumerWidget {
                   title: "Sign Up With Google",
                   textColor: AppColors.kBlack,
                   borderSide: BorderSide(color: AppColors.kPrimary.withAlpha(100), width: context.w(0.5)),
-                  onPress: () {},
+                  onPress: () async {
+                    final success = await authNotifier.signInWithGoogle();
+                    if (success) {
+                      context.go(Routes.home);
+                    }
+                  },
                   buttonColor: AppColors.kTransparent,
                 ).padBottom(context.h(3)),
 
