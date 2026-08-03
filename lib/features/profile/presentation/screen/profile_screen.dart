@@ -20,14 +20,7 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Profile',
-          style: AppTextStyle.kBodyLarge.copyWith(
-            fontSize: context.h(3),
-            fontWeight: FontWeight.bold,
-            color: AppColors.kBlack,
-          ),
-        ),
+        title: Text('Profile', style: AppTextStyle.kHeading),
         leading: CustomIconButton(
           onTap: () => context.go(Routes.home),
           icon: Icons.arrow_back_ios_new,
@@ -68,95 +61,118 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  // Profile Card
+  // Profile Card Builder
   Widget _buildProfileContent(BuildContext context, userProfile) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Content
-        Expanded(
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Profile Card
-              Container(
-                width: double.infinity,
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Profile Card
+            Center(
+              child: Container(
+                width: context.w(90),
+                height: context.h(50),
                 decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.blue[100]!),
+                  color: AppColors.kBlue.withAlpha(60),
+                  borderRadius: BorderRadius.circular(context.w(5)),
+                  border: Border.all(color: AppColors.kBlue),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(15),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Edit Button
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: IconButton(
-                          onPressed: () {
-                            context.push(Routes.editProfile);
-                          },
-                          icon: const Icon(Icons.edit, size: 18, color: Colors.black87),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: const CircleBorder(),
-                            padding: const EdgeInsets.all(8),
-                            elevation: 2,
+                      // Scrollable Content Area
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Edit Button
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: IconButton(
+                                  onPressed: () => context.push(Routes.editProfile),
+                                  icon: Icon(Icons.edit, size: context.w(6), color: AppColors.kBlack),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: AppColors.kWhite,
+                                    shape: const CircleBorder(),
+                                    padding: EdgeInsets.all(context.w(3)),
+                                    elevation: 2,
+                                  ),
+                                ),
+                              ),
+
+                              // Name
+                              Center(
+                                child: Text(
+                                  userProfile.name,
+                                  style: AppTextStyle.kHeading,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+
+                              // Email
+                              Center(
+                                child: Text(
+                                  userProfile.email,
+                                  style: AppTextStyle.kBodyLarge,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+
+                              SizedBox(height: context.h(3)),
+
+                              // About
+                              Text('About Me', style: AppTextStyle.kDisplayTitle),
+                              SizedBox(height: context.h(1.5)),
+                              Text(
+                                userProfile.about ?? 'No about information',
+                                style: AppTextStyle.kBodyMedium,
+                              ),
+
+                              SizedBox(height: context.h(3)),
+
+                              // Skills
+                              const Text('My Skills', style: AppTextStyle.kDisplayTitle),
+                              SizedBox(height: context.h(1.5)),
+                              Wrap(
+                                spacing: context.w(4),
+                                runSpacing: context.w(4),
+                                children: (userProfile.skills ?? [])
+                                    .map<SkillChip>((skill) => SkillChip(label: skill))
+                                    .toList(),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-
-                      // Name
-                      Center(child: Text(userProfile.name, style: AppTextStyle.kBodyLarge)),
-
-                      // Email
-                      Center(child: Text(userProfile.email, style: AppTextStyle.kBodyLarge)),
-
-                      const SizedBox(height: 24),
-
-                      // About
-                      const Text('About Me', style: AppTextStyle.kBodyLarge),
-                      const SizedBox(height: 8),
-                      Text(userProfile.about ?? 'No about information', style: AppTextStyle.kBodyMedium),
-
-                      const SizedBox(height: 24),
-
-                      // Skills
-                      const Text('My Skills', style: AppTextStyle.kBodyLarge),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: context.w(4),
-                        runSpacing: context.w(4),
-                        children: (userProfile.skills ?? [])
-                            .map<SkillChip>((skill) => SkillChip(label: skill))
-                            .toList(),
-                      ),
                     ],
-                  ).padOnly(),
-                ),
-              ),
-
-              /// Profile Image
-              Positioned(
-                top: -context.h(4),
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: AppColors.kGrey,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.kWhite, width: context.w(2)),
-                    ),
-                    child: _buildProfileImage(userProfile.profileImageUrl, context),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+
+            /// Profile Image
+            Positioned(
+              top: -context.h(4.5),
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: AppColors.kGrey,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.kWhite, width: context.w(1)),
+                  ),
+                  child: _buildProfileImage(userProfile.profileImageUrl, context),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -164,7 +180,7 @@ class ProfileScreen extends ConsumerWidget {
 
   Widget _buildProfileImage(String? imageUrl, BuildContext context) {
     if (imageUrl == null || imageUrl.isEmpty) {
-      return Icon(Icons.person, size: context.h(8), color: AppColors.kGrey);
+      return Icon(Icons.person, size: context.h(8), color: AppColors.kWhite);
     }
 
     return ClipOval(
@@ -172,7 +188,7 @@ class ProfileScreen extends ConsumerWidget {
         imageUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return Icon(Icons.person, size: context.h(8), color: AppColors.kGrey);
+          return Icon(Icons.person, size: context.h(8), color: AppColors.kWhite);
         },
       ),
     );
