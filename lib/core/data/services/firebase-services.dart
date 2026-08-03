@@ -1,46 +1,50 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 class FirebaseAuthServices {
-  // Get the instance of the firebaseAuth
-  final firebaseAuth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Signup Method
-  Future<User?> signUp(TextEditingController email, TextEditingController pass, BuildContext context) async {
-    final result = await firebaseAuth.createUserWithEmailAndPassword(
-      email: email.text.toString(),
-      password: pass.text.toString(),
-    );
-    return result.user;
-  }
-
-  // Password Reset Method
-  Future<void> resetPass(TextEditingController email) async {
-    await firebaseAuth.sendPasswordResetEmail(email: email.text.trim());
-  }
-
-  // SignIn Method
-  Future<User?> signIn(TextEditingController email, TextEditingController pass, BuildContext context) async {
-    final result = await firebaseAuth.signInWithEmailAndPassword(
-      email: email.text.toString(),
-      password: pass.text.toString(),
-    );
-    return result.user;
-  }
-
-  // SignOut User
-  Future<void> signOut(BuildContext context) async {
-    await firebaseAuth.signOut();
-  }
-
-  // isLogin Method
-  bool isLogin() {
-    // Get current user
-    final user = firebaseAuth.currentUser;
-    if (user == null) {
-      return false;
-    } else {
-      return true;
+  // Signup
+  Future<User?> signUp(String email, String password) async {
+    try {
+      final result = await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+      return result.user;
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? "Signup failed";
     }
   }
+
+  // Login
+  Future<User?> signIn(String email, String password) async {
+    try {
+      final result = await _auth.signInWithEmailAndPassword(email: email.trim(), password: password.trim());
+      return result.user;
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? "Login failed";
+    }
+  }
+
+  // Reset Password
+  Future<void> resetPass(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? "Reset failed";
+    }
+  }
+
+  // Logout
+  Future<void> signOut() async {
+    await _auth.signOut();
+  }
+
+  // Check login
+  bool isLogin() {
+    return _auth.currentUser != null;
+  }
+
+  // Auth state stream (VERY IMPORTANT)
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 }
