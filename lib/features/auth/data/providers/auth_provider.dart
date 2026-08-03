@@ -184,16 +184,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  // RESET PASSWORD
-  Future<void> resetPassword() async {
-    try {
-      state = state.copyWith(isLoading: true, errorMessage: null);
+  // RESET PASSWORD (Standard Email Link Flow)
+  Future<bool> resetPassword() async {
+    // Ensure the controller isn't empty before making the network request
+    if (state.resetPassEmailController.text.trim().isEmpty) {
+      state = state.copyWith(errorMessage: "Please enter your email address.");
+      return false;
+    }
 
+    try {
+      state = state.copyWith(isLoading: true);
+
+      // Firebase sends the reset link automatically to this email address
       await _auth.sendPasswordResetEmail(email: state.resetPassEmailController.text.trim());
 
       state = state.copyWith(isLoading: false);
+      return true; // Email sent successfully
     } on FirebaseAuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
+      return false;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
     }
   }
 

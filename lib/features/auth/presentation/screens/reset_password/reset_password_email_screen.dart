@@ -9,6 +9,7 @@ import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/presentation/widgets/custom_text_field.dart';
+import 'package:lms/core/presentation/widgets/snackbar.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
 
@@ -64,8 +65,18 @@ class ResetPasswordEmailScreen extends ConsumerWidget {
                 fontFamily: AppFonts.kLight,
                 height: context.h(6.5),
                 title: "Send",
-                onPress: () {
-                  context.replace(Routes.resetPass);
+                onPress: () async {
+                  final success = await ref.read(authProvider.notifier).resetPassword();
+
+                  if (success && context.mounted) {
+                    ShowSnackbar1.success(
+                      context,
+                      'Reset link sent to ${ref.read(authProvider).resetPassEmailController.text.trim()}. Please check your inbox.',
+                    );
+
+                    // Route to the Sign-In screen
+                    context.go(Routes.signin);
+                  }
                 },
               ).padOnly(left: context.w(6), right: context.w(6)),
             ],
