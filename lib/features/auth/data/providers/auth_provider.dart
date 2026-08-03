@@ -95,14 +95,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// 🔥 Listen to auth state changes
+  // Listen to auth state changes
   void _initAuthListener() {
     _auth.authStateChanges().listen((user) {
       state = state.copyWith(user: user);
     });
   }
 
-  /// 🔐 SIGN UP
+  // SIGN UP
   Future<void> signUp() async {
     if (!state.signUpFormKey.currentState!.validate()) return;
 
@@ -120,9 +120,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// 🔑 SIGN IN
-  Future<void> signIn() async {
-    if (!state.signinFormKey.currentState!.validate()) return;
+  // SIGN IN
+  Future<bool> signIn() async {
+    if (!state.signinFormKey.currentState!.validate()) return false;
 
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
@@ -133,12 +133,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
 
       state = state.copyWith(isLoading: false, user: result.user);
+      return true;
     } on FirebaseAuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
     }
+    return false;
   }
 
-  /// 🔄 RESET PASSWORD
+  // RESET PASSWORD
   Future<void> resetPassword() async {
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
@@ -151,18 +153,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// 🚪 LOGOUT
+  // LOGOUT
   Future<void> signOut() async {
     await _auth.signOut();
     state = state.copyWith(user: null);
   }
 
-  /// 🔍 CHECK LOGIN
+  // CHECK LOGIN
   bool isLoggedIn() {
     return _auth.currentUser != null;
   }
 
-  /// 🧹 Dispose controllers (VERY IMPORTANT)
+  // Dispose controllers (VERY IMPORTANT)
   @override
   void dispose() {
     state.authEmailController.dispose();

@@ -21,13 +21,14 @@ class SigninScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(authProvider);
+    final auth = ref.watch(authProvider);
+    final authNotifier = ref.read(authProvider.notifier);
     return CustomSafeArea(
       child: Scaffold(
         backgroundColor: AppColors.kWhite,
         body: SingleChildScrollView(
           child: Form(
-            key: state.signinFormKey,
+            key: auth.signinFormKey,
             child: Column(
               children: [
                 Center(
@@ -43,7 +44,7 @@ class SigninScreen extends ConsumerWidget {
                 CustomTextField(
                   cursorColor: AppColors.kPrimary,
                   borderWidth: context.w(0.5),
-                  controller: state.authEmailController,
+                  controller: auth.authEmailController,
                   hintText: "...@gmail.com",
                   focusedBorderColor: AppColors.kPrimary,
                   enabledBorderColor: AppColors.kPrimary.withAlpha(100),
@@ -63,7 +64,7 @@ class SigninScreen extends ConsumerWidget {
                 CustomPasswordTextField(
                   cursorColor: AppColors.kPrimary,
                   focusedBorderColor: AppColors.kPrimary,
-                  controller: state.authPasswordController,
+                  controller: auth.authPasswordController,
                   hintText: "xX1@...",
                   labelText: null,
                   borderWidth: context.w(0.5),
@@ -90,7 +91,13 @@ class SigninScreen extends ConsumerWidget {
                   fontFamily: AppFonts.kLight,
                   height: context.h(6.5),
                   title: "SIGN IN",
-                  onPress: () => context.go(Routes.home),
+                  onPress: () async {
+                    final success = await authNotifier.signIn();
+
+                    if (success) {
+                      context.go(Routes.home);
+                    }
+                  },
                   buttonColor: AppColors.kPrimary,
                 ).padBottom(context.h(3)),
 
