@@ -13,8 +13,6 @@ class MyCoursesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final coursesAsync = ref.watch(coursesProvider);
-
     return Scaffold(
       backgroundColor: AppColors.kWhite,
       appBar: AppBar(
@@ -28,41 +26,40 @@ class MyCoursesScreen extends ConsumerWidget {
         ),
         title: const Text('My Courses', style: AppTextStyle.kHeading),
       ),
-      body: coursesAsync.when(
-        data: (allCourses) {
-          // Filter only enrolled courses (progress > 0)
-          final myCourses = allCourses.where((course) => course.progress > 0).toList();
+      body: ref
+          .watch(myCoursesProvider)
+          .when(
+            data: (myCourses) {
+              if (myCourses.isEmpty) {
+                return _buildEmptyState(context);
+              }
 
-          if (myCourses.isEmpty) {
-            return _buildEmptyState(context);
-          }
-
-          return ListView.separated(
-            //padding: EdgeInsets.only(top: context.h(1.75), bottom: context.h(2)),
-            itemCount: myCourses.length,
-            separatorBuilder: (context, index) => SizedBox(height: context.h(0.5)),
-            itemBuilder: (context, index) {
-              return MyCourseCard(course: myCourses[index]);
+              return ListView.separated(
+                //padding: EdgeInsets.only(top: context.h(1.75), bottom: context.h(2)),
+                itemCount: myCourses.length,
+                separatorBuilder: (context, index) => SizedBox(height: context.h(0.5)),
+                itemBuilder: (context, index) {
+                  return MyCourseCard(courseEnrollment: myCourses[index]);
+                },
+              );
             },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(5)),
-              SizedBox(height: context.h(2)),
-              Text('Error: $error'),
-              SizedBox(height: context.h(2)),
-              ElevatedButton(
-                onPressed: () => ref.invalidate(coursesProvider),
-                child: const Text('Retry', style: AppTextStyle.kBodyLarge),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(5)),
+                  SizedBox(height: context.h(2)),
+                  Text('Error: $error'),
+                  SizedBox(height: context.h(2)),
+                  ElevatedButton(
+                    onPressed: () => ref.invalidate(myCoursesProvider),
+                    child: const Text('Retry', style: AppTextStyle.kBodyLarge),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 

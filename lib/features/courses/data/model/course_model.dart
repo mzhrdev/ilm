@@ -1,4 +1,3 @@
-
 import 'package:lms/features/courses/data/model/module_model.dart';
 import 'package:lms/features/home/data/model/review_model.dart';
 
@@ -12,13 +11,15 @@ class CourseModel {
   final double rating;
   final int totalRatings;
   final double price;
-  final double progress; // 0.0 to 1.0
+  
   final int totalDurationMinutes;
   final List<String> skills;
   final List<ModuleModel> modules;
   final List<ReviewModel> reviews;
+  final String instructorId;
 
   CourseModel({
+    required this.instructorId,
     required this.reviews,
     required this.id,
     required this.title,
@@ -29,7 +30,7 @@ class CourseModel {
     required this.rating,
     required this.totalRatings,
     required this.price,
-    required this.progress,
+    
     required this.totalDurationMinutes,
     required this.skills,
     required this.modules,
@@ -43,6 +44,7 @@ class CourseModel {
     final reviewsJson = json['reviews'] ?? [];
     final modulesJson = json['modules'] ?? [];
     return CourseModel(
+      instructorId: json['instructorId'] as String,
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
@@ -52,7 +54,7 @@ class CourseModel {
       rating: (json['rating'] as num).toDouble(),
       totalRatings: json['totalRatings'] as int,
       price: (json['price'] as num).toDouble(),
-      progress: (json['progress'] as num).toDouble(),
+     
       totalDurationMinutes: json['totalDurationMinutes'] as int,
       skills: List<String>.from(json['skills'] ?? []),
       modules: (modulesJson as List).map((m) => ModuleModel.fromJson(m)).toList(),
@@ -62,6 +64,7 @@ class CourseModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'instructorId': instructorId,
       'id': id,
       'title': title,
       'description': description,
@@ -71,7 +74,7 @@ class CourseModel {
       'rating': rating,
       'totalRatings': totalRatings,
       'price': price,
-      'progress': progress,
+      
       'totalDurationMinutes': totalDurationMinutes,
       'skills': skills,
       'modules': modules.map((m) => m.toJson()).toList(),
@@ -79,6 +82,3 @@ class CourseModel {
     };
   }
 }
-
-
-

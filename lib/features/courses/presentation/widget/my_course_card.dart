@@ -7,17 +7,17 @@ import 'package:lms/core/constants/app_assets.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/routing/app_routing.dart';
-import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
 
 class MyCourseCard extends StatelessWidget {
-  final CourseModel course;
+  final CourseEnrollmentModel courseEnrollment;
 
-  const MyCourseCard({super.key, required this.course});
+  const MyCourseCard({super.key, required this.courseEnrollment});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(Routes.courseDetail.replaceAll(':id', course.id)),
+      onTap: () => context.push(Routes.courseDetail.replaceAll(':id', courseEnrollment.id)),
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
         padding: EdgeInsets.all(context.w(3)),
@@ -41,14 +41,14 @@ class MyCourseCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course.title,
+                    courseEnrollment.title,
                     style: AppTextStyle.kBodyLarge,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: context.h(0.75)),
                   Text(
-                    'By ${course.instructorName}',
+                    'By ${courseEnrollment.instructorName}',
                     style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kBlack.withAlpha(90)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -58,7 +58,7 @@ class MyCourseCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(2),
                     child: LinearProgressIndicator(
-                      value: course.progress,
+                      value: courseEnrollment.progress,
                       minHeight: 4,
                       backgroundColor: Colors.grey[300],
                       valueColor: const AlwaysStoppedAnimation<Color>(AppColors.kBlack),
@@ -69,7 +69,7 @@ class MyCourseCard extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      '${(course.progress * 100).toInt()}% Done',
+                      '${(courseEnrollment.progress * 100).toInt()}% Done',
                       style: AppTextStyle.kBodySmall.copyWith(color: AppColors.kBlack.withAlpha(90)),
                     ),
                   ),
@@ -83,9 +83,9 @@ class MyCourseCard extends StatelessWidget {
   }
 
   Widget _buildThumbnail() {
-    if (course.thumbnailUrl.isNotEmpty) {
+    if (courseEnrollment.thumbnailUrl.isNotEmpty) {
       return Image.network(
-        course.thumbnailUrl,
+        courseEnrollment.thumbnailUrl,
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,

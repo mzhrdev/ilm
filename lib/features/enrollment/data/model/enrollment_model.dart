@@ -1,7 +1,6 @@
-
-
 class EnrollmentModel {
   final String courseId;
+  final String userId;
   final String courseName;
   final String instructorName;
   final int totalLectures;
@@ -13,9 +12,11 @@ class EnrollmentModel {
   final DateTime purchaseDate;
   final int currentStep;
   final bool hasCertificate;
+  final double progress; // 0.0 to 1.0
 
   EnrollmentModel({
     required this.courseId,
+    required this.userId,
     required this.courseName,
     required this.instructorName,
     required this.totalLectures,
@@ -25,15 +26,17 @@ class EnrollmentModel {
     required this.finalPrice,
     required this.couponCode,
     required this.purchaseDate,
+    required this.progress,
     this.currentStep = 1,
     this.hasCertificate = true,
   });
 
-  String get formattedDate => 
+  String get formattedDate =>
       '${purchaseDate.day.toString().padLeft(2, '0')}/${purchaseDate.month.toString().padLeft(2, '0')}/${purchaseDate.year}';
 
   EnrollmentModel copyWith({
     String? courseId,
+    String? userId,
     String? courseName,
     String? instructorName,
     int? totalLectures,
@@ -45,9 +48,11 @@ class EnrollmentModel {
     DateTime? purchaseDate,
     int? currentStep,
     bool? hasCertificate,
+    double? progress,
   }) {
     return EnrollmentModel(
       courseId: courseId ?? this.courseId,
+      userId: userId ?? this.userId,
       courseName: courseName ?? this.courseName,
       instructorName: instructorName ?? this.instructorName,
       totalLectures: totalLectures ?? this.totalLectures,
@@ -59,6 +64,7 @@ class EnrollmentModel {
       purchaseDate: purchaseDate ?? this.purchaseDate,
       currentStep: currentStep ?? this.currentStep,
       hasCertificate: hasCertificate ?? this.hasCertificate,
+      progress: progress ?? this.progress,
     );
   }
 }

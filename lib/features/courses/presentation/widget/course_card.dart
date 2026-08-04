@@ -8,17 +8,17 @@ import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/routing/app_routing.dart';
 
-import '../../data/model/course_model.dart';
+import '../../data/model/course_enrollment_model.dart';
 
 class CourseCard extends StatelessWidget {
-  final CourseModel course;
+  final CourseEnrollmentModel courseEnrollment;
 
-  const CourseCard({super.key, required this.course});
+  const CourseCard({super.key, required this.courseEnrollment});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(Routes.courseDetail.replaceAll(':id', course.id)),
+      onTap: () => context.push(Routes.courseDetail.replaceAll(':id', courseEnrollment.id)),
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -44,14 +44,14 @@ class CourseCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  course.title,
+                  courseEnrollment.title,
                   style: AppTextStyle.kBodyMedium.copyWith(fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: context.h(0.35)),
                 Text(
-                  'By ${course.instructorName}',
+                  'By ${courseEnrollment.instructorName}',
                   style: AppTextStyle.kBodySmall.copyWith(fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -62,10 +62,10 @@ class CourseCard extends StatelessWidget {
                   children: [
                     Icon(Icons.star, size: 16, color: AppColors.kAmber),
                     SizedBox(width: context.w(2)),
-                    Text(course.rating.toString(), style: AppTextStyle.kBodySmall),
+                    Text(courseEnrollment.rating.toString(), style: AppTextStyle.kBodySmall),
                     const Spacer(),
                     Text(
-                      '${(course.progress * 100).toInt()}% Done',
+                      '${(courseEnrollment.progress * 100).toInt()}% Done',
                       style: AppTextStyle.kBodySmall.copyWith(fontSize: context.h(1.25)),
                     ),
                   ],
@@ -75,7 +75,7 @@ class CourseCard extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2),
                   child: LinearProgressIndicator(
-                    value: course.progress,
+                    value: courseEnrollment.progress,
                     minHeight: 4,
                     backgroundColor: AppColors.kGrey.withAlpha(400),
                     valueColor: const AlwaysStoppedAnimation<Color>(AppColors.kBlack),
@@ -90,9 +90,9 @@ class CourseCard extends StatelessWidget {
   }
 
   Widget _buildThumbnail() {
-    if (course.thumbnailUrl.isNotEmpty) {
+    if (courseEnrollment.thumbnailUrl.isNotEmpty) {
       return Image.network(
-        course.thumbnailUrl,
+        courseEnrollment.thumbnailUrl,
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,

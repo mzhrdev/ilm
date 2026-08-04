@@ -10,7 +10,7 @@ import 'package:lms/core/presentation/widgets/custom_text_button.dart';
 import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
-import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
 import 'package:lms/features/home/data/providers/home_provider.dart';
 
 import '../../../courses/data/provider/course_provider.dart';
@@ -26,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
     final home = ref.watch(homeProvider);
     final user = ref.watch(currentUserProvider);
     final categories = ref.watch(categoriesProvider);
-    final coursesAsync = ref.watch(coursesProvider);
+    final coursesAsync = ref.watch(continueWatchingProvider);
 
     return CustomSafeArea(
       child: Scaffold(
@@ -55,9 +55,7 @@ class HomeScreen extends ConsumerWidget {
 
             // Course Grid
             coursesAsync.when<Widget>(
-              data: (allCourses) {
-                final continueWatching = allCourses.where((course) => course.progress > 0).toList();
-
+              data: (continueWatching) {
                 if (continueWatching.isEmpty) {
                   return SliverToBoxAdapter(
                     child: Center(
@@ -83,7 +81,7 @@ class HomeScreen extends ConsumerWidget {
                       Text('Error: $error'),
                       SizedBox(height: context.h(8)),
                       ElevatedButton(
-                        onPressed: () => ref.invalidate(coursesProvider),
+                        onPressed: () => ref.invalidate(continueWatchingProvider),
                         child: const Text('Retry'),
                       ),
                     ],
@@ -165,7 +163,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   // Build Course Grid Method
-  Widget _buildCourseGrid(List<CourseModel> courses, BuildContext context) {
+  Widget _buildCourseGrid(List<CourseEnrollmentModel> courses, BuildContext context) {
     return SliverGrid(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -175,7 +173,7 @@ class HomeScreen extends ConsumerWidget {
       ),
       delegate: SliverChildBuilderDelegate((context, index) {
         final course = courses[index];
-        return CourseCard(course: course);
+        return CourseCard(courseEnrollment: course);
       }, childCount: courses.length),
     );
   }

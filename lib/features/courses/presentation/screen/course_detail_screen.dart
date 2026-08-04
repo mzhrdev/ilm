@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/courses/data/model/lesson_model.dart';
 import 'package:lms/features/enrollment/data/provider/enrollment_provider.dart';
 import 'package:lms/features/home/presentation/widgets/review_card.dart';
@@ -85,8 +86,10 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
           child: ElevatedButton(
             // 2. ALL logic goes INSIDE the onPressed callback
             onPressed: () {
+              final userId = ref.read(currentUserProvider)?.id ?? '';
+
               // Step A: Save the course data to our state manager
-              ref.read(enrollmentProvider.notifier).initializeFromCourse(course);
+              ref.read(enrollmentProvider.notifier).initializeFromCourse(course, userId: userId);
 
               // Step B: Navigate to the enrollment screen
               context.push(Routes.enrollmentScreen);

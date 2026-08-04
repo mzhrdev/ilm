@@ -7,6 +7,7 @@ import 'package:lms/features/home/data/dummy_data/dummy_review_c1.dart';
 
 final List<CourseModel> mockCourses = [
   CourseModel(
+    instructorId: '800',
     id: '1',
     title: 'Graphic Design',
     description:
@@ -17,7 +18,7 @@ final List<CourseModel> mockCourses = [
     rating: 4.5,
     totalRatings: 128,
     price: 72,
-    progress: 0.4,
+   
     totalDurationMinutes: 360,
     skills: ['Adobe', 'Adobe Photo Shop', 'Logo', 'Designing', 'Poster Design', 'Figma'],
     reviews: mockReviews,
@@ -118,6 +119,7 @@ final List<CourseModel> mockCourses = [
   ),
   CourseModel(
     id: '2',
+    instructorId: '801',
     title: 'Wireframing',
     description: 'Learn wireframing basics',
     instructorName: 'Shahzad Hassan',
@@ -126,7 +128,7 @@ final List<CourseModel> mockCourses = [
     rating: 4.8,
     totalRatings: 95,
     price: 65,
-    progress: 0.4,
+   
     totalDurationMinutes: 240,
     skills: ['Figma', 'Sketch', 'UI Design'],
     reviews: mockReviews,
@@ -134,6 +136,7 @@ final List<CourseModel> mockCourses = [
   ),
   CourseModel(
     id: '3',
+    instructorId: '804',
     title: 'Website Design',
     description: 'Master website design',
     instructorName: 'Danish Hanif',
@@ -142,7 +145,7 @@ final List<CourseModel> mockCourses = [
     rating: 4.6,
     totalRatings: 110,
     price: 80,
-    progress: 0.0,
+  
     totalDurationMinutes: 480,
     reviews: mockReviews,
     skills: ['HTML', 'CSS', 'Responsive Design'],
@@ -150,6 +153,7 @@ final List<CourseModel> mockCourses = [
   ),
   CourseModel(
     id: '4',
+    instructorId: '805',
     title: 'Video Editing',
     description: 'Professional video editing',
     instructorName: 'Ammar Ijaz',
@@ -158,7 +162,7 @@ final List<CourseModel> mockCourses = [
     rating: 4.7,
     totalRatings: 87,
     price: 70,
-    progress: 0.0,
+   
     totalDurationMinutes: 300,
     reviews: mockReviews,
     skills: ['Premiere Pro', 'After Effects', 'Color Grading'],

@@ -1,9 +1,13 @@
 // lib/features/home/data/providers/course_provider.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/courses/data/dummy_data/dummy_course_list.dart';
-import '../model/course_model.dart';
+import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
+import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
+import 'package:lms/features/enrollment/data/provider/enrollment_provider.dart';
 
+import '../model/course_model.dart';
 
 // All courses provider
 final coursesProvider = FutureProvider<List<CourseModel>>((ref) async {
@@ -13,26 +17,49 @@ final coursesProvider = FutureProvider<List<CourseModel>>((ref) async {
 });
 
 // Single course detail provider
-final courseDetailProvider =
-    FutureProvider.family<CourseModel, String>((ref, courseId) async {
+final courseDetailProvider = FutureProvider.family<CourseModel, String>((ref, courseId) async {
   // Simulate API delay
   await Future.delayed(const Duration(milliseconds: 500));
-  
+
   final course = mockCourses.firstWhere(
     (c) => c.id == courseId,
     orElse: () => throw Exception('Course not found'),
   );
-  
+
   return course;
 });
 
-// Continue watching provider (filtered)
-final continueWatchingProvider = Provider<List<CourseModel>>((ref) {
-  final coursesAsync = ref.watch(coursesProvider);
-  
-  return coursesAsync.when(
-    data: (courses) => courses.where((c) => c.progress > 0).toList(),
-    loading: () => [],
-    error: (_, __) => [],
+final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
+  final courses = await ref.watch(coursesProvider.future);
+  final userId = ref.watch(currentUserProvider)?.id;
+
+  final enrollments = userId == null
+      ? List<EnrollmentModel?>.filled(courses.length, null)
+      : await Future.wait(
+          courses.map(
+            (course) => ref.watch(enrollmentLookupProvider((courseId: course.id, userId: userId)).future),
+          ),
+        );
+
+  return List.generate(
+    courses.length,
+    (index) => CourseEnrollmentModel(course: courses[index], enrollment: enrollments[index]),
   );
+});
+
+final continueWatchingProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
+  final courses = await ref.watch(courseEnrollmentsProvider.future);
+  return courses
+      .where((courseEnrollment) => courseEnrollment.progress > 0 && courseEnrollment.progress < 1)
+      .toList();
+});
+
+final myCoursesProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
+  final courses = await ref.watch(courseEnrollmentsProvider.future);
+  return courses.where((courseEnrollment) => courseEnrollment.progress > 0).toList();
+});
+
+final completedCoursesProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
+  final courses = await ref.watch(courseEnrollmentsProvider.future);
+  return courses.where((courseEnrollment) => courseEnrollment.isCompleted).toList();
 });
