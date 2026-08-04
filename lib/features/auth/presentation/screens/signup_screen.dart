@@ -177,8 +177,10 @@ class SignupScreen extends ConsumerWidget {
                   onPress: () async {
                     final success = await authNotifier.signInWithGoogle();
                     if (success) {
-                      context.go(Routes.home);
                       authNotifier.clearAuth();
+                      if (context.mounted) {
+                        context.go(Routes.home);
+                      }
                     }
                   },
                   buttonColor: AppColors.kTransparent,
