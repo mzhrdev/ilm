@@ -18,7 +18,9 @@ class ResetPasswordEmailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(authProvider);
+    final reset = ref.watch(authProvider);
+    final resetNotifier = ref.read(authProvider.notifier);
+
     return CustomSafeArea(
       child: Scaffold(
         backgroundColor: AppColors.kWhite,
@@ -45,7 +47,7 @@ class ResetPasswordEmailScreen extends ConsumerWidget {
               CustomTextField(
                 cursorColor: AppColors.kPrimary,
                 borderWidth: context.w(0.5),
-                controller: state.resetPassEmailController,
+                controller: reset.resetPassEmailController,
                 hintText: "...@gmail.com",
                 focusedBorderColor: AppColors.kPrimary,
                 enabledBorderColor: AppColors.kPrimary.withAlpha(100),
@@ -66,16 +68,17 @@ class ResetPasswordEmailScreen extends ConsumerWidget {
                 height: context.h(6.5),
                 title: "Send",
                 onPress: () async {
-                  final success = await ref.read(authProvider.notifier).resetPassword();
+                  final success = await resetNotifier.resetPassword();
 
                   if (success && context.mounted) {
                     ShowSnackbar1.success(
                       context,
-                      'Reset link sent to ${ref.read(authProvider).resetPassEmailController.text.trim()}. Please check your inbox.',
+                      'Reset link sent to ${reset.resetPassEmailController.text.trim()}. Please check your inbox.',
                     );
 
                     // Route to the Sign-In screen
                     context.go(Routes.signin);
+                    resetNotifier.clearReset();
                   }
                 },
               ).padOnly(left: context.w(6), right: context.w(6)),

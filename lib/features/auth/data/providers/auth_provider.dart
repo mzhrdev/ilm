@@ -18,9 +18,6 @@ class AuthState {
     required this.confirmPassController,
 
     required this.resetPassEmailController,
-    required this.resetPassController,
-
-    required this.userTypeController,
 
     this.isLoading = false,
     this.errorMessage,
@@ -37,8 +34,6 @@ class AuthState {
   final TextEditingController userNameController;
   final TextEditingController confirmPassController;
   final TextEditingController resetPassEmailController;
-  final TextEditingController resetPassController;
-  final TextEditingController userTypeController;
 
   // 🔹 Firebase State
   final bool isLoading;
@@ -53,8 +48,7 @@ class AuthState {
     TextEditingController? userNameController,
     TextEditingController? confirmPassController,
     TextEditingController? resetPassEmailController,
-    TextEditingController? resetPassController,
-    TextEditingController? userTypeController,
+
     bool? isLoading,
     String? errorMessage,
     User? user,
@@ -67,8 +61,7 @@ class AuthState {
       userNameController: userNameController ?? this.userNameController,
       confirmPassController: confirmPassController ?? this.confirmPassController,
       resetPassEmailController: resetPassEmailController ?? this.resetPassEmailController,
-      resetPassController: resetPassController ?? this.resetPassController,
-      userTypeController: userTypeController ?? this.userTypeController,
+
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
       user: user ?? this.user,
@@ -87,8 +80,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
           userNameController: TextEditingController(),
           confirmPassController: TextEditingController(),
           resetPassEmailController: TextEditingController(),
-          resetPassController: TextEditingController(),
-          userTypeController: TextEditingController(),
         ),
       ) {
     _initAuthListener();
@@ -220,16 +211,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return _auth.currentUser != null;
   }
 
-  // Dispose controllers (VERY IMPORTANT)
-  @override
-  void dispose() {
-    state.authEmailController.dispose();
-    state.authPasswordController.dispose();
-    state.userNameController.dispose();
-    state.confirmPassController.dispose();
-    state.resetPassEmailController.dispose();
-    state.resetPassController.dispose();
-    state.userTypeController.dispose();
-    super.dispose();
+  // Clear Sign In Controllers
+  void clearAuth() {
+    state.userNameController.clear();
+    state.authEmailController.clear();
+    state.authPasswordController.clear();
+  }
+
+  // Clear Reset Email Controllers
+  void clearReset() {
+    state.resetPassEmailController.clear();
   }
 }

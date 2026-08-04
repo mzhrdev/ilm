@@ -97,7 +97,7 @@ class SigninScreen extends ConsumerWidget {
 
                     if (success) {
                       context.go(Routes.home);
-                      authNotifier.dispose();
+                      authNotifier.clearAuth();
                     }
                   },
                   buttonColor: AppColors.kPrimary,

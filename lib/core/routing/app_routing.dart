@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/features/auth/presentation/screens/reset_password/reset_password_email_screen.dart';
-import 'package:lms/features/auth/presentation/screens/reset_password/reset_password_screen.dart';
-import 'package:lms/features/auth/presentation/screens/reset_password/reset_password_success_screen.dart';
 import 'package:lms/features/auth/presentation/screens/signin_screen.dart';
 import 'package:lms/features/auth/presentation/screens/signup_screen.dart';
 import 'package:lms/features/chat/presentation/screen/audio_call_screen.dart';
@@ -71,12 +69,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.signup, builder: (context, index) => SignupScreen()),
       // ForgotPassword
       GoRoute(path: Routes.resetPassEmail, builder: (context, index) => ResetPasswordEmailScreen()),
-      // Reset Password Screen
-      GoRoute(path: Routes.resetPass, builder: (context, index) => ResetPasswordScreen()),
-      // Reset Password Success Screen
-      GoRoute(path: Routes.resetPassSuccess, builder: (context, index) => ResetPasswordSuccessScreen()),
-      // Home Screen
-      // GoRoute(path: Routes.home, builder: (context, index) => HomeScreen()),
+
       // Course Detailed Screen
       GoRoute(
         path: Routes.courseDetail,
@@ -128,12 +121,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.notification, builder: (context, state) => const NotificationsScreen()),
       // Settings Screen
       GoRoute(path: Routes.settings, builder: (context, state) => const SettingsScreen()),
-      // Profile Screen
-      //GoRoute(path: Routes.profile, builder: (context, state) => const ProfileScreen()),
-      // Chat Screen
-      //GoRoute(path: Routes.chat, builder: (context, state) => const ChatScreen()),
-      // Course Screen
-      // GoRoute(path: Routes.course, builder: (context, state) => const MyCoursesScreen()),
       // Conversation Screen
       GoRoute(
         path: Routes.conversation,
