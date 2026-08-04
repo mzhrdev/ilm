@@ -1,59 +1,59 @@
-// lib/features/profile/data/provider/profile_provider.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lms/core/data/services/firebase_firestore_services.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 
 final profileProvider = StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
-  return ProfileNotifier();
+  final firestoreServices = ref.watch(firestoreServicesProvider);
+  return ProfileNotifier(firestoreServices);
 });
 
 class ProfileState {
+  const ProfileState({this.userProfile, this.isLoading = false, this.error});
+
   final UserModel? userProfile;
   final bool isLoading;
   final String? error;
 
-  ProfileState({this.userProfile, this.isLoading = true, this.error});
+  static const Object _unset = Object();
 
-  ProfileState copyWith({UserModel? userProfile, bool? isLoading, String? error}) {
+  ProfileState copyWith({UserModel? userProfile, bool? isLoading, Object? error = _unset}) {
     return ProfileState(
       userProfile: userProfile ?? this.userProfile,
       isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
+      error: identical(error, _unset) ? this.error : error as String?,
     );
   }
 }
 
 class ProfileNotifier extends StateNotifier<ProfileState> {
-  ProfileNotifier() : super(ProfileState()) {
+  ProfileNotifier(this._firestoreServices) : super(const ProfileState()) {
     _loadProfile();
   }
+
+  final FirebaseFirestoreServices _firestoreServices;
 
   Future<void> _loadProfile() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      // TODO: Replace with actual API call or auth provider data
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      state = state.copyWith(
-        userProfile: UserModel(
-          id: 'user_001',
-          name: 'Name Here',
-          email: 'namehere@example.com',
-          profileImageUrl: null,
-          skills: ['UI/UX', 'Graphics Design', 'Figma', 'Video Editor'],
-          about:
-              'Lorem ipsum dolor sit amet consectetur. Nec eget accumsan molestie prin. Integer rhoncus vitae nisi natoque ac mus tellus scelerisque.',
-        ),
-        isLoading: false,
-      );
+      final user = await _firestoreServices.getUser();
+      state = state.copyWith(userProfile: user, isLoading: false);
     } catch (e) {
-      state = state.copyWith(error: e.toString(), isLoading: false);
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
+  /// Persists an edited profile to Firestore, then updates local state.
+  /// Uses merge semantics so partial edits never wipe unrelated fields.
   Future<void> updateProfile(UserModel updatedUser) async {
-    state = state.copyWith(userProfile: updatedUser);
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _firestoreServices.saveUser(updatedUser, onlyIfNew: false);
+      state = state.copyWith(userProfile: updatedUser, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
   }
 
   Future<void> refreshProfile() async {
