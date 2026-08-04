@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/courses/data/model/lesson_model.dart';
 import 'package:lms/features/enrollment/data/provider/enrollment_provider.dart';
 import 'package:lms/features/home/presentation/widgets/review_card.dart';
 
