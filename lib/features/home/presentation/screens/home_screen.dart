@@ -9,13 +9,13 @@ import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/presentation/widgets/custom_text_button.dart';
 import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
 import 'package:lms/features/home/data/providers/home_provider.dart';
 
 import '../../../courses/data/provider/course_provider.dart';
 import '../../../courses/presentation/widget/course_card.dart';
 import '../../data/providers/category_provider.dart';
-import '../../data/providers/user_provider.dart';
 import '../widgets/category_chip.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -24,7 +24,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
-    final user = ref.watch(userProvider);
+    final user = ref.watch(currentUserProvider);
     final categories = ref.watch(categoriesProvider);
     final coursesAsync = ref.watch(coursesProvider);
 
@@ -34,7 +34,7 @@ class HomeScreen extends ConsumerWidget {
         body: CustomScrollView(
           slivers: [
             // Header
-            SliverToBoxAdapter(child: _buildHeader(context, user.name)),
+            SliverToBoxAdapter(child: _buildHeader(context, user?.name ?? 'Buddy')),
 
             // Search Bar
             SliverToBoxAdapter(child: _buildSearchBar(home.homeSearchController, context)),
@@ -97,12 +97,19 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  String _firstName(String? fullName) {
+    if (fullName == null || fullName.trim().isEmpty) return 'there';
+    final trimmed = fullName.trim();
+    final spaceIndex = trimmed.indexOf(' ');
+    return spaceIndex == -1 ? trimmed : trimmed.substring(0, spaceIndex);
+  }
+
   // Home Screen Header
-  Widget _buildHeader(BuildContext context, String userName) {
+  Widget _buildHeader(BuildContext context, String? userName) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Welcome, $userName', style: AppTextStyle.kHeading),
+        Text('Welcome, ${_firstName(userName)}', style: AppTextStyle.kHeading),
         Row(
           children: [
             // Settings Button

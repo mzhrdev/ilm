@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/home/presentation/widgets/skill_chip.dart';
+
 import '../../data/provider/profile_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -47,13 +49,16 @@ class ProfileScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(5)),
+          Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(8)),
           SizedBox(height: context.h(3)),
-          const Text('Failed to load profile'),
+          Text(
+            'Failed to load profile',
+            style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kBlack, fontSize: context.h(2)),
+          ),
           SizedBox(height: context.h(5)),
-          ElevatedButton(
-            onPressed: () => ref.read(profileProvider.notifier).refreshProfile(),
-            child: const Text('Retry'),
+          CustomElevatedButton(
+            onPress: () => ref.read(profileProvider.notifier).refreshProfile(),
+            title: 'Retry',
           ),
         ],
       ),

@@ -130,6 +130,7 @@ class SignupScreen extends ConsumerWidget {
                   title: "SIGN UP",
                   onPress: () async {
                     final success = await authNotifier.signUp();
+                    print('signIn success: $success, error: ${authNotifier.debugState}');
                     if (success) {
                       context.go(Routes.home);
                     }
@@ -178,9 +179,7 @@ class SignupScreen extends ConsumerWidget {
                     final success = await authNotifier.signInWithGoogle();
                     if (success) {
                       authNotifier.clearAuth();
-                      if (context.mounted) {
-                        context.go(Routes.home);
-                      }
+                      context.go(Routes.home);
                     }
                   },
                   buttonColor: AppColors.kTransparent,
