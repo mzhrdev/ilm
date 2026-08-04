@@ -10,6 +10,7 @@ import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
 import 'package:lms/core/presentation/widgets/custom_password_text_field.dart';
 import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/presentation/widgets/custom_text_field.dart';
+import 'package:lms/core/presentation/widgets/snackbar.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/auth/presentation/widgets/screen_bottom.dart';
@@ -130,9 +131,11 @@ class SignupScreen extends ConsumerWidget {
                   title: "SIGN UP",
                   onPress: () async {
                     final success = await authNotifier.signUp();
-                    print('signIn success: $success, error: ${authNotifier.debugState}');
+
                     if (success) {
                       context.go(Routes.home);
+                    } else {
+                      ShowSnackbar1.error(context, auth.errorMessage.toString());
                     }
                   },
                   buttonColor: AppColors.kPrimary,
