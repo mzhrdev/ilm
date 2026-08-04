@@ -97,6 +97,7 @@ class SigninScreen extends ConsumerWidget {
 
                     if (success) {
                       context.go(Routes.home);
+                      authNotifier.dispose();
                     }
                   },
                   buttonColor: AppColors.kPrimary,
@@ -141,7 +142,7 @@ class SigninScreen extends ConsumerWidget {
                   textColor: AppColors.kBlack,
                   borderSide: BorderSide(color: AppColors.kPrimary.withAlpha(100), width: context.w(0.5)),
                   onPress: () async {
-                    final success = await  authNotifier.signInWithGoogle();
+                    final success = await authNotifier.signInWithGoogle();
                     if (success) {
                       context.go(Routes.home);
                     }
