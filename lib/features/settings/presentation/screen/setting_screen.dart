@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
 import 'package:lms/features/settings/presentation/widget/settings_menu_item_widget.dart';
 
@@ -163,7 +164,7 @@ class SettingsScreen extends ConsumerWidget {
               context.pop(); // Close dialog first
 
               // 1. Clear auth state / tokens here
-              ref.read(settingsProvider.notifier).logout();
+              ref.read(authProvider.notifier).signOut();
 
               // 2. Navigate to Login screen and clear the stack
               context.go(Routes.signin);

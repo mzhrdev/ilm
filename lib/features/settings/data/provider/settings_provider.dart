@@ -1,12 +1,9 @@
 // lib/features/settings/data/provider/settings_provider.dart
 
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // Make sure this import path matches where your UserModel is located
 import 'package:lms/features/auth/data/model/user_model.dart';
 import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
-
-
 
 final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
   return SettingsNotifier();
@@ -99,11 +96,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
 
   Future<void> _showLogoutConfirmation() async {
     print('Show logout confirmation');
-  }
-
-  Future<void> logout() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    state = SettingsState(menuItems: SettingsMenuItem.menuItems, isLoading: false);
   }
 
   Future<void> updateProfile(UserModel profile) async {
