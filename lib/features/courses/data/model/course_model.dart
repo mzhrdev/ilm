@@ -1,5 +1,5 @@
-// lib/features/home/data/model/course_model.dart
 
+import 'package:lms/features/courses/data/model/module_model.dart';
 import 'package:lms/features/home/data/model/review_model.dart';
 
 class CourseModel {
@@ -80,52 +80,5 @@ class CourseModel {
   }
 }
 
-class ModuleModel {
-  final String id;
-  final String title;
-  final List<LessonModel> lessons;
 
-  ModuleModel({required this.id, required this.title, required this.lessons});
 
-  factory ModuleModel.fromJson(Map<String, dynamic> json) {
-    return ModuleModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      lessons: (json['lessons'] as List).map((l) => LessonModel.fromJson(l)).toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'id': id, 'title': title, 'lessons': lessons.map((l) => l.toJson()).toList()};
-  }
-}
-
-class LessonModel {
-  final String id;
-  final String title;
-  final String type; // 'video', 'text', 'quiz'
-  final int durationMinutes;
-  final bool isFree;
-
-  LessonModel({
-    required this.id,
-    required this.title,
-    required this.type,
-    required this.durationMinutes,
-    required this.isFree,
-  });
-
-  factory LessonModel.fromJson(Map<String, dynamic> json) {
-    return LessonModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      type: json['type'] as String,
-      durationMinutes: json['durationMinutes'] as int,
-      isFree: json['isFree'] as bool? ?? false,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'id': id, 'title': title, 'type': type, 'durationMinutes': durationMinutes, 'isFree': isFree};
-  }
-}

@@ -1,6 +1,8 @@
 // lib/features/home/data/mock_data.dart
 
 import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/courses/data/model/lesson_model.dart';
+import 'package:lms/features/courses/data/model/module_model.dart';
 import 'package:lms/features/home/data/dummy_data/dummy_review_c1.dart';
 
 final List<CourseModel> mockCourses = [
