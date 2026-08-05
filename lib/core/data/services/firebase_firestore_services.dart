@@ -1,23 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
-
+import 'package:lms/features/courses/data/model/course_model.dart';
 
 class FirebaseFirestoreServices {
-  FirebaseFirestoreServices({
-    FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+  FirebaseFirestoreServices({FirebaseFirestore? firestore, FirebaseAuth? auth})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
 
-  CollectionReference<Map<String, dynamic>> get _usersRef =>
-      _firestore.collection('users');
+  CollectionReference<Map<String, dynamic>> get _usersRef => _firestore.collection('users');
 
-
-  // Saves the given [user] to Firestore. 
+  // Saves the given [user] to Firestore.
   Future<void> saveUser(UserModel user, {bool onlyIfNew = false}) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
@@ -60,5 +56,12 @@ class FirebaseFirestoreServices {
     } catch (e) {
       throw Exception('Unexpected error while fetching user: $e');
     }
+  }
+
+  // Saving Course to Firebase
+  Future<void> saveCourseToFirebase(CourseModel course) async {
+    final firestore = FirebaseFirestore.instance;
+
+    await firestore.collection('courses').doc(course.id).set(course.toJson());
   }
 }
