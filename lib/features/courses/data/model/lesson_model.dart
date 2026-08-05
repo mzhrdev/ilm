@@ -4,7 +4,7 @@ class LessonModel {
   final String type; // 'video', 'text', 'quiz'
   final int durationMinutes;
   final bool isFree;
-  final String? content;
+  final String? content; // What does this lesson actually contain?
 
   LessonModel({
     required this.id,

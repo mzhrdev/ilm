@@ -122,6 +122,11 @@ class HomeScreen extends ConsumerWidget {
               icon: Icons.notifications,
               iconColor: AppColors.kPrimary,
             ),
+            CustomIconButton(
+              onTap: () => context.push(Routes.createCourse),
+              icon: Icons.add_circle_outline,
+              iconColor: AppColors.kBlack,
+            ),
           ],
         ),
       ],

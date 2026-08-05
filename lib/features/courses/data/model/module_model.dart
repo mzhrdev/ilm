@@ -1,4 +1,3 @@
-
 import 'package:lms/features/courses/data/model/lesson_model.dart';
 
 class ModuleModel {
@@ -18,5 +17,9 @@ class ModuleModel {
 
   Map<String, dynamic> toJson() {
     return {'id': id, 'title': title, 'lessons': lessons.map((l) => l.toJson()).toList()};
+  }
+
+  ModuleModel copyWith({String? id, String? title, List<LessonModel>? lessons}) {
+    return ModuleModel(id: id ?? this.id, title: title ?? this.title, lessons: lessons ?? this.lessons);
   }
 }

@@ -11,6 +11,7 @@ import 'package:lms/features/chat/presentation/screen/chat_screen.dart';
 import 'package:lms/features/chat/presentation/screen/conversation_screen.dart';
 import 'package:lms/features/chat/presentation/screen/video_call_screen.dart';
 import 'package:lms/features/courses/presentation/screen/course_detail_screen.dart';
+import 'package:lms/features/courses/presentation/screen/create_course_screen.dart';
 import 'package:lms/features/courses/presentation/screen/my_course_screen.dart';
 import 'package:lms/features/enrollment/presentation/screen/enrollment_screen.dart';
 import 'package:lms/features/helpCenter/presentation/screen/help_center_screen.dart';
@@ -49,6 +50,7 @@ class Routes {
   static const String terms = '/termsnconditions';
   static const String payment = '/payment';
   static const String helpCenter = '/helpCenter';
+  static const String createCourse = '/create_course';
 }
 
 // Global navigator key
@@ -69,7 +71,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.signup, builder: (context, index) => SignupScreen()),
       // ForgotPassword
       GoRoute(path: Routes.resetPassEmail, builder: (context, index) => ResetPasswordEmailScreen()),
-
       // Course Detailed Screen
       GoRoute(
         path: Routes.courseDetail,
@@ -78,6 +79,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           return CourseDetailScreen(courseId: courseId);
         },
       ),
+      // Create Course Screen
+      GoRoute(path: Routes.createCourse, builder: (context, index) => CreateCourseScreen()),
       // -------Screens with Persistent View-------
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
