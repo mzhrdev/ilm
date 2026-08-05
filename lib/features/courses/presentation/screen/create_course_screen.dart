@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:lms/core/presentation/widgets/snackbar.dart';
+import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/courses/data/model/lesson_model.dart';
 import 'package:lms/features/courses/data/model/module_model.dart';
 import 'package:lms/features/courses/data/provider/create_course_provider.dart';
@@ -100,10 +103,17 @@ class CreateCourseScreen extends ConsumerWidget {
 
             // ---------------- SAVE BUTTON ----------------
             CustomElevatedButton(
-              onPress: () {
-                // For now just print
-                print(draft);
-                notifier.clear();
+              onPress: () async {
+                final draft = ref.read(createCourseProvider);
+
+                final course = draft.toCourse("instructor_123");
+
+                await saveCourseToFirebase(course);
+
+                ShowSnackbar1.success(context, 'Course Saved');
+
+                ref.read(createCourseProvider.notifier).clear();
+                context.go(Routes.home);
               },
               title: 'Save Course',
             ),
