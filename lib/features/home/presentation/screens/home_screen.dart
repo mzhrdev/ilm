@@ -11,9 +11,8 @@ import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
+import 'package:lms/features/courses/data/provider/continue_watching_provider.dart';
 import 'package:lms/features/home/data/providers/home_provider.dart';
-
-import '../../../courses/data/provider/course_provider.dart';
 import '../../../courses/presentation/widget/course_card.dart';
 import '../../data/providers/category_provider.dart';
 import '../widgets/category_chip.dart';
@@ -24,9 +23,10 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
+    final coursesAsync = ref.watch(continueWatchingProvider);
     final user = ref.watch(currentUserProvider);
     final categories = ref.watch(categoriesProvider);
-    final coursesAsync = ref.watch(continueWatchingProvider);
+    
 
     return CustomSafeArea(
       child: Scaffold(
@@ -107,7 +107,7 @@ class HomeScreen extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Welcome, ${_firstName(userName)}', style: AppTextStyle.kHeading),
+        Expanded(child: Text('Welcome, ${_firstName(userName)}', style: AppTextStyle.kHeading)),
         Row(
           children: [
             // Settings Button

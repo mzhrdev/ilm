@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class EnrollmentModel {
   final String courseId;
   final String userId;
@@ -66,5 +68,47 @@ class EnrollmentModel {
       hasCertificate: hasCertificate ?? this.hasCertificate,
       progress: progress ?? this.progress,
     );
+  }
+
+  // FROM FIRESTORE
+  factory EnrollmentModel.fromFirestore(Map<String, dynamic> data) {
+    return EnrollmentModel(
+      courseId: data['courseId'] ?? '',
+      userId: data['userId'] ?? '',
+      courseName: data['courseName'] ?? '',
+      instructorName: data['instructorName'] ?? '',
+      totalLectures: data['totalLectures'] ?? 0,
+      duration: data['duration'] ?? '',
+      originalPrice: (data['originalPrice'] ?? 0).toDouble(),
+      discountPercentage: (data['discountPercentage'] ?? 0).toDouble(),
+      finalPrice: (data['finalPrice'] ?? 0).toDouble(),
+      couponCode: data['couponCode'] ?? '',
+      purchaseDate: data['purchaseDate'] != null
+          ? (data['purchaseDate'] as Timestamp).toDate()
+          : DateTime.now(),
+      currentStep: data['currentStep'] ?? 1,
+      hasCertificate: data['hasCertificate'] ?? true,
+      progress: (data['progress'] ?? 0).toDouble(),
+    );
+  }
+
+  // TO FIRESTORE
+  Map<String, dynamic> toJson() {
+    return {
+      'courseId': courseId,
+      'userId': userId,
+      'courseName': courseName,
+      'instructorName': instructorName,
+      'totalLectures': totalLectures,
+      'duration': duration,
+      'originalPrice': originalPrice,
+      'discountPercentage': discountPercentage,
+      'finalPrice': finalPrice,
+      'couponCode': couponCode,
+      'purchaseDate': Timestamp.fromDate(purchaseDate),
+      'currentStep': currentStep,
+      'hasCertificate': hasCertificate,
+      'progress': progress,
+    };
   }
 }

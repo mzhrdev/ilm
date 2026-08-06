@@ -1,5 +1,5 @@
+import 'package:lms/features/courses/data/model/course_draft_model.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
-import 'package:lms/features/courses/data/provider/create_course_provider.dart';
 import 'package:uuid/uuid.dart';
 
 extension CourseDraftMapper on CourseDraft {
@@ -18,9 +18,8 @@ extension CourseDraftMapper on CourseDraft {
       title: title,
       description: description,
       thumbnailUrl: thumbnailPath ?? '',
-
       modules: modules,
-
+      totalDurationMinutes: totalDuration,
       // --- Provided externally ---
       instructorName: instructorName,
 
@@ -31,8 +30,6 @@ extension CourseDraftMapper on CourseDraft {
       totalRatings: 0,
       reviews: [],
       skills: [],
-
-      totalDurationMinutes: totalDuration,
     );
   }
 }
