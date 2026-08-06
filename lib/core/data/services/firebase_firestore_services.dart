@@ -64,4 +64,12 @@ class FirebaseFirestoreServices {
 
     await firestore.collection('courses').doc(course.id).set(course.toJson());
   }
+
+  // Fetching Course from Firestore
+  Stream<List<CourseModel>> getCourses() {
+    return FirebaseFirestore.instance
+        .collection('courses')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => CourseModel.fromJson(doc.data())).toList());
+  }
 }

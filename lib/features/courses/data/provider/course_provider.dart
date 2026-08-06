@@ -29,6 +29,7 @@ final courseDetailProvider = FutureProvider.family<CourseModel, String>((ref, co
   return course;
 });
 
+// Course + Whether the user is enrolled in it
 final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
   final courses = await ref.watch(coursesProvider.future);
   final userId = ref.watch(currentUserProvider)?.id;
@@ -47,18 +48,14 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
   );
 });
 
-final continueWatchingProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
-  final courses = await ref.watch(courseEnrollmentsProvider.future);
-  return courses
-      .where((courseEnrollment) => courseEnrollment.progress > 0 && courseEnrollment.progress < 1)
-      .toList();
-});
 
+// Courses where progress > 0
 final myCoursesProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
   final courses = await ref.watch(courseEnrollmentsProvider.future);
   return courses.where((courseEnrollment) => courseEnrollment.progress > 0).toList();
 });
 
+// Courses where progress >= 1
 final completedCoursesProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
   final courses = await ref.watch(courseEnrollmentsProvider.future);
   return courses.where((courseEnrollment) => courseEnrollment.isCompleted).toList();
