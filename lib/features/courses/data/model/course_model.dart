@@ -99,8 +99,13 @@ class CourseModel {
       price: (json['price'] ?? 0).toDouble(),
       totalDurationMinutes: json['totalDurationMinutes'] ?? 0,
       skills: List<String>.from(json['skills'] ?? []),
-      modules: (json['modules'] ?? []).map((m) => ModuleModel.fromJson(m)).toList(),
-      reviews: (json['reviews'] ?? []).map((r) => ReviewModel.fromJson(r)).toList(),
+      modules: (json['modules'] as List<dynamic>? ?? [])
+          .map((module) => ModuleModel.fromJson(module as Map<String, dynamic>))
+          .toList(),
+
+      reviews: (json['reviews'] as List<dynamic>? ?? [])
+          .map((review) => ReviewModel.fromJson(review as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
