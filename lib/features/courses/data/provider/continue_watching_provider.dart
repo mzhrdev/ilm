@@ -5,7 +5,6 @@ import 'package:lms/features/courses/data/services/course_service.dart';
 
 final continueWatchingProvider = StreamProvider<List<CourseEnrollmentModel>>((ref) {
   final user = FirebaseAuth.instance.currentUser;
-
   if (user == null) {
     return Stream.value([]);
   }

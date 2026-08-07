@@ -20,22 +20,28 @@ CourseModel? _findCourseById(String courseId) {
 
 final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({String courseId, String? userId})>(
   (ref, args) async {
+    print('[enrollmentLookupProvider] start courseId=${args.courseId}, userId=${args.userId ?? 'null'}');
     await Future.delayed(const Duration(milliseconds: 250));
 
     final userId = args.userId;
     if (userId == null || userId.isEmpty) {
+      print('[enrollmentLookupProvider] no userId for courseId=${args.courseId}, returning null');
       return null;
     }
 
     final progress = _mockEnrollmentProgressByCourseId[args.courseId];
     if (progress == null || progress <= 0) {
+      print('[enrollmentLookupProvider] no progress for courseId=${args.courseId}, returning null');
       return null;
     }
 
     final course = _findCourseById(args.courseId);
     if (course == null) {
+      print('[enrollmentLookupProvider] no course found for courseId=${args.courseId}, returning null');
       return null;
     }
+
+    print('[enrollmentLookupProvider] resolved enrollment for courseId=${args.courseId}, progress=$progress');
 
     return EnrollmentModel(
       courseId: course.id,

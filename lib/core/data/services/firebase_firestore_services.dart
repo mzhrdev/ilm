@@ -98,6 +98,6 @@ class FirebaseFirestoreServices {
     return FirebaseFirestore.instance
         .collection('courses')
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => CourseModel.fromJson(doc.data())).toList());
+        .map((snapshot) => snapshot.docs.map((doc) => CourseModel.fromFirestore(doc)).toList());
   }
 }

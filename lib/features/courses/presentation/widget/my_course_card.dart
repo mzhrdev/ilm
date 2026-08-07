@@ -1,5 +1,3 @@
-// lib/features/courses/presentation/widgets/my_course_card.dart
-
 import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -17,7 +15,16 @@ class MyCourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(Routes.courseDetail.replaceAll(':id', courseEnrollment.course.id)),
+      onTap: () {
+        final id = courseEnrollment.id;
+
+        if (id.isEmpty) {
+          debugPrint('Course ID is empty');
+          return;
+        }
+
+        context.push(Routes.courseDetail.replaceAll(':id', id));
+      },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
         padding: EdgeInsets.all(context.w(3)),
@@ -32,9 +39,10 @@ class MyCourseCard extends StatelessWidget {
                 color: AppColors.kGrey,
                 borderRadius: BorderRadius.circular(context.w(3)),
               ),
-              child: _buildThumbnail(),
+              child: _buildThumbnail(context),
             ),
             SizedBox(width: context.w(4)),
+
             // Course Info
             Expanded(
               child: Column(
@@ -47,6 +55,7 @@ class MyCourseCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: context.h(0.75)),
+
                   Text(
                     'By ${courseEnrollment.instructorName}',
                     style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kBlack.withAlpha(90)),
@@ -54,6 +63,7 @@ class MyCourseCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: context.h(0.75)),
+
                   // Progress Bar
                   ClipRRect(
                     borderRadius: BorderRadius.circular(2),
@@ -65,6 +75,7 @@ class MyCourseCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: context.h(0.75)),
+
                   // Progress Percentage
                   Align(
                     alignment: Alignment.centerRight,
@@ -82,37 +93,40 @@ class MyCourseCard extends StatelessWidget {
     );
   }
 
-  Widget _buildThumbnail() {
-    if (courseEnrollment.thumbnailUrl.isNotEmpty) {
+  Widget _buildThumbnail(BuildContext context) {
+    final thumbnailUrl = courseEnrollment.thumbnailUrl;
+
+    if (thumbnailUrl.isNotEmpty) {
       return Image.network(
-        courseEnrollment.thumbnailUrl,
+        thumbnailUrl, // ✅ FIXED
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
+        errorBuilder: (_, __, ___) {
           return Center(
             child: Icon(Icons.image, size: context.h(5), color: AppColors.kGrey),
           );
         },
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
+
           return Center(
             child: CircularProgressIndicator(
+              strokeWidth: 2,
               value: loadingProgress.expectedTotalBytes != null
                   ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                   : null,
-              strokeWidth: 2,
             ),
           );
         },
       );
-    } else {
-      return Image.asset(
-        AppImages.graphic_design,
-        width: double.infinity,
-        height: double.infinity,
-        fit: BoxFit.fill,
-      );
     }
+
+    return Image.asset(
+      AppImages.graphic_design,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.fill,
+    );
   }
 }
