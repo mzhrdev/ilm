@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
+import 'package:lms/features/courses/data/mappers/course_mapper.dart';
+import 'package:lms/features/courses/data/model/course_draft_model.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
 
 class FirebaseFirestoreServices {
@@ -55,6 +57,32 @@ class FirebaseFirestoreServices {
       throw Exception('Failed to fetch user: ${e.message}');
     } catch (e) {
       throw Exception('Unexpected error while fetching user: $e');
+    }
+  }
+
+  // Save course from the draft
+  Future<void> saveCourseFromDraft({
+    required CourseDraft draft,
+    required String instructorId,
+    required String instructorName,
+  }) async {
+    try {
+      // Generate Firestore document ID
+      final docRef = _firestore.collection('courses').doc();
+
+      // Convert Draft into complete CourseModel
+      final course = draft.toCourse(
+        id: docRef.id,
+        instructorId: instructorId,
+        instructorName: instructorName,
+      );
+
+      // Save course
+      await docRef.set(course.toJson());
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to save course: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error while saving course: $e');
     }
   }
 

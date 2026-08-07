@@ -3,8 +3,6 @@ import 'package:lms/features/courses/data/model/course_draft_model.dart';
 import 'package:lms/features/courses/data/model/lesson_model.dart';
 import 'package:lms/features/courses/data/model/module_model.dart';
 
-
-
 final createCourseProvider = StateNotifierProvider<CreateCourseNotifier, CourseDraft>((ref) {
   return CreateCourseNotifier();
 });
@@ -12,9 +10,9 @@ final createCourseProvider = StateNotifierProvider<CreateCourseNotifier, CourseD
 class CreateCourseNotifier extends StateNotifier<CourseDraft> {
   CreateCourseNotifier() : super(const CourseDraft());
 
-  // ---------------------------------------------------------------------
-  // Basic fields
-  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------
+  // Basic Course Information
+  // ---------------------------------------------------------
 
   void setTitle(String title) {
     state = state.copyWith(title: title);
@@ -24,85 +22,99 @@ class CreateCourseNotifier extends StateNotifier<CourseDraft> {
     state = state.copyWith(description: description);
   }
 
-  void setThumbnail(String? path) {
-    state = state.copyWith(thumbnailPath: path);
+  void setThumbnailUrl(String url) {
+    state = state.copyWith(thumbnailUrl: url);
   }
 
-  void clearThumbnail() {
-    state = state.copyWith(thumbnailPath: null);
+  void setCategory(String category) {
+    state = state.copyWith(category: category);
   }
 
-  // ---------------------------------------------------------------------
-  // Internal helper — find a module by id, transform it, put it back.
-  // Every module-scoped mutation (lessons included) goes through this so
-  // there's exactly one place that does the "find + replace" dance.
-  // ---------------------------------------------------------------------
+  void setPrice(double price) {
+    state = state.copyWith(price: price);
+  }
+
+  void setSkills(List<String> skills) {
+    state = state.copyWith(skills: skills);
+  }
+
+  // ---------------------------------------------------------
+  // Internal Module Update Helper
+  // ---------------------------------------------------------
 
   void _updateModule(String moduleId, ModuleModel Function(ModuleModel module) transform) {
-    final index = state.modules.indexWhere((m) => m.id == moduleId);
-    assert(index != -1, '_updateModule: no module found with id $moduleId');
-    if (index == -1) return; // no-op in release builds if id is stale/wrong
+    final index = state.modules.indexWhere((module) => module.id == moduleId);
+
+    if (index == -1) {
+      return;
+    }
 
     final updatedModules = [...state.modules];
+
     updatedModules[index] = transform(updatedModules[index]);
+
     state = state.copyWith(modules: updatedModules);
   }
 
-  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------
   // Modules
-  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------
 
   void addModule(ModuleModel module) {
-    assert(
-      state.modules.every((m) => m.id != module.id),
-      'addModule: a module with id ${module.id} already exists',
-    );
+    final exists = state.modules.any((item) => item.id == module.id);
+
+    if (exists) {
+      return;
+    }
+
     state = state.copyWith(modules: [...state.modules, module]);
   }
 
   void removeModule(String moduleId) {
-    state = state.copyWith(modules: state.modules.where((m) => m.id != moduleId).toList());
+    state = state.copyWith(modules: state.modules.where((module) => module.id != moduleId).toList());
   }
 
   void updateModule(String moduleId, {String? title}) {
-    _updateModule(moduleId, (module) => module.copyWith(title: title));
+    _updateModule(moduleId, (module) {
+      return module.copyWith(title: title);
+    });
   }
 
-  
-
-  // ---------------------------------------------------------------------
-  // Lessons (inside a module)
-  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------
+  // Lessons
+  // ---------------------------------------------------------
 
   void addLesson(String moduleId, LessonModel lesson) {
     _updateModule(moduleId, (module) {
-      assert(
-        module.lessons.every((l) => l.id != lesson.id),
-        'addLesson: a lesson with id ${lesson.id} already exists in module $moduleId',
-      );
+      final exists = module.lessons.any((item) => item.id == lesson.id);
+
+      if (exists) {
+        return module;
+      }
+
       return module.copyWith(lessons: [...module.lessons, lesson]);
     });
   }
 
   void removeLesson(String moduleId, String lessonId) {
-    _updateModule(
-      moduleId,
-      (module) => module.copyWith(lessons: module.lessons.where((l) => l.id != lessonId).toList()),
-    );
+    _updateModule(moduleId, (module) {
+      return module.copyWith(lessons: module.lessons.where((lesson) => lesson.id != lessonId).toList());
+    });
   }
 
   void updateLesson(String moduleId, String lessonId, LessonModel updatedLesson) {
-    _updateModule(
-      moduleId,
-      (module) =>
-          module.copyWith(lessons: module.lessons.map((l) => l.id == lessonId ? updatedLesson : l).toList()),
-    );
+    _updateModule(moduleId, (module) {
+      return module.copyWith(
+        lessons: module.lessons.map((lesson) {
+          return lesson.id == lessonId ? updatedLesson : lesson;
+        }).toList(),
+      );
+    });
   }
 
-
-  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------
   // Reset
-  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------
 
   void clear() {
     state = const CourseDraft();
