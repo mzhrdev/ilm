@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/presentation/widgets/custom_text_button.dart';
@@ -13,6 +14,7 @@ import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
 import 'package:lms/features/courses/data/provider/continue_watching_provider.dart';
 import 'package:lms/features/home/data/providers/home_provider.dart';
+
 import '../../../courses/presentation/widget/course_card.dart';
 import '../../data/providers/category_provider.dart';
 import '../widgets/category_chip.dart';
@@ -26,7 +28,6 @@ class HomeScreen extends ConsumerWidget {
     final coursesAsync = ref.watch(continueWatchingProvider);
     final user = ref.watch(currentUserProvider);
     final categories = ref.watch(categoriesProvider);
-    
 
     return CustomSafeArea(
       child: Scaffold(
@@ -79,10 +80,11 @@ class HomeScreen extends ConsumerWidget {
                       const Icon(Icons.error_outline, color: Colors.red, size: 48),
                       SizedBox(height: context.h(4)),
                       Text('Error: $error'),
+
                       SizedBox(height: context.h(8)),
-                      ElevatedButton(
-                        onPressed: () => ref.invalidate(continueWatchingProvider),
-                        child: const Text('Retry'),
+                      CustomElevatedButton(
+                        onPress: () => ref.invalidate(continueWatchingProvider),
+                        title: 'Retry',
                       ),
                     ],
                   ),
