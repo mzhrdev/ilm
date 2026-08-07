@@ -1,5 +1,6 @@
 // lib/features/home/data/providers/course_provider.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/courses/data/dummy_data/dummy_course_list.dart';
@@ -16,17 +17,14 @@ final coursesProvider = FutureProvider<List<CourseModel>>((ref) async {
   return mockCourses;
 });
 
-// Single course detail provider
 final courseDetailProvider = FutureProvider.family<CourseModel, String>((ref, courseId) async {
-  // Simulate API delay
-  await Future.delayed(const Duration(milliseconds: 500));
+  final doc = await FirebaseFirestore.instance.collection('courses').doc(courseId).get();
 
-  final course = mockCourses.firstWhere(
-    (c) => c.id == courseId,
-    orElse: () => throw Exception('Course not found'),
-  );
+  if (!doc.exists) {
+    throw Exception("Course not found");
+  }
 
-  return course;
+  return CourseModel.fromFirestore(doc);
 });
 
 // Course + Whether the user is enrolled in it
@@ -47,7 +45,6 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
     (index) => CourseEnrollmentModel(course: courses[index], enrollment: enrollments[index]),
   );
 });
-
 
 // Courses where progress > 0
 final myCoursesProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
