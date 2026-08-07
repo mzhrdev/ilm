@@ -20,7 +20,7 @@ class CourseService {
 
       // Combine both
       return courseSnapshot.docs.map((doc) {
-        final course = CourseModel.fromJson(doc.data());
+        final course = CourseModel.fromFirestore(doc);
 
         return CourseEnrollmentModel(course: course, enrollment: enrollmentMap[course.id]);
       }).toList();
