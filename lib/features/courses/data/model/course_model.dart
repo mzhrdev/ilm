@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lms/features/courses/data/model/module_model.dart';
 import 'package:lms/features/home/data/model/review_model.dart';
 
@@ -11,7 +12,7 @@ class CourseModel {
   final double rating;
   final int totalRatings;
   final double price;
-  
+
   final int totalDurationMinutes;
   final List<String> skills;
   final List<ModuleModel> modules;
@@ -30,7 +31,7 @@ class CourseModel {
     required this.rating,
     required this.totalRatings,
     required this.price,
-    
+
     required this.totalDurationMinutes,
     required this.skills,
     required this.modules,
@@ -54,7 +55,7 @@ class CourseModel {
       rating: (json['rating'] as num).toDouble(),
       totalRatings: json['totalRatings'] as int,
       price: (json['price'] as num).toDouble(),
-     
+
       totalDurationMinutes: json['totalDurationMinutes'] as int,
       skills: List<String>.from(json['skills'] ?? []),
       modules: (modulesJson as List).map((m) => ModuleModel.fromJson(m)).toList(),
@@ -74,11 +75,37 @@ class CourseModel {
       'rating': rating,
       'totalRatings': totalRatings,
       'price': price,
-      
+
       'totalDurationMinutes': totalDurationMinutes,
       'skills': skills,
       'modules': modules.map((m) => m.toJson()).toList(),
       'reviews': reviews.map((r) => r.toJson()).toList(),
     };
+  }
+
+  factory CourseModel.fromFirestore(DocumentSnapshot doc) {
+    final json = doc.data() as Map<String, dynamic>;
+
+    return CourseModel(
+      id: doc.id, // <-- Firestore document ID
+      instructorId: json['instructorId'],
+      title: json['title'],
+      description: json['description'],
+      instructorName: json['instructorName'],
+      thumbnailUrl: json['thumbnailUrl'],
+      category: json['category'],
+      rating: (json['rating'] ?? 0).toDouble(),
+      totalRatings: json['totalRatings'] ?? 0,
+      price: (json['price'] ?? 0).toDouble(),
+      totalDurationMinutes: json['totalDurationMinutes'] ?? 0,
+      skills: List<String>.from(json['skills'] ?? []),
+      modules: (json['modules'] as List<dynamic>? ?? [])
+          .map((module) => ModuleModel.fromJson(module as Map<String, dynamic>))
+          .toList(),
+
+      reviews: (json['reviews'] as List<dynamic>? ?? [])
+          .map((review) => ReviewModel.fromJson(review as Map<String, dynamic>))
+          .toList(),
+    );
   }
 }

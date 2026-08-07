@@ -1,35 +1,55 @@
 import 'package:lms/features/courses/data/model/course_draft_model.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
-import 'package:uuid/uuid.dart';
 
 extension CourseDraftMapper on CourseDraft {
-  CourseModel toCourse({required String instructorId, required String instructorName}) {
-    final totalDuration = modules.fold<int>(
-      0,
-      (sum, module) =>
-          sum + module.lessons.fold(0, (lessonSum, lesson) => lessonSum + lesson.durationMinutes),
-    );
+  CourseModel toCourse({required String id, required String instructorId, required String instructorName}) {
+    final totalDurationMinutes = modules.fold<int>(0, (total, module) {
+      return total +
+          module.lessons.fold<int>(0, (lessonTotal, lesson) {
+            return lessonTotal + lesson.durationMinutes;
+          });
+    });
 
     return CourseModel(
-      id: const Uuid().v4(),
+      // -----------------------------
+      // Identity
+      // -----------------------------
+      id: id,
+
       instructorId: instructorId,
 
-      // --- From Draft ---
-      title: title,
-      description: description,
-      thumbnailUrl: thumbnailPath ?? '',
-      modules: modules,
-      totalDurationMinutes: totalDuration,
-      // --- Provided externally ---
       instructorName: instructorName,
 
-      // --- Default / System Generated ---
-      category: 'General', // change later via UI
-      price: 0.0, // free by default
+      // -----------------------------
+      // Course Draft Data
+      // -----------------------------
+      title: title,
+
+      description: description,
+
+      thumbnailUrl: thumbnailUrl,
+
+      category: category,
+
+      price: price,
+
+      skills: skills,
+
+      modules: modules,
+
+      // -----------------------------
+      // Generated Defaults
+      // -----------------------------
       rating: 0.0,
+
       totalRatings: 0,
+
       reviews: [],
-      skills: [],
+
+      // -----------------------------
+      // Calculated Data
+      // -----------------------------
+      totalDurationMinutes: totalDurationMinutes,
     );
   }
 }
