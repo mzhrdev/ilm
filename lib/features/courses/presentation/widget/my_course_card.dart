@@ -17,7 +17,7 @@ class MyCourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(Routes.courseDetail.replaceAll(':id', courseEnrollment.id)),
+      onTap: () => context.push(Routes.courseDetail.replaceAll(':id', courseEnrollment.course.id)),
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
         padding: EdgeInsets.all(context.w(3)),
