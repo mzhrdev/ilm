@@ -1,7 +1,7 @@
+import 'package:Edvance/core/data/services/firebase_firestore_services.dart';
+import 'package:Edvance/features/auth/data/model/user_model.dart';
+import 'package:Edvance/features/auth/data/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/core/data/services/firebase_firestore_services.dart';
-import 'package:lms/features/auth/data/model/user_model.dart';
-import 'package:lms/features/auth/data/providers/auth_provider.dart';
 
 final profileProvider = StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
   final firestoreServices = ref.watch(firestoreServicesProvider);

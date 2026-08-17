@@ -1,7 +1,7 @@
 // lib/features/settings/data/provider/payment_methods_provider.dart
 
+import 'package:Edvance/features/payment/data/dummy_data/payment_method.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/payment/data/dummy_data/payment_method.dart';
 
 import '../model/payment_method_model.dart';
 

@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:lms/core/constants/app_colors.dart';
+import 'package:Edvance/core/constants/app_colors.dart';
 
 
 

@@ -1,6 +1,6 @@
 // Renamed from chatProvider to conversationProvider
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/chat/data/model/direct_message.dart';
+import 'package:Edvance/features/chat/data/model/direct_message.dart';
 
 final conversationProvider = StateNotifierProvider<ConversationNotifier, List<DirectMessage>>((ref) {
   return ConversationNotifier();
@@ -19,7 +19,7 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
     ),
     DirectMessage(
       id: '2',
-      text: "I'm doing great! Just finished the new UI design for the LMS app.",
+      text: "I'm doing great! Just finished the new UI design for the Edvance app.",
       isMe: true,
       time: DateTime.now().subtract(const Duration(minutes: 4)),
     ),

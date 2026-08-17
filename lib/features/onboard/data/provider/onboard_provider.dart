@@ -1,13 +1,10 @@
-
 import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/core/constants/app_colors.dart';
-
+import 'package:Edvance/core/constants/app_colors.dart';
 
 // PROVIDER
-final onBoardingProvider =
-    StateNotifierProvider<OnBoardingNotifier, OnBoardingState>(
+final onBoardingProvider = StateNotifierProvider<OnBoardingNotifier, OnBoardingState>(
   (ref) => OnBoardingNotifier(),
 );
 
@@ -16,15 +13,9 @@ class OnBoardingState {
   final int currentPage;
   final PageController controller;
 
-  OnBoardingState({
-    required this.currentPage,
-    required this.controller,
-  });
+  OnBoardingState({required this.currentPage, required this.controller});
 
-  OnBoardingState copyWith({
-    int? currentPage,
-    PageController? controller,
-  }) {
+  OnBoardingState copyWith({int? currentPage, PageController? controller}) {
     return OnBoardingState(
       currentPage: currentPage ?? this.currentPage,
       controller: controller ?? this.controller,
@@ -34,13 +25,7 @@ class OnBoardingState {
 
 // NOTIFIER
 class OnBoardingNotifier extends StateNotifier<OnBoardingState> {
-  OnBoardingNotifier()
-      : super(
-          OnBoardingState(
-            currentPage: 0,
-            controller: PageController(),
-          ),
-        );
+  OnBoardingNotifier() : super(OnBoardingState(currentPage: 0, controller: PageController()));
 
   // update current page method
   void updateCurrentPage(int val) {
@@ -49,32 +34,21 @@ class OnBoardingNotifier extends StateNotifier<OnBoardingState> {
 
   // scroll to next page method
   void nextPage() {
-    state.controller.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeIn,
-    );
+    state.controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
   }
 
   // scroll to previous page method
   void previousPage() {
-    state.controller.previousPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeIn,
-    );
+    state.controller.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
   }
 
   // animated dots when moving from one page to other
-  AnimatedContainer buildDots({
-    required int index,
-    required BuildContext context,
-  }) {
+  AnimatedContainer buildDots({required int index, required BuildContext context}) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(12)),
-        color: state.currentPage == index
-            ? AppColors.kPrimary
-            : AppColors.kSecondary,
+        color: state.currentPage == index ? AppColors.kPrimary : AppColors.kSecondary,
       ),
       margin: EdgeInsets.symmetric(horizontal: context.w(2)),
       height: 2,
@@ -83,5 +57,3 @@ class OnBoardingNotifier extends StateNotifier<OnBoardingState> {
     );
   }
 }
-
-

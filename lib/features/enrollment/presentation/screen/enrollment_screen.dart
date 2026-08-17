@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/core/constants/app_assets.dart';
-import 'package:lms/core/routing/app_routing.dart';
-import 'package:lms/features/courses/data/model/course_model.dart';
-import 'package:lms/features/courses/data/provider/course_provider.dart';
-import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
-import 'package:lms/features/enrollment/data/provider/enrollment_provider.dart';
-import 'package:lms/features/enrollment/presentation/widget/progress_stepper.dart';
-import 'package:lms/features/enrollment/presentation/widget/purchase_details_card.dart';
-import 'package:lms/features/payment/data/provider/payment_method_provider.dart';
+import 'package:Edvance/core/constants/app_assets.dart';
+import 'package:Edvance/core/routing/app_routing.dart';
+import 'package:Edvance/features/courses/data/model/course_model.dart';
+import 'package:Edvance/features/courses/data/provider/course_provider.dart';
+import 'package:Edvance/features/enrollment/data/model/enrollment_model.dart';
+import 'package:Edvance/features/enrollment/data/provider/enrollment_provider.dart';
+import 'package:Edvance/features/enrollment/presentation/widget/progress_stepper.dart';
+import 'package:Edvance/features/enrollment/presentation/widget/purchase_details_card.dart';
+import 'package:Edvance/features/payment/data/provider/payment_method_provider.dart';
 
 class EnrollmentScreen extends ConsumerStatefulWidget {
   const EnrollmentScreen({super.key});

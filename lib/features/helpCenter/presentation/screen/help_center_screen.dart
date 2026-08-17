@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/core/constants/app_colors.dart';
-import 'package:lms/features/helpCenter/data/dummy_data/faq_list.dart';
-import 'package:lms/features/helpCenter/data/dummy_data/help_categories.dart';
+import 'package:Edvance/core/constants/app_colors.dart';
+import 'package:Edvance/features/helpCenter/data/dummy_data/faq_list.dart';
+import 'package:Edvance/features/helpCenter/data/dummy_data/help_categories.dart';
 
 class HelpCenterScreen extends ConsumerStatefulWidget {
   const HelpCenterScreen({super.key});
@@ -252,7 +252,7 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
             _buildContactOption(
               icon: Icons.email_outlined,
               title: 'Email Us',
-              subtitle: 'support@lmsapp.com',
+              subtitle: 'support@Edvanceapp.com',
               onTap: () {
                 // TODO: Launch email app
                 context.pop();

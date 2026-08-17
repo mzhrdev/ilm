@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:lms/features/auth/data/model/user_model.dart';
-import 'package:lms/features/courses/data/mappers/course_mapper.dart';
-import 'package:lms/features/courses/data/model/course_draft_model.dart';
-import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:Edvance/features/auth/data/model/user_model.dart';
+import 'package:Edvance/features/courses/data/mappers/course_mapper.dart';
+import 'package:Edvance/features/courses/data/model/course_draft_model.dart';
+import 'package:Edvance/features/courses/data/model/course_model.dart';
 
 class FirebaseFirestoreServices {
   FirebaseFirestoreServices({FirebaseFirestore? firestore, FirebaseAuth? auth})

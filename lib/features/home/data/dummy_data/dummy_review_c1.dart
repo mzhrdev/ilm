@@ -1,4 +1,4 @@
-import 'package:lms/features/home/data/model/review_model.dart';
+import 'package:Edvance/features/home/data/model/review_model.dart';
 
 final List<ReviewModel> mockReviews = [
   ReviewModel(

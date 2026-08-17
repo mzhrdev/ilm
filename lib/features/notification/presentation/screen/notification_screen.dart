@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/features/notification/data/provider/notification_provider.dart';
-import 'package:lms/features/notification/presentation/widget/notification_card.dart';
+import 'package:Edvance/features/notification/data/provider/notification_provider.dart';
+import 'package:Edvance/features/notification/presentation/widget/notification_card.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});

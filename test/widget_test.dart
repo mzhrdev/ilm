@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lms/core/app.dart';
+import 'package:Edvance/core/app.dart';
 
 
 

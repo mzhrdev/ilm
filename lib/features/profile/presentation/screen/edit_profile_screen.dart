@@ -1,9 +1,9 @@
 // lib/features/profile/presentation/screens/edit_profile_screen.dart
 
+import 'package:Edvance/features/auth/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/features/auth/data/model/user_model.dart';
 
 import '../../data/provider/profile_provider.dart';
 
@@ -119,7 +119,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       border: Border.all(color: Colors.white, width: 4),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),

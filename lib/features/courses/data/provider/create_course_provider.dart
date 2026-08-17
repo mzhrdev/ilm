@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/courses/data/model/course_draft_model.dart';
-import 'package:lms/features/courses/data/model/lesson_model.dart';
-import 'package:lms/features/courses/data/model/module_model.dart';
+import 'package:Edvance/features/courses/data/model/course_draft_model.dart';
+import 'package:Edvance/features/courses/data/model/lesson_model.dart';
+import 'package:Edvance/features/courses/data/model/module_model.dart';
 
 final createCourseProvider = StateNotifierProvider<CreateCourseNotifier, CourseDraft>((ref) {
   return CreateCourseNotifier();

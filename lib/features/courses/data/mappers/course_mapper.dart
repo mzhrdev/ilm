@@ -1,5 +1,5 @@
-import 'package:lms/features/courses/data/model/course_draft_model.dart';
-import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:Edvance/features/courses/data/model/course_draft_model.dart';
+import 'package:Edvance/features/courses/data/model/course_model.dart';
 
 extension CourseDraftMapper on CourseDraft {
   CourseModel toCourse({required String id, required String instructorId, required String instructorName}) {

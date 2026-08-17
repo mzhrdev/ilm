@@ -2,12 +2,12 @@ import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/core/constants/app_colors.dart';
-import 'package:lms/core/constants/app_text_styles.dart';
-import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
-import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
-import 'package:lms/core/routing/app_routing.dart';
-import 'package:lms/features/home/presentation/widgets/skill_chip.dart';
+import 'package:Edvance/core/constants/app_colors.dart';
+import 'package:Edvance/core/constants/app_text_styles.dart';
+import 'package:Edvance/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:Edvance/core/presentation/widgets/custom_icon_button.dart';
+import 'package:Edvance/core/routing/app_routing.dart';
+import 'package:Edvance/features/home/presentation/widgets/skill_chip.dart';
 
 import '../../data/provider/profile_provider.dart';
 

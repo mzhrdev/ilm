@@ -1,9 +1,9 @@
+import 'package:Edvance/core/constants/app_colors.dart';
+import 'package:Edvance/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:Edvance/core/routing/app_routing.dart';
 import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/core/constants/app_colors.dart';
-import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
-import 'package:lms/core/routing/app_routing.dart';
 
 class TwoButtonRow extends StatelessWidget {
   const TwoButtonRow({super.key});

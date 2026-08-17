@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:lms/core/constants/app_colors.dart';
-import 'package:lms/core/constants/app_fonts.dart';
+import 'package:Edvance/core/constants/app_colors.dart';
+import 'package:Edvance/core/constants/app_fonts.dart';
 
 
 

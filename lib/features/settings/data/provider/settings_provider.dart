@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/auth/data/model/user_model.dart';
-import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
+import 'package:Edvance/features/auth/data/model/user_model.dart';
+import 'package:Edvance/features/settings/data/model/settings_menu_item_model.dart';
 
 final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
   return SettingsNotifier();

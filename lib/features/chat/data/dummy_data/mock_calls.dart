@@ -1,4 +1,4 @@
-import 'package:lms/features/chat/data/model/call_model.dart';
+import 'package:Edvance/features/chat/data/model/call_model.dart';
 
 final List<CallModel> mockCalls = [
   CallModel(

@@ -1,4 +1,4 @@
- import 'package:lms/features/payment/data/model/payment_method_model.dart';
+ import 'package:Edvance/features/payment/data/model/payment_method_model.dart';
 
 final List<PaymentMethodModel> mockMethods = [
     PaymentMethodModel(

@@ -1,4 +1,4 @@
-import 'package:lms/features/chat/data/model/chat_model.dart';
+import 'package:Edvance/features/chat/data/model/chat_model.dart';
 
 final List<ChatModel> mockMessages = [
   ChatModel(

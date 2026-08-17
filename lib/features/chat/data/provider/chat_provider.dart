@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/chat/data/dummy_data/mock_messages.dart';
-import 'package:lms/features/chat/data/model/chat_model.dart';
+import 'package:Edvance/features/chat/data/dummy_data/mock_messages.dart';
+import 'package:Edvance/features/chat/data/model/chat_model.dart';
 
 enum MessageTab { chat, calls }
 

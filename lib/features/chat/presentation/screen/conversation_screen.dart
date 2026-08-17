@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lms/core/routing/app_routing.dart';
-import 'package:lms/features/chat/data/model/call_model.dart';
-import 'package:lms/features/chat/data/model/direct_message.dart';
-import 'package:lms/features/chat/data/provider/active_call_provider.dart';
-import 'package:lms/features/chat/data/provider/direct_message_provider.dart';
+import 'package:Edvance/core/routing/app_routing.dart';
+import 'package:Edvance/features/chat/data/model/call_model.dart';
+import 'package:Edvance/features/chat/data/model/direct_message.dart';
+import 'package:Edvance/features/chat/data/provider/active_call_provider.dart';
+import 'package:Edvance/features/chat/data/provider/direct_message_provider.dart';
 
 // Renamed from ChatScreen to ConversationScreen
 class ConversationScreen extends ConsumerStatefulWidget {
