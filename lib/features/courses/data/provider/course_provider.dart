@@ -42,10 +42,12 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
   }
 
   final enrollments = await Future.wait(
-    courses.map((course) {
-      print('[courseEnrollmentsProvider] checking enrollment for courseId=${course.id}');
-      return ref.watch(enrollmentLookupProvider((courseId: course.id, userId: user.id)).future);
-    }),
+    courses.map(
+      (course) {
+        print('[courseEnrollmentsProvider] checking enrollment for courseId=${course.id}');
+        return ref.watch(enrollmentLookupProvider((courseId: course.id, userId: user.id)).future);
+      },
+    ),
   );
 
   for (var i = 0; i < courses.length; i++) {
