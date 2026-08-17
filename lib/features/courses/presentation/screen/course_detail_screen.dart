@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/courses/data/model/lesson_model.dart';
+import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 import 'package:lms/features/enrollment/data/provider/enrollment_provider.dart';
 import 'package:lms/features/home/presentation/widgets/review_card.dart';
 
@@ -42,65 +43,113 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
   Widget build(BuildContext context) {
     final courseAsync = ref.watch(courseDetailProvider(widget.courseId));
 
+    final userId = ref.watch(currentUserProvider)?.id;
+
+    final enrollmentAsync = ref.watch(enrollmentLookupProvider((courseId: widget.courseId, userId: userId)));
+
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: courseAsync.when(
         data: (course) => _buildCourseDetailContent(course),
+
         loading: () => const Center(child: CircularProgressIndicator()),
+
         error: (error, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.error_outline, color: Colors.red, size: 48),
+
               const SizedBox(height: 8),
+
               Text('Error: $error'),
+
               const SizedBox(height: 16),
+
               ElevatedButton(
-                onPressed: () => ref.invalidate(courseDetailProvider(widget.courseId)),
+                onPressed: () {
+                  ref.invalidate(courseDetailProvider(widget.courseId));
+                },
                 child: const Text('Retry'),
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: _buildEnrollButton(courseAsync.value),
+
+      bottomNavigationBar: _buildEnrollButton(courseAsync.value, enrollmentAsync),
     );
   }
 
-  Widget _buildEnrollButton(CourseModel? course) {
-    // 1. Safety Check: If course is null, don't render the button
-    if (course == null) return const SizedBox.shrink();
+  Widget _buildEnrollButton(CourseModel? course, AsyncValue<EnrollmentModel?> enrollmentAsync) {
+    if (course == null) {
+      return const SizedBox.shrink();
+    }
+
+    final isEnrolled = enrollmentAsync.value != null;
+    final isCheckingEnrollment = enrollmentAsync.isLoading;
+
+    String buttonText;
+
+    if (isCheckingEnrollment) {
+      buttonText = 'CHECKING...';
+    } else if (isEnrolled) {
+      buttonText = 'ENROLLED';
+    } else {
+      buttonText = 'GET ENROLL';
+    }
 
     return Container(
       padding: const EdgeInsets.all(16),
+
       decoration: BoxDecoration(
         color: Colors.white,
+
         boxShadow: [
           BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -2)),
         ],
       ),
+
       child: SafeArea(
         child: SizedBox(
           width: double.infinity,
           height: 50,
+
           child: ElevatedButton(
-            // 2. ALL logic goes INSIDE the onPressed callback
-            onPressed: () async {
-              final userId = ref.read(currentUserProvider)?.id ?? '';
+            onPressed: isCheckingEnrollment
+                ? null
+                : isEnrolled
+                ? null
+                : () {
+                    final userId = ref.read(currentUserProvider)?.id ?? '';
 
-              // Step A: Save the course data to our state manager
-              ref.read(enrollmentProvider.notifier).initializeFromCourse(course, userId: userId);
+                    if (userId.isEmpty) {
+                      return;
+                    }
 
-              // Step B: Navigate to the enrollment screen
-              context.push(Routes.enrollmentScreen);
-            },
+                    ref.read(enrollmentProvider.notifier).initializeFromCourse(course, userId: userId);
+
+                    context.push(Routes.enrollmentScreen);
+                  },
+
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
+
+              disabledBackgroundColor: isEnrolled ? Colors.grey[300] : Colors.grey[400],
+
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text(
-              'GET ENROLL',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+
+            child: Text(
+              buttonText,
+
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+
+                color: isEnrolled ? Colors.black87 : Colors.white,
+              ),
             ),
           ),
         ),

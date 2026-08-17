@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/courses/data/provider/continue_watching_provider.dart';
 import 'package:lms/features/courses/data/provider/course_provider.dart';
 import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 
@@ -205,8 +206,6 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
         'INVALIDATING ENROLLMENT LOOKUP',
       );
 
-      ref.invalidate(enrollmentLookupProvider((courseId: enrollment.courseId, userId: enrollment.userId)));
-
       // -----------------------------------------------------------------------
       // REFRESH COURSE + ENROLLMENT DATA
       // -----------------------------------------------------------------------
@@ -215,8 +214,9 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
         '[EnrollmentNotifier] '
         'INVALIDATING COURSE ENROLLMENTS',
       );
-
+      ref.invalidate(enrollmentLookupProvider((courseId: enrollment.courseId, userId: enrollment.userId)));
       ref.invalidate(courseEnrollmentsProvider);
+      ref.invalidate(continueWatchingProvider);
 
       print(
         '[EnrollmentNotifier] '
