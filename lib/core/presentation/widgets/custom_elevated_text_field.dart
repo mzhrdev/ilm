@@ -1,10 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_fonts.dart';
-
-
 
 class CustomElevatedTextField extends StatelessWidget {
   const CustomElevatedTextField({
@@ -95,7 +92,6 @@ class CustomElevatedTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      
       decoration: BoxDecoration(
         color: AppColors.kWhite,
         borderRadius: BorderRadius.circular(15),
@@ -117,47 +113,26 @@ class CustomElevatedTextField extends StatelessWidget {
         minLines: minLines,
         readOnly: readOnly,
         controller: controller,
-        style: TextStyle(
-          color: fontColor,
-          fontSize: fontSize,
-          fontFamily: textFontFamily,
-        ),
+        style: TextStyle(color: fontColor, fontSize: fontSize, fontFamily: textFontFamily),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(
-            color: hintTextColor,
-            fontSize: hintFontSize,
-            fontFamily: hintFontFamily,
-          ),
+          hintStyle: TextStyle(color: hintTextColor, fontSize: hintFontSize, fontFamily: hintFontFamily),
           fillColor: fillColor,
           filled: filled,
           floatingLabelBehavior: floatingLabelBehavior,
           labelText: labelText,
-          labelStyle: TextStyle(
-            fontSize: labelFontSize,
-            color: labelColor,
-            fontFamily: labelFontFamily,
-          ),
+          labelStyle: TextStyle(fontSize: labelFontSize, color: labelColor, fontFamily: labelFontFamily),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: BorderSide(
-              color: enabledBorderColor,
-              width: borderWidth,
-            ),
+            borderSide: BorderSide(color: enabledBorderColor, width: borderWidth),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: BorderSide(
-              color: enabledBorderColor,
-              width: borderWidth,
-            ),
+            borderSide: BorderSide(color: enabledBorderColor, width: borderWidth),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: BorderSide(
-              color: focusedBorderColor,
-              width: borderWidth,
-            ),
+            borderSide: BorderSide(color: focusedBorderColor, width: borderWidth),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius),
@@ -167,12 +142,8 @@ class CustomElevatedTextField extends StatelessWidget {
             borderRadius: BorderRadius.circular(borderRadius),
             borderSide: BorderSide(color: AppColors.kRed, width: borderWidth),
           ),
-          prefixIcon: isPrefixIconEnabled!
-              ? Icon(preFixIcon, color: prefixIconColor)
-              : null,
-          suffixIcon: isSuffixIconEnabled!
-              ? Icon(suffixIcon, color: suffixIconColor)
-              : null,
+          prefixIcon: isPrefixIconEnabled! ? Icon(preFixIcon, color: prefixIconColor) : null,
+          suffixIcon: isSuffixIconEnabled! ? Icon(suffixIcon, color: suffixIconColor) : null,
           contentPadding: contentPadding,
         ),
         keyboardType: keyboardType,

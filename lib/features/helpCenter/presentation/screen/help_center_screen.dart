@@ -190,34 +190,39 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
+      child: Material(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(
-              question,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
-            ),
-            trailing: Icon(
-              isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              color: Colors.grey[600],
-            ),
-            onTap: () {
-              setState(() {
-                _expandedQuestionIndex = isExpanded ? null : index;
-              });
-            },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
           ),
-          if (isExpanded)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Text(answer, style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5)),
-            ),
-        ],
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(
+                  question,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+                ),
+                trailing: Icon(
+                  isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  color: Colors.grey[600],
+                ),
+                onTap: () {
+                  setState(() {
+                    _expandedQuestionIndex = isExpanded ? null : index;
+                  });
+                },
+              ),
+              if (isExpanded)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Text(answer, style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5)),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

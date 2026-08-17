@@ -12,7 +12,6 @@ class CourseModel {
   final double rating;
   final int totalRatings;
   final double price;
-
   final int totalDurationMinutes;
   final List<String> skills;
   final List<ModuleModel> modules;

@@ -1,9 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_fonts.dart';
-
 
 class CustomPasswordTextField extends StatefulWidget {
   const CustomPasswordTextField({
@@ -25,9 +23,9 @@ class CustomPasswordTextField extends StatefulWidget {
     this.onTap,
     this.isSuffixIconEnabled = true,
     this.suffixIcon = Icons.abc,
-    this.labelColor = AppColors.kGrey,    //AppColors.kPrimary changed
+    this.labelColor = AppColors.kGrey, //AppColors.kPrimary changed
     this.floatingLabelBehavior = FloatingLabelBehavior.auto,
-    this.hintTextColor = AppColors.kGrey,    //AppColors.kBlack changed
+    this.hintTextColor = AppColors.kGrey, //AppColors.kBlack changed
     this.minLines = 1,
     this.hintFontSize = 14,
     this.inputFormatters,
@@ -101,11 +99,9 @@ class _CustomPasswordTextFieldState extends State<CustomPasswordTextField> {
   bool _obscureText = true;
   // Toggles the password show status
   void _toggle() {
-    setState(
-      () {
-        _obscureText = !_obscureText;
-      },
-    );
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 
   @override
@@ -142,39 +138,22 @@ class _CustomPasswordTextFieldState extends State<CustomPasswordTextField> {
           border: InputBorder.none,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            borderSide: BorderSide(
-              color: widget.enabledBorderColor,
-              width: widget.borderWidth,
-            ),
+            borderSide: BorderSide(color: widget.enabledBorderColor, width: widget.borderWidth),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(
-              widget.borderRadius,
-            ),
-            borderSide: BorderSide(
-              color: widget.focusedBorderColor,
-              width: widget.borderWidth,
-            ),
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            borderSide: BorderSide(color: widget.focusedBorderColor, width: widget.borderWidth),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            borderSide: BorderSide(
-              color: AppColors.kRed,
-              width: widget.borderWidth,
-            ),
+            borderSide: BorderSide(color: AppColors.kRed, width: widget.borderWidth),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            borderSide: BorderSide(
-              color: AppColors.kRed,
-              width: widget.borderWidth,
-            ),
+            borderSide: BorderSide(color: AppColors.kRed, width: widget.borderWidth),
           ),
           prefixIcon: widget.isPrefixIconEnabled!
-              ? Icon(
-                  widget.preFixIcon,
-                  color: widget.prefixIconColor,
-                )
+              ? Icon(widget.preFixIcon, color: widget.prefixIconColor)
               : null,
           suffixIcon: widget.isSuffixIconEnabled!
               ? IconButton(

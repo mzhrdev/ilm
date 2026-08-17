@@ -10,19 +10,15 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'LMS',
+      title: 'lms',
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
       theme: ThemeData(
         colorSchemeSeed: Ext.getMaterialColor(AppColors.kWhite),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(
-              AppColors.kTransparent,
-            ), // solid color
-            foregroundColor: WidgetStatePropertyAll(
-              AppColors.kTransparent,
-            ), // text/icon color
+            backgroundColor: WidgetStatePropertyAll(AppColors.kTransparent), // solid color
+            foregroundColor: WidgetStatePropertyAll(AppColors.kTransparent), // text/icon color
           ),
         ),
         dialogTheme: DialogThemeData(
@@ -34,17 +30,12 @@ class MyApp extends ConsumerWidget {
           backgroundColor: AppColors.kWhite,
           surfaceTintColor: AppColors.kTransparent,
         ),
-        cardTheme: CardThemeData(
-          surfaceTintColor: AppColors.kTransparent,
-          color: AppColors.kWhite,
-        ),
+        cardTheme: CardThemeData(surfaceTintColor: AppColors.kTransparent, color: AppColors.kWhite),
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.kWhite,
           surfaceTintColor: AppColors.kTransparent,
         ),
-        drawerTheme: const DrawerThemeData(
-          surfaceTintColor: AppColors.kTransparent,
-        ),
+        drawerTheme: const DrawerThemeData(surfaceTintColor: AppColors.kTransparent),
         popupMenuTheme: const PopupMenuThemeData(
           surfaceTintColor: AppColors.kTransparent,
           color: AppColors.kWhite,

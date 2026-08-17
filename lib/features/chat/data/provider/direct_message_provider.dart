@@ -19,7 +19,7 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
     ),
     DirectMessage(
       id: '2',
-      text: "I'm doing great! Just finished the new UI design for the LMS app.",
+      text: "I'm doing great! Just finished the new UI design for the lms app.",
       isMe: true,
       time: DateTime.now().subtract(const Duration(minutes: 4)),
     ),

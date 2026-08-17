@@ -1,9 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_fonts.dart';
-
-
 
 class CustomIconTextButton extends StatelessWidget {
   const CustomIconTextButton({
@@ -27,11 +24,7 @@ class CustomIconTextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton.icon(
-      icon: Icon(
-        icon,
-        color: iconColor,
-        size: iconSize,
-      ),
+      icon: Icon(icon, color: iconColor, size: iconSize),
       style: TextButton.styleFrom(
         surfaceTintColor: AppColors.kTransparent,
         minimumSize: const Size(0, 0),
@@ -41,11 +34,7 @@ class CustomIconTextButton extends StatelessWidget {
       onPressed: onPressed,
       label: Text(
         text,
-        style: TextStyle(
-          fontSize: fontSize,
-          color: color,
-          fontFamily: AppFonts.kMedium,
-        ),
+        style: TextStyle(fontSize: fontSize, color: color, fontFamily: AppFonts.kMedium),
       ),
     );
   }

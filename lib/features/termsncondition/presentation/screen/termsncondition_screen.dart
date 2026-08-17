@@ -30,7 +30,7 @@ class TermsAndConditionsScreen extends ConsumerWidget {
           children: [
             _buildSectionTitle('1. Acceptance of Terms'),
             _buildParagraph(
-              'By accessing and using the LMS platform, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.',
+              'By accessing and using the lms platform, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.',
             ),
             const SizedBox(height: 24),
 
@@ -48,7 +48,7 @@ class TermsAndConditionsScreen extends ConsumerWidget {
 
             _buildSectionTitle('4. Intellectual Property'),
             _buildParagraph(
-              'All content provided on this platform, including but not limited to videos, text, graphics, and course materials, is the property of the LMS or its content suppliers and is protected by international copyright laws.',
+              'All content provided on this platform, including but not limited to videos, text, graphics, and course materials, is the property of the lms or its content suppliers and is protected by international copyright laws.',
             ),
             const SizedBox(height: 24),
 

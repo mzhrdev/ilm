@@ -1,8 +1,6 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/core/constants/app_colors.dart';
-
 
 class CustomCachedNetworkImage extends StatelessWidget {
   const CustomCachedNetworkImage({
@@ -50,18 +48,12 @@ class CustomCachedNetworkImage extends StatelessWidget {
                     bottomRight: Radius.circular(bottomRightRadiusCircular),
                   ),
             border: border,
-            image: DecorationImage(
-              image: imageProvider,
-              fit: fit,
-            ),
+            image: DecorationImage(image: imageProvider, fit: fit),
           ),
           child: child,
         );
       },
-      errorWidget: (context, url, error) => const Icon(
-        Icons.error,
-        color: AppColors.kRed,
-      ),
+      errorWidget: (context, url, error) => const Icon(Icons.error, color: AppColors.kRed),
       progressIndicatorBuilder: (context, url, progress) => Center(
         child: CircularProgressIndicator(
           value: progress.progress,

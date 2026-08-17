@@ -1,17 +1,14 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/core/constants/app_colors.dart';
-
-
 
 class CustomProfileImageAvatar extends StatelessWidget {
   const CustomProfileImageAvatar({
     super.key,
     this.onTap,
     this.inkWellEffectBorderRadius = 30,
-   
+
     this.maximumCircleAvatarRadius = 23,
 
     this.circleAvatarBackgroundColor = AppColors.kPrimary,
@@ -54,41 +51,28 @@ class CustomProfileImageAvatar extends StatelessWidget {
         isLabelVisible: badgeVisible!,
         //Badge Size
         smallSize: badgeSize,
-        child: CircleAvatar(
-          //Maximum Parent Circle Avatar Radius
-          radius: maximumCircleAvatarRadius,
-          //Parent Circle Avatar Background Color
-          backgroundColor: circleAvatarBackgroundColor,
-          child: CachedNetworkImage(
-            imageUrl:
-                //Profile Image Link
-                profileImageUrl,
-            imageBuilder: (
-              context,
-              imageProvider,
-            ) =>
-                CircleAvatar(
-              //Image Circle Avatar Radius
-              radius: imageCircleAvatarRadius,
-              backgroundImage: imageProvider,
+        child:
+            CircleAvatar(
+              //Maximum Parent Circle Avatar Radius
+              radius: maximumCircleAvatarRadius,
+              //Parent Circle Avatar Background Color
+              backgroundColor: circleAvatarBackgroundColor,
+              child: CachedNetworkImage(
+                imageUrl:
+                    //Profile Image Link
+                    profileImageUrl,
+                imageBuilder: (context, imageProvider) => CircleAvatar(
+                  //Image Circle Avatar Radius
+                  radius: imageCircleAvatarRadius,
+                  backgroundImage: imageProvider,
+                ),
+                placeholder: (context, url) => const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              ),
+            ).padAll(
+              //Padding Around Parent Circle Avatar For Ink Well Effect
+              paddingAroundParentCircleAvatar,
             ),
-            placeholder: (
-              context,
-              url,
-            ) =>
-                const CircularProgressIndicator(),
-            errorWidget: (
-              context,
-              url,
-              error,
-            ) =>
-                const Icon(
-              Icons.error,
-            ),
-          ),
-        ).padAll(
-            //Padding Around Parent Circle Avatar For Ink Well Effect
-            paddingAroundParentCircleAvatar),
       ),
     );
   }

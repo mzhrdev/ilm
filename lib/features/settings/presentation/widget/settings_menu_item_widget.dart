@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
 
-
 class SettingsMenuItemTile extends StatelessWidget {
   final SettingsMenuItem item;
   final VoidCallback onTap;

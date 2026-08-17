@@ -1,102 +1,303 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/courses/data/dummy_data/dummy_course_list.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/courses/data/provider/continue_watching_provider.dart';
+import 'package:lms/features/courses/data/provider/course_provider.dart';
 import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 
+// -----------------------------------------------------------------------------
+// ENROLLMENT PROVIDER
+// -----------------------------------------------------------------------------
+
 final enrollmentProvider = StateNotifierProvider<EnrollmentNotifier, EnrollmentModel?>((ref) {
-  return EnrollmentNotifier();
+  return EnrollmentNotifier(ref);
 });
 
-const Map<String, double> _mockEnrollmentProgressByCourseId = {'1': 0.2, '2': 0.65, '3': 1.0};
-
-CourseModel? _findCourseById(String courseId) {
-  for (final course in mockCourses) {
-    if (course.id == courseId) {
-      return course;
-    }
-  }
-  return null;
-}
+// -----------------------------------------------------------------------------
+// ENROLLMENT LOOKUP PROVIDER
+// -----------------------------------------------------------------------------
 
 final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({String courseId, String? userId})>(
   (ref, args) async {
-    print('[enrollmentLookupProvider] start courseId=${args.courseId}, userId=${args.userId ?? 'null'}');
-    await Future.delayed(const Duration(milliseconds: 250));
+    print('');
+    print('==================================================');
+    print('[enrollmentLookupProvider] LOOKUP START');
+    print('courseId=${args.courseId}');
+    print('userId=${args.userId ?? 'null'}');
+    print('==================================================');
 
     final userId = args.userId;
+
     if (userId == null || userId.isEmpty) {
-      print('[enrollmentLookupProvider] no userId for courseId=${args.courseId}, returning null');
+      print('[enrollmentLookupProvider] No userId -> returning null');
       return null;
     }
 
-    final progress = _mockEnrollmentProgressByCourseId[args.courseId];
-    if (progress == null || progress <= 0) {
-      print('[enrollmentLookupProvider] no progress for courseId=${args.courseId}, returning null');
-      return null;
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('enrollments')
+          .where('courseId', isEqualTo: args.courseId)
+          .where('userId', isEqualTo: userId)
+          .limit(1)
+          .get();
+
+      print(
+        '[enrollmentLookupProvider] '
+        'documents found=${snapshot.docs.length}',
+      );
+
+      if (snapshot.docs.isEmpty) {
+        print(
+          '[enrollmentLookupProvider] '
+          'NOT ENROLLED '
+          'courseId=${args.courseId}',
+        );
+
+        return null;
+      }
+
+      final doc = snapshot.docs.first;
+
+      print(
+        '[enrollmentLookupProvider] '
+        'ENROLLMENT FOUND '
+        'documentId=${doc.id}',
+      );
+
+      final enrollment = EnrollmentModel.fromFirestore(doc.data());
+
+      print(
+        '[enrollmentLookupProvider] '
+        'courseId=${enrollment.courseId}',
+      );
+
+      print(
+        '[enrollmentLookupProvider] '
+        'userId=${enrollment.userId}',
+      );
+
+      print(
+        '[enrollmentLookupProvider] '
+        'progress=${enrollment.progress}',
+      );
+
+      print(
+        '[enrollmentLookupProvider] '
+        'paidAmount=${enrollment.paidAmount}',
+      );
+
+      return enrollment;
+    } catch (error, stackTrace) {
+      print(
+        '[enrollmentLookupProvider] '
+        'ERROR: $error',
+      );
+
+      print(stackTrace);
+
+      rethrow;
     }
-
-    final course = _findCourseById(args.courseId);
-    if (course == null) {
-      print('[enrollmentLookupProvider] no course found for courseId=${args.courseId}, returning null');
-      return null;
-    }
-
-    print('[enrollmentLookupProvider] resolved enrollment for courseId=${args.courseId}, progress=$progress');
-
-    return EnrollmentModel(
-      courseId: course.id,
-      userId: userId,
-      courseName: course.title,
-      instructorName: course.instructorName,
-      totalLectures: course.totalLessons,
-      duration: '${course.totalDurationMinutes ~/ 60} Weeks',
-      originalPrice: course.price,
-      discountPercentage: 10.0,
-      finalPrice: course.price * 0.9,
-      couponCode: '10% Off',
-      purchaseDate: DateTime.now().subtract(const Duration(days: 7)),
-      currentStep: 1,
-      hasCertificate: true,
-      progress: progress,
-    );
   },
 );
 
+// -----------------------------------------------------------------------------
+// ENROLLMENT NOTIFIER
+// -----------------------------------------------------------------------------
+
 class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
-  EnrollmentNotifier() : super(null);
+  final Ref ref;
+
+  EnrollmentNotifier(this.ref) : super(null);
+
+  // ---------------------------------------------------------------------------
+  // INITIALIZE
+  // ---------------------------------------------------------------------------
 
   void initializeFromCourse(CourseModel course, {required String userId}) {
+    print('');
+    print('==================================================');
+    print('===== INITIALIZE ENROLLMENT =====');
+    print('==================================================');
+
+    print('Course ID: ${course.id}');
+    print('Course Title: ${course.title}');
+    print('User ID: $userId');
+
+    const discountPercentage = 10.0;
+
+    final paidAmount = course.price - (course.price * discountPercentage / 100);
+
     state = EnrollmentModel(
       courseId: course.id,
       userId: userId,
-      courseName: course.title,
-      instructorName: course.instructorName,
-      totalLectures: course.totalLessons,
-      duration: '${course.totalDurationMinutes ~/ 60} Weeks',
       originalPrice: course.price,
-      discountPercentage: 10.0, // You can make this dynamic
-      finalPrice: course.price * 0.9, // 10% discount
+      discountPercentage: discountPercentage,
+      paidAmount: paidAmount,
       couponCode: '10% Off',
       purchaseDate: DateTime.now(),
       currentStep: 1,
       hasCertificate: true,
-      progress: 0,
+      progress: 0.0,
     );
+
+    print('[EnrollmentNotifier] Enrollment state initialized');
+    print('[EnrollmentNotifier] courseId=${state!.courseId}');
+    print('[EnrollmentNotifier] userId=${state!.userId}');
+    print('[EnrollmentNotifier] progress=${state!.progress}');
   }
+
+  // ---------------------------------------------------------------------------
+  // SAVE ENROLLMENT
+  // ---------------------------------------------------------------------------
+
+  Future<void> saveEnrollment() async {
+    final enrollment = state;
+
+    if (enrollment == null) {
+      throw StateError('Cannot save enrollment because enrollment state is null.');
+    }
+
+    print('');
+    print('==================================================');
+    print('[EnrollmentNotifier] SAVE ENROLLMENT');
+    print('==================================================');
+
+    print('courseId=${enrollment.courseId}');
+    print('userId=${enrollment.userId}');
+    print('paidAmount=${enrollment.paidAmount}');
+    print('progress=${enrollment.progress}');
+
+    try {
+      final collection = FirebaseFirestore.instance.collection('enrollments');
+
+      // -----------------------------------------------------------------------
+      // SAVE TO FIRESTORE
+      // -----------------------------------------------------------------------
+
+      final document = await collection.add(enrollment.toJson());
+
+      print(
+        '[EnrollmentNotifier] '
+        'ENROLLMENT SAVED SUCCESSFULLY',
+      );
+
+      print(
+        '[EnrollmentNotifier] '
+        'documentId=${document.id}',
+      );
+
+      print(
+        '[EnrollmentNotifier] '
+        'courseId=${enrollment.courseId}',
+      );
+
+      print(
+        '[EnrollmentNotifier] '
+        'userId=${enrollment.userId}',
+      );
+
+      // -----------------------------------------------------------------------
+      // REFRESH ENROLLMENT LOOKUP
+      // -----------------------------------------------------------------------
+
+      print('');
+      print(
+        '[EnrollmentNotifier] '
+        'INVALIDATING ENROLLMENT LOOKUP',
+      );
+
+      // -----------------------------------------------------------------------
+      // REFRESH COURSE + ENROLLMENT DATA
+      // -----------------------------------------------------------------------
+
+      print(
+        '[EnrollmentNotifier] '
+        'INVALIDATING COURSE ENROLLMENTS',
+      );
+      ref.invalidate(enrollmentLookupProvider((courseId: enrollment.courseId, userId: enrollment.userId)));
+      ref.invalidate(courseEnrollmentsProvider);
+      ref.invalidate(continueWatchingProvider);
+
+      print(
+        '[EnrollmentNotifier] '
+        'ENROLLMENT DATA REFRESH TRIGGERED',
+      );
+
+      print('==================================================');
+      print('[EnrollmentNotifier] SAVE COMPLETED');
+      print('==================================================');
+    } catch (error, stackTrace) {
+      print('');
+      print(
+        '[EnrollmentNotifier] '
+        'FAILED TO SAVE ENROLLMENT',
+      );
+
+      print('[EnrollmentNotifier] ERROR: $error');
+      print('[EnrollmentNotifier] STACK TRACE:');
+      print(stackTrace);
+
+      rethrow;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // NEXT STEP
+  // ---------------------------------------------------------------------------
 
   void nextStep() {
-    if (state != null && state!.currentStep < 3) {
-      state = state!.copyWith(currentStep: state!.currentStep + 1);
+    if (state == null) {
+      return;
+    }
+
+    if (state!.currentStep < 3) {
+      final nextStep = state!.currentStep + 1;
+
+      print(
+        '[EnrollmentNotifier] '
+        'Moving from step ${state!.currentStep} to step $nextStep',
+      );
+
+      state = state!.copyWith(currentStep: nextStep);
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // PREVIOUS STEP
+  // ---------------------------------------------------------------------------
 
   void previousStep() {
-    if (state != null && state!.currentStep > 1) {
-      state = state!.copyWith(currentStep: state!.currentStep - 1);
+    if (state == null) {
+      print(
+        '[EnrollmentNotifier] '
+        'previousStep called but state is null',
+      );
+
+      return;
+    }
+
+    if (state!.currentStep > 1) {
+      final previousStep = state!.currentStep - 1;
+
+      print(
+        '[EnrollmentNotifier] '
+        'Moving from step ${state!.currentStep} to step $previousStep',
+      );
+
+      state = state!.copyWith(currentStep: previousStep);
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // RESET
+  // ---------------------------------------------------------------------------
+
   void reset() {
+    print(
+      '[EnrollmentNotifier] '
+      'Resetting enrollment state',
+    );
+
     state = null;
   }
 }
