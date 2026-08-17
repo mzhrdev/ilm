@@ -672,7 +672,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                  * 1. Create Enrollment in Firestore.
                  * 2. Move to step 3.
                  */
-
+                notifier.saveEnrollment();
                 notifier.nextStep();
                 return;
               }
