@@ -76,7 +76,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -2)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -2)),
         ],
       ),
       child: SafeArea(
@@ -85,7 +85,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
           height: 50,
           child: ElevatedButton(
             // 2. ALL logic goes INSIDE the onPressed callback
-            onPressed: () {
+            onPressed: () async {
               final userId = ref.read(currentUserProvider)?.id ?? '';
 
               // Step A: Save the course data to our state manager

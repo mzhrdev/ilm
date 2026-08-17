@@ -648,7 +648,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
           height: 50,
 
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               final notifier = ref.read(enrollmentProvider.notifier);
 
               if (enrollment.currentStep == 1) {
@@ -672,7 +672,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                  * 1. Create Enrollment in Firestore.
                  * 2. Move to step 3.
                  */
-                notifier.saveEnrollment();
+                await notifier.saveEnrollment();
                 notifier.nextStep();
                 return;
               }

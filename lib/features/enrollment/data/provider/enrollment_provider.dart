@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/courses/data/provider/course_provider.dart';
 import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 
 // -----------------------------------------------------------------------------
@@ -8,18 +9,11 @@ import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 // -----------------------------------------------------------------------------
 
 final enrollmentProvider = StateNotifierProvider<EnrollmentNotifier, EnrollmentModel?>((ref) {
-  return EnrollmentNotifier();
+  return EnrollmentNotifier(ref);
 });
 
 // -----------------------------------------------------------------------------
 // ENROLLMENT LOOKUP PROVIDER
-// -----------------------------------------------------------------------------
-//
-// Finds an existing enrollment for a specific user + course.
-//
-// Enrollment is determined by the existence of a matching Firestore document.
-// Progress is NOT used to determine enrollment.
-//
 // -----------------------------------------------------------------------------
 
 final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({String courseId, String? userId})>(
@@ -110,16 +104,12 @@ final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({Strin
 // -----------------------------------------------------------------------------
 
 class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
-  EnrollmentNotifier() : super(null);
+  final Ref ref;
+
+  EnrollmentNotifier(this.ref) : super(null);
 
   // ---------------------------------------------------------------------------
   // INITIALIZE
-  // ---------------------------------------------------------------------------
-  //
-  // Creates the temporary enrollment state when the user starts enrollment.
-  //
-  // This does NOT save anything to Firestore yet.
-  //
   // ---------------------------------------------------------------------------
 
   void initializeFromCourse(CourseModel course, {required String userId}) {
@@ -158,12 +148,6 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
   // ---------------------------------------------------------------------------
   // SAVE ENROLLMENT
   // ---------------------------------------------------------------------------
-  //
-  // Persists the current enrollment to the existing Firestore collection.
-  //
-  // The Firestore structure comes directly from EnrollmentModel.toJson().
-  //
-  // ---------------------------------------------------------------------------
 
   Future<void> saveEnrollment() async {
     final enrollment = state;
@@ -181,16 +165,24 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
     print('userId=${enrollment.userId}');
     print('paidAmount=${enrollment.paidAmount}');
     print('progress=${enrollment.progress}');
-   
 
     try {
       final collection = FirebaseFirestore.instance.collection('enrollments');
 
-      await collection.add(enrollment.toJson());
+      // -----------------------------------------------------------------------
+      // SAVE TO FIRESTORE
+      // -----------------------------------------------------------------------
+
+      final document = await collection.add(enrollment.toJson());
 
       print(
         '[EnrollmentNotifier] '
         'ENROLLMENT SAVED SUCCESSFULLY',
+      );
+
+      print(
+        '[EnrollmentNotifier] '
+        'documentId=${document.id}',
       );
 
       print(
@@ -202,7 +194,38 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
         '[EnrollmentNotifier] '
         'userId=${enrollment.userId}',
       );
-       print('COURSE SAVED');
+
+      // -----------------------------------------------------------------------
+      // REFRESH ENROLLMENT LOOKUP
+      // -----------------------------------------------------------------------
+
+      print('');
+      print(
+        '[EnrollmentNotifier] '
+        'INVALIDATING ENROLLMENT LOOKUP',
+      );
+
+      ref.invalidate(enrollmentLookupProvider((courseId: enrollment.courseId, userId: enrollment.userId)));
+
+      // -----------------------------------------------------------------------
+      // REFRESH COURSE + ENROLLMENT DATA
+      // -----------------------------------------------------------------------
+
+      print(
+        '[EnrollmentNotifier] '
+        'INVALIDATING COURSE ENROLLMENTS',
+      );
+
+      ref.invalidate(courseEnrollmentsProvider);
+
+      print(
+        '[EnrollmentNotifier] '
+        'ENROLLMENT DATA REFRESH TRIGGERED',
+      );
+
+      print('==================================================');
+      print('[EnrollmentNotifier] SAVE COMPLETED');
+      print('==================================================');
     } catch (error, stackTrace) {
       print('');
       print(
@@ -224,7 +247,6 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
 
   void nextStep() {
     if (state == null) {
-      // print('[EnrollmentNotifier] nextStep called but state is null');
       return;
     }
 
@@ -246,7 +268,11 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
 
   void previousStep() {
     if (state == null) {
-      print('[EnrollmentNotifier] previousStep called but state is null');
+      print(
+        '[EnrollmentNotifier] '
+        'previousStep called but state is null',
+      );
+
       return;
     }
 
@@ -267,7 +293,10 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
   // ---------------------------------------------------------------------------
 
   void reset() {
-    print('[EnrollmentNotifier] Resetting enrollment state');
+    print(
+      '[EnrollmentNotifier] '
+      'Resetting enrollment state',
+    );
 
     state = null;
   }
