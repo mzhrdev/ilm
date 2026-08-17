@@ -86,6 +86,15 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
 
           data: (courses) {
             CourseModel? course;
+            print('===== COURSES LOADED IN ENROLLMENT SCREEN =====');
+            print('Enrollment courseId: ${enrollment.courseId}');
+
+            for (final course in courses) {
+              print(
+                'Course ID: ${course.id} | '
+                'Title: ${course.title}',
+              );
+            }
 
             for (final item in courses) {
               if (item.id == enrollment.courseId) {

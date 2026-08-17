@@ -38,6 +38,10 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
 
   // Initialize enrollment from the actual Firebase CourseModel.
   void initializeFromCourse(CourseModel course, {required String userId}) {
+    print('===== INITIALIZE ENROLLMENT =====');
+    print('Course ID: ${course.id}');
+    print('Course Title: ${course.title}');
+    print('User ID: $userId');
     final discountPercentage = 10.0;
     final paidAmount = course.price - (course.price * discountPercentage / 100);
 
