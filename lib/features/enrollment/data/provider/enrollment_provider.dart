@@ -1,97 +1,72 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/courses/data/dummy_data/dummy_course_list.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
 import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 
+// enrollment provider
 final enrollmentProvider = StateNotifierProvider<EnrollmentNotifier, EnrollmentModel?>((ref) {
   return EnrollmentNotifier();
 });
 
-const Map<String, double> _mockEnrollmentProgressByCourseId = {'1': 0.2, '2': 0.65, '3': 1.0};
-
-CourseModel? _findCourseById(String courseId) {
-  for (final course in mockCourses) {
-    if (course.id == courseId) {
-      return course;
-    }
-  }
-  return null;
-}
-
+// enrollment lookup provider
 final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({String courseId, String? userId})>(
   (ref, args) async {
-    print('[enrollmentLookupProvider] start courseId=${args.courseId}, userId=${args.userId ?? 'null'}');
-    await Future.delayed(const Duration(milliseconds: 250));
-
     final userId = args.userId;
+
     if (userId == null || userId.isEmpty) {
-      print('[enrollmentLookupProvider] no userId for courseId=${args.courseId}, returning null');
       return null;
     }
 
-    final progress = _mockEnrollmentProgressByCourseId[args.courseId];
-    if (progress == null || progress <= 0) {
-      print('[enrollmentLookupProvider] no progress for courseId=${args.courseId}, returning null');
+    final snapshot = await FirebaseFirestore.instance
+        .collection('enrollments')
+        .where('courseId', isEqualTo: args.courseId)
+        .where('userId', isEqualTo: userId)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
       return null;
     }
 
-    final course = _findCourseById(args.courseId);
-    if (course == null) {
-      print('[enrollmentLookupProvider] no course found for courseId=${args.courseId}, returning null');
-      return null;
-    }
-
-    print('[enrollmentLookupProvider] resolved enrollment for courseId=${args.courseId}, progress=$progress');
-
-    return EnrollmentModel(
-      courseId: course.id,
-      userId: userId,
-      courseName: course.title,
-      instructorName: course.instructorName,
-      totalLectures: course.totalLessons,
-      duration: '${course.totalDurationMinutes ~/ 60} Weeks',
-      originalPrice: course.price,
-      discountPercentage: 10.0,
-      finalPrice: course.price * 0.9,
-      couponCode: '10% Off',
-      purchaseDate: DateTime.now().subtract(const Duration(days: 7)),
-      currentStep: 1,
-      hasCertificate: true,
-      progress: progress,
-    );
+    return EnrollmentModel.fromFirestore(snapshot.docs.first.data());
   },
 );
 
+// enrollment notifier class
 class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
   EnrollmentNotifier() : super(null);
 
+  // Initialize enrollment from the actual Firebase CourseModel.
   void initializeFromCourse(CourseModel course, {required String userId}) {
+    final discountPercentage = 10.0;
+    final paidAmount = course.price - (course.price * discountPercentage / 100);
+
     state = EnrollmentModel(
       courseId: course.id,
       userId: userId,
-      courseName: course.title,
-      instructorName: course.instructorName,
-      totalLectures: course.totalLessons,
-      duration: '${course.totalDurationMinutes ~/ 60} Weeks',
       originalPrice: course.price,
-      discountPercentage: 10.0, // You can make this dynamic
-      finalPrice: course.price * 0.9, // 10% discount
+      discountPercentage: discountPercentage,
+      paidAmount: paidAmount,
       couponCode: '10% Off',
       purchaseDate: DateTime.now(),
       currentStep: 1,
       hasCertificate: true,
-      progress: 0,
+      progress: 0.0,
     );
   }
 
   void nextStep() {
-    if (state != null && state!.currentStep < 3) {
+    if (state == null) return;
+
+    if (state!.currentStep < 3) {
       state = state!.copyWith(currentStep: state!.currentStep + 1);
     }
   }
 
   void previousStep() {
-    if (state != null && state!.currentStep > 1) {
+    if (state == null) return;
+
+    if (state!.currentStep > 1) {
       state = state!.copyWith(currentStep: state!.currentStep - 1);
     }
   }

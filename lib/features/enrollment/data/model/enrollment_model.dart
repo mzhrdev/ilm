@@ -1,52 +1,77 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EnrollmentModel {
-  
+  // ---------------------------------------------------------------------------
+  // Identity
+  // ---------------------------------------------------------------------------
+
   final String courseId;
   final String userId;
-  final String courseName;
-  final String instructorName;
-  final int totalLectures;
-  final String duration;
-  final double originalPrice;
-  final double discountPercentage;
-  final double finalPrice;
-  final String couponCode;
-  final DateTime purchaseDate;
-  final int currentStep;
-  final bool hasCertificate;
-  final double progress; // 0.0 to 1.0
 
-  EnrollmentModel({
+  // ---------------------------------------------------------------------------
+  // Purchase Information
+  // ---------------------------------------------------------------------------
+
+  /// Price of the course before discount at the time of purchase.
+  final double originalPrice;
+
+  /// Discount applied at the time of purchase.
+  final double discountPercentage;
+
+  /// Actual amount paid by the student.
+  final double paidAmount;
+
+  /// Coupon used during purchase, if any.
+  final String? couponCode;
+
+  final DateTime purchaseDate;
+
+  // ---------------------------------------------------------------------------
+  // Learning Progress
+  // ---------------------------------------------------------------------------
+
+  /// Current lesson/step the student is on.
+  final int currentStep;
+
+  /// Whether the student has earned/completed the certificate.
+  final bool hasCertificate;
+
+  /// Learning progress from 0.0 to 1.0.
+  final double progress;
+
+  const EnrollmentModel({
     required this.courseId,
     required this.userId,
-    required this.courseName,
-    required this.instructorName,
-    required this.totalLectures,
-    required this.duration,
     required this.originalPrice,
     required this.discountPercentage,
-    required this.finalPrice,
+    required this.paidAmount,
     required this.couponCode,
     required this.purchaseDate,
     required this.progress,
-    this.currentStep = 1,
+    this.currentStep = 0,
     this.hasCertificate = true,
   });
 
-  String get formattedDate =>
-      '${purchaseDate.day.toString().padLeft(2, '0')}/${purchaseDate.month.toString().padLeft(2, '0')}/${purchaseDate.year}';
+  // ---------------------------------------------------------------------------
+  // Computed
+  // ---------------------------------------------------------------------------
+
+  String get formattedDate {
+    return '${purchaseDate.day.toString().padLeft(2, '0')}/'
+        '${purchaseDate.month.toString().padLeft(2, '0')}/'
+        '${purchaseDate.year}';
+  }
+
+  // ---------------------------------------------------------------------------
+  // Copy With
+  // ---------------------------------------------------------------------------
 
   EnrollmentModel copyWith({
     String? courseId,
     String? userId,
-    String? courseName,
-    String? instructorName,
-    int? totalLectures,
-    String? duration,
     double? originalPrice,
     double? discountPercentage,
-    double? finalPrice,
+    double? paidAmount,
     String? couponCode,
     DateTime? purchaseDate,
     int? currentStep,
@@ -56,13 +81,9 @@ class EnrollmentModel {
     return EnrollmentModel(
       courseId: courseId ?? this.courseId,
       userId: userId ?? this.userId,
-      courseName: courseName ?? this.courseName,
-      instructorName: instructorName ?? this.instructorName,
-      totalLectures: totalLectures ?? this.totalLectures,
-      duration: duration ?? this.duration,
       originalPrice: originalPrice ?? this.originalPrice,
       discountPercentage: discountPercentage ?? this.discountPercentage,
-      finalPrice: finalPrice ?? this.finalPrice,
+      paidAmount: paidAmount ?? this.paidAmount,
       couponCode: couponCode ?? this.couponCode,
       purchaseDate: purchaseDate ?? this.purchaseDate,
       currentStep: currentStep ?? this.currentStep,
@@ -71,42 +92,50 @@ class EnrollmentModel {
     );
   }
 
-  // FROM FIRESTORE
+  // ---------------------------------------------------------------------------
+  // From Firestore
+  // ---------------------------------------------------------------------------
+
   factory EnrollmentModel.fromFirestore(Map<String, dynamic> data) {
     return EnrollmentModel(
       courseId: data['courseId'] ?? '',
       userId: data['userId'] ?? '',
-      courseName: data['courseName'] ?? '',
-      instructorName: data['instructorName'] ?? '',
-      totalLectures: data['totalLectures'] ?? 0,
-      duration: data['duration'] ?? '',
+
       originalPrice: (data['originalPrice'] ?? 0).toDouble(),
+
       discountPercentage: (data['discountPercentage'] ?? 0).toDouble(),
-      finalPrice: (data['finalPrice'] ?? 0).toDouble(),
-      couponCode: data['couponCode'] ?? '',
-      purchaseDate: data['purchaseDate'] != null
+
+      paidAmount: (data['paidAmount'] ?? 0).toDouble(),
+
+      couponCode: data['couponCode'],
+
+      purchaseDate: data['purchaseDate'] is Timestamp
           ? (data['purchaseDate'] as Timestamp).toDate()
           : DateTime.now(),
-      currentStep: data['currentStep'] ?? 1,
-      hasCertificate: data['hasCertificate'] ?? true,
+
+      currentStep: data['currentStep'] ?? 0,
+
+      hasCertificate: data['hasCertificate'] ?? false,
+
       progress: (data['progress'] ?? 0).toDouble(),
     );
   }
 
-  // TO FIRESTORE
+  // ---------------------------------------------------------------------------
+  // To Firestore
+  // ---------------------------------------------------------------------------
+
   Map<String, dynamic> toJson() {
     return {
       'courseId': courseId,
       'userId': userId,
-      'courseName': courseName,
-      'instructorName': instructorName,
-      'totalLectures': totalLectures,
-      'duration': duration,
+
       'originalPrice': originalPrice,
       'discountPercentage': discountPercentage,
-      'finalPrice': finalPrice,
+      'paidAmount': paidAmount,
       'couponCode': couponCode,
       'purchaseDate': Timestamp.fromDate(purchaseDate),
+
       'currentStep': currentStep,
       'hasCertificate': hasCertificate,
       'progress': progress,

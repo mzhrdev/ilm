@@ -54,7 +54,7 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
     final enrollment = enrollments[i];
     print(
       '[courseEnrollmentsProvider] enrollment result for courseId=${courses[i].id}: '
-      '${enrollment == null ? 'null' : 'progress=${enrollment.progress}'}',
+      '${enrollment == null ? 'null' : 'progress=${''}'}',
     );
   }
 
