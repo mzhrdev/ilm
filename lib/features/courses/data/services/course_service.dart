@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:Edvance/features/courses/data/model/course_enrollment_model.dart';
-import 'package:Edvance/features/courses/data/model/course_model.dart';
-import 'package:Edvance/features/enrollment/data/model/enrollment_model.dart';
+import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
+import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 
 class CourseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

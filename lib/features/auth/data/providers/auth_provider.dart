@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:Edvance/core/data/services/firebase_firestore_services.dart';
-import 'package:Edvance/features/auth/data/model/user_model.dart';
+import 'package:lms/core/data/services/firebase_firestore_services.dart';
+import 'package:lms/features/auth/data/model/user_model.dart';
 
 // Single shared instance of FirebaseFirestoreServices.
 final firestoreServicesProvider = Provider<FirebaseFirestoreServices>((ref) {

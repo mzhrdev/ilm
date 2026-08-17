@@ -1,10 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:Edvance/core/constants/app_colors.dart';
-
-
-
+import 'package:lms/core/constants/app_colors.dart';
 
 class CustomRatingBar extends StatelessWidget {
   const CustomRatingBar({
@@ -30,10 +26,7 @@ class CustomRatingBar extends StatelessWidget {
       allowHalfRating: true,
       itemCount: 5,
       itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-      itemBuilder: (context, _) => Icon(
-        Icons.star_rounded,
-        color: color,
-      ),
+      itemBuilder: (context, _) => Icon(Icons.star_rounded, color: color),
       onRatingUpdate: onRatingUpdate,
     );
   }

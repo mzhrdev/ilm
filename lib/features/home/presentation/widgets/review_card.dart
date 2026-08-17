@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:Edvance/features/home/data/model/review_model.dart';
+import 'package:lms/features/home/data/model/review_model.dart';
 
 class ReviewCard extends StatelessWidget {
   final ReviewModel review;

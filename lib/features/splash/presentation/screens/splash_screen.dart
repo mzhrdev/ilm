@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Edvance/core/constants/app_assets.dart';
-import 'package:Edvance/core/constants/app_colors.dart';
-import 'package:Edvance/core/routing/app_routing.dart';
-import 'package:Edvance/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/core/constants/app_assets.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});

@@ -1,10 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:Edvance/core/constants/app_colors.dart';
-import 'package:Edvance/core/constants/app_fonts.dart';
-
-
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_fonts.dart';
 
 class CustomElevatedPasswordTextField extends StatefulWidget {
   const CustomElevatedPasswordTextField({
@@ -94,12 +91,10 @@ class CustomElevatedPasswordTextField extends StatefulWidget {
   final Color? suffixIconColor;
 
   @override
-  State<CustomElevatedPasswordTextField> createState() =>
-      _CustomElevatedPasswordTextFieldState();
+  State<CustomElevatedPasswordTextField> createState() => _CustomElevatedPasswordTextFieldState();
 }
 
-class _CustomElevatedPasswordTextFieldState
-    extends State<CustomElevatedPasswordTextField> {
+class _CustomElevatedPasswordTextFieldState extends State<CustomElevatedPasswordTextField> {
   // Initially password is obscure
   bool _obscureText = true;
   // Toggles the password show status
@@ -155,31 +150,19 @@ class _CustomElevatedPasswordTextFieldState
           border: InputBorder.none,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            borderSide: BorderSide(
-              color: widget.enabledBorderColor,
-              width: widget.borderWidth,
-            ),
+            borderSide: BorderSide(color: widget.enabledBorderColor, width: widget.borderWidth),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            borderSide: BorderSide(
-              color: widget.focusedBorderColor,
-              width: widget.borderWidth,
-            ),
+            borderSide: BorderSide(color: widget.focusedBorderColor, width: widget.borderWidth),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            borderSide: BorderSide(
-              color: AppColors.kRed,
-              width: widget.borderWidth,
-            ),
+            borderSide: BorderSide(color: AppColors.kRed, width: widget.borderWidth),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            borderSide: BorderSide(
-              color: AppColors.kRed,
-              width: widget.borderWidth,
-            ),
+            borderSide: BorderSide(color: AppColors.kRed, width: widget.borderWidth),
           ),
           prefixIcon: widget.isPrefixIconEnabled!
               ? Icon(widget.preFixIcon, color: widget.prefixIconColor)
@@ -188,9 +171,7 @@ class _CustomElevatedPasswordTextFieldState
               ? IconButton(
                   onPressed: _toggle,
                   icon: Icon(
-                    _obscureText
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
+                    _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                     color: widget.suffixIconColor,
                   ),
                 )

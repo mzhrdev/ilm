@@ -1,7 +1,7 @@
 import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:Edvance/core/constants/app_colors.dart';
-import 'package:Edvance/core/constants/app_fonts.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_fonts.dart';
 
 class CustomElevatedDropDownMenuButton extends StatelessWidget {
   const CustomElevatedDropDownMenuButton({

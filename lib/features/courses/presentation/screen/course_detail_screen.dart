@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Edvance/core/routing/app_routing.dart';
-import 'package:Edvance/features/auth/data/providers/auth_provider.dart';
-import 'package:Edvance/features/courses/data/model/lesson_model.dart';
-import 'package:Edvance/features/enrollment/data/model/enrollment_model.dart';
-import 'package:Edvance/features/enrollment/data/provider/enrollment_provider.dart';
-import 'package:Edvance/features/home/presentation/widgets/review_card.dart';
+import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/courses/data/model/lesson_model.dart';
+import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
+import 'package:lms/features/enrollment/data/provider/enrollment_provider.dart';
+import 'package:lms/features/home/presentation/widgets/review_card.dart';
 
 import '../../../home/presentation/widgets/skill_chip.dart';
 import '../../data/model/course_model.dart';

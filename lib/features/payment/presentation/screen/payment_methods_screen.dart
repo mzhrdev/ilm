@@ -1,9 +1,9 @@
-import 'package:Edvance/core/constants/app_colors.dart';
-import 'package:Edvance/features/payment/data/provider/payment_method_provider.dart';
-import 'package:Edvance/features/payment/presentation/widget/payment_method_tile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/features/payment/data/provider/payment_method_provider.dart';
+import 'package:lms/features/payment/presentation/widget/payment_method_tile_widget.dart';
 
 class PaymentMethodsScreen extends ConsumerWidget {
   const PaymentMethodsScreen({super.key});

@@ -1,8 +1,8 @@
 import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Edvance/core/constants/app_colors.dart';
-import 'package:Edvance/core/routing/app_routing.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/routing/app_routing.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -10,7 +10,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'Edvance',
+      title: 'lms',
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
       theme: ThemeData(

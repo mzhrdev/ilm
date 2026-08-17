@@ -1,4 +1,4 @@
-import 'package:Edvance/features/courses/data/model/lesson_model.dart';
+import 'package:lms/features/courses/data/model/lesson_model.dart';
 
 class ModuleModel {
   final String id;

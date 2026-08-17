@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:Edvance/core/constants/app_fonts.dart';
+import 'package:lms/core/constants/app_fonts.dart';
 
 class AppTextStyle {
   // Headings & Prominent Titles

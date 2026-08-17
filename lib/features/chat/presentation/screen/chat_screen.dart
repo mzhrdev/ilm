@@ -2,15 +2,15 @@ import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Edvance/core/constants/app_colors.dart';
-import 'package:Edvance/core/constants/app_text_styles.dart';
-import 'package:Edvance/core/presentation/widgets/custom_text_field.dart';
-import 'package:Edvance/core/routing/app_routing.dart';
-import 'package:Edvance/features/chat/data/model/chat_model.dart';
-import 'package:Edvance/features/chat/data/provider/call_provider.dart';
-import 'package:Edvance/features/chat/data/provider/chat_provider.dart';
-import 'package:Edvance/features/chat/presentation/widget/call_list_item.dart';
-import 'package:Edvance/features/chat/presentation/widget/chat_list_item.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_text_field.dart';
+import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/chat/data/model/chat_model.dart';
+import 'package:lms/features/chat/data/provider/call_provider.dart';
+import 'package:lms/features/chat/data/provider/chat_provider.dart';
+import 'package:lms/features/chat/presentation/widget/call_list_item.dart';
+import 'package:lms/features/chat/presentation/widget/chat_list_item.dart';
 
 class ChatScreen extends ConsumerWidget {
   const ChatScreen({super.key});

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:Edvance/features/courses/data/model/course_model.dart';
-import 'package:Edvance/features/courses/data/provider/continue_watching_provider.dart';
-import 'package:Edvance/features/courses/data/provider/course_provider.dart';
-import 'package:Edvance/features/enrollment/data/model/enrollment_model.dart';
+import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/courses/data/provider/continue_watching_provider.dart';
+import 'package:lms/features/courses/data/provider/course_provider.dart';
+import 'package:lms/features/enrollment/data/model/enrollment_model.dart';
 
 // -----------------------------------------------------------------------------
 // ENROLLMENT PROVIDER

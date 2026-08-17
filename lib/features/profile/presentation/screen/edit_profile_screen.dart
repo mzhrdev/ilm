@@ -1,9 +1,9 @@
 // lib/features/profile/presentation/screens/edit_profile_screen.dart
 
-import 'package:Edvance/features/auth/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/features/auth/data/model/user_model.dart';
 
 import '../../data/provider/profile_provider.dart';
 

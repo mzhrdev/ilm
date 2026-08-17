@@ -67,6 +67,6 @@ class DefaultFirebaseOptions {
     projectId: 'knowledge-a2d0e',
     storageBucket: 'knowledge-a2d0e.firebasestorage.app',
     iosClientId: '200338959567-4bvb76crrdcjjtnvmlqog0s4f8vl2219.apps.googleusercontent.com',
-    iosBundleId: 'com.example.Edvance',
+    iosBundleId: 'com.example.lms',
   );
 }

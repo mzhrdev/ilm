@@ -1,9 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:Edvance/core/constants/app_colors.dart';
-import 'package:Edvance/core/constants/app_fonts.dart';
-
-
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_fonts.dart';
 
 class CustomIconElevatedButton extends StatelessWidget {
   const CustomIconElevatedButton({
@@ -46,32 +43,17 @@ class CustomIconElevatedButton extends StatelessWidget {
           surfaceTintColor: AppColors.kTransparent,
           minimumSize: Size.zero,
           backgroundColor: buttonColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              borderRadius!,
-            ),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius!)),
           side: borderSide,
         ),
         onPressed: onPress,
         iconAlignment: iconAlignment,
-        icon: Icon(
-          icon,
-          color: iconColor,
-          size: iconSize,
-        ),
+        icon: Icon(icon, color: iconColor, size: iconSize),
         label: loading!
-            ? CircularProgressIndicator(
-                color: loadingIndicatorColor,
-                strokeCap: StrokeCap.round,
-              )
+            ? CircularProgressIndicator(color: loadingIndicatorColor, strokeCap: StrokeCap.round)
             : Text(
                 title!,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: fontSize,
-                  fontFamily: fontFamily,
-                ),
+                style: TextStyle(color: textColor, fontSize: fontSize, fontFamily: fontFamily),
               ),
       ),
     );

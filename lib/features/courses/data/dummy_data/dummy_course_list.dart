@@ -1,9 +1,9 @@
 // lib/features/home/data/mock_data.dart
 
-import 'package:Edvance/features/courses/data/model/course_model.dart';
-import 'package:Edvance/features/courses/data/model/lesson_model.dart';
-import 'package:Edvance/features/courses/data/model/module_model.dart';
-import 'package:Edvance/features/home/data/dummy_data/dummy_review_c1.dart';
+import 'package:lms/features/courses/data/model/course_model.dart';
+import 'package:lms/features/courses/data/model/lesson_model.dart';
+import 'package:lms/features/courses/data/model/module_model.dart';
+import 'package:lms/features/home/data/dummy_data/dummy_review_c1.dart';
 
 final List<CourseModel> mockCourses = [
   CourseModel(
@@ -18,7 +18,7 @@ final List<CourseModel> mockCourses = [
     rating: 4.5,
     totalRatings: 128,
     price: 72,
-   
+
     totalDurationMinutes: 360,
     skills: ['Adobe', 'Adobe Photo Shop', 'Logo', 'Designing', 'Poster Design', 'Figma'],
     reviews: mockReviews,
@@ -128,7 +128,7 @@ final List<CourseModel> mockCourses = [
     rating: 4.8,
     totalRatings: 95,
     price: 65,
-   
+
     totalDurationMinutes: 240,
     skills: ['Figma', 'Sketch', 'UI Design'],
     reviews: mockReviews,
@@ -145,7 +145,7 @@ final List<CourseModel> mockCourses = [
     rating: 4.6,
     totalRatings: 110,
     price: 80,
-  
+
     totalDurationMinutes: 480,
     reviews: mockReviews,
     skills: ['HTML', 'CSS', 'Responsive Design'],
@@ -162,7 +162,7 @@ final List<CourseModel> mockCourses = [
     rating: 4.7,
     totalRatings: 87,
     price: 70,
-   
+
     totalDurationMinutes: 300,
     reviews: mockReviews,
     skills: ['Premiere Pro', 'After Effects', 'Color Grading'],

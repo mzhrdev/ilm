@@ -1,4 +1,4 @@
-import 'package:Edvance/features/courses/data/model/module_model.dart';
+import 'package:lms/features/courses/data/model/module_model.dart';
 
 class CourseDraft {
   const CourseDraft({

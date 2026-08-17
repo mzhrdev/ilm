@@ -1,8 +1,7 @@
 // lib/features/settings/presentation/widgets/settings_menu_item_tile.dart
 
 import 'package:flutter/material.dart';
-import 'package:Edvance/features/settings/data/model/settings_menu_item_model.dart';
-
+import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
 
 class SettingsMenuItemTile extends StatelessWidget {
   final SettingsMenuItem item;

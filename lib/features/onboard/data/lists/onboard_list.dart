@@ -1,5 +1,5 @@
-import 'package:Edvance/core/constants/app_assets.dart';
-import 'package:Edvance/features/onboard/data/model/onboard_model.dart';
+import 'package:lms/core/constants/app_assets.dart';
+import 'package:lms/features/onboard/data/model/onboard_model.dart';
 
 List<OnBoardingModel> onBoardingContents = [
   OnBoardingModel(

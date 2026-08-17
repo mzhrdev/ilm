@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Edvance/core/data/services/firebase_firestore_services.dart';
-import 'package:Edvance/core/presentation/widgets/custom_elevated_button.dart';
-import 'package:Edvance/core/presentation/widgets/snackbar.dart';
-import 'package:Edvance/core/routing/app_routing.dart';
-import 'package:Edvance/features/courses/data/model/lesson_model.dart';
-import 'package:Edvance/features/courses/data/model/module_model.dart';
-import 'package:Edvance/features/courses/data/provider/create_course_provider.dart';
+import 'package:lms/core/data/services/firebase_firestore_services.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:lms/core/presentation/widgets/snackbar.dart';
+import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/courses/data/model/lesson_model.dart';
+import 'package:lms/features/courses/data/model/module_model.dart';
+import 'package:lms/features/courses/data/provider/create_course_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateCourseScreen extends ConsumerWidget {

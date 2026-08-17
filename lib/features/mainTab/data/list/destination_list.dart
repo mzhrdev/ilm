@@ -1,5 +1,5 @@
-import 'package:Edvance/core/constants/app_assets.dart';
-import 'package:Edvance/features/mainTab/data/model/destination_model.dart';
+import 'package:lms/core/constants/app_assets.dart';
+import 'package:lms/features/mainTab/data/model/destination_model.dart';
 
 final destination = [
   Destination(label: 'Home', icon: AppIcons.home),

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:Edvance/features/courses/data/model/module_model.dart';
-import 'package:Edvance/features/home/data/model/review_model.dart';
+import 'package:lms/features/courses/data/model/module_model.dart';
+import 'package:lms/features/home/data/model/review_model.dart';
 
 class CourseModel {
   final String id;
@@ -17,7 +17,6 @@ class CourseModel {
   final List<ModuleModel> modules;
   final List<ReviewModel> reviews;
   final String instructorId;
-  
 
   CourseModel({
     required this.instructorId,

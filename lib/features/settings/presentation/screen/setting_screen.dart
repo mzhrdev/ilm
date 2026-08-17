@@ -4,10 +4,10 @@ import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Edvance/core/routing/app_routing.dart';
-import 'package:Edvance/features/auth/data/providers/auth_provider.dart';
-import 'package:Edvance/features/settings/data/model/settings_menu_item_model.dart';
-import 'package:Edvance/features/settings/presentation/widget/settings_menu_item_widget.dart';
+import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
+import 'package:lms/features/settings/presentation/widget/settings_menu_item_widget.dart';
 
 import '../../data/provider/settings_provider.dart';
 

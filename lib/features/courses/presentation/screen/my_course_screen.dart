@@ -2,12 +2,12 @@ import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Edvance/core/constants/app_colors.dart';
-import 'package:Edvance/core/constants/app_text_styles.dart';
-import 'package:Edvance/core/presentation/widgets/custom_elevated_button.dart';
-import 'package:Edvance/core/routing/app_routing.dart';
-import 'package:Edvance/features/courses/data/provider/course_provider.dart';
-import 'package:Edvance/features/courses/presentation/widget/my_course_card.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/courses/data/provider/course_provider.dart';
+import 'package:lms/features/courses/presentation/widget/my_course_card.dart';
 
 class MyCoursesScreen extends ConsumerWidget {
   const MyCoursesScreen({super.key});

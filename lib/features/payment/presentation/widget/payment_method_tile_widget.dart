@@ -1,5 +1,5 @@
-import 'package:Edvance/features/payment/data/model/payment_method_model.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/features/payment/data/model/payment_method_model.dart';
 
 
 class PaymentMethodTile extends StatelessWidget {
