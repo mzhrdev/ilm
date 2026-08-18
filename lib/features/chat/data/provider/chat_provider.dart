@@ -141,4 +141,9 @@ class ChatNotifier extends StateNotifier<ChatState> {
     _conversationsSubscription?.cancel();
     super.dispose();
   }
+
+  void clearSearch() {
+    state.searchController.clear();
+    state = state.copyWith(searchQuery: '', matchingUsers: const []);
+  }
 }

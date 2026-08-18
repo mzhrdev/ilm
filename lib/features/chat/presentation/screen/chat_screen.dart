@@ -166,7 +166,7 @@ class ChatScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
             child: const Text('Start new chat', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
-          ...matchingUsers.map((user) => _buildUserSearchItem(context, user)),
+          ...matchingUsers.map((user) => _buildUserSearchItem(context, user, ref)),
           if (messages.isNotEmpty)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
@@ -178,6 +178,7 @@ class ChatScreen extends ConsumerWidget {
             message: message,
             onTap: () {
               ref.read(chatProvider.notifier).markAsRead(message.id);
+              ref.read(chatProvider.notifier).clearSearch();
               context.push(
                 '${Routes.conversation}'
                 '?userId=${Uri.encodeComponent(message.senderId)}'
@@ -190,7 +191,7 @@ class ChatScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserSearchItem(BuildContext context, UserModel user) {
+  Widget _buildUserSearchItem(BuildContext context, UserModel user, WidgetRef ref) {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: Colors.grey[300],
@@ -199,6 +200,7 @@ class ChatScreen extends ConsumerWidget {
       ),
       title: Text(user.name),
       onTap: () {
+        ref.read(chatProvider.notifier).clearSearch();
         context.push(
           '${Routes.conversation}'
           '?userId=${Uri.encodeComponent(user.id)}'

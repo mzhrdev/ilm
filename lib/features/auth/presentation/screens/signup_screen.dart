@@ -192,7 +192,10 @@ class SignupScreen extends ConsumerWidget {
                 ScreenBottom(
                   question: "Already have an account?",
                   bText: "Sign In Here",
-                  onTap: () => context.go(Routes.signin),
+                  onTap: () {
+                    authNotifier.clearAuth(); // ADD
+                    context.go(Routes.signin);
+                  },
                 ).centerWidget.padBottom(context.h(3)),
               ],
             ).padOnly(left: context.w(5), right: context.w(5)),
