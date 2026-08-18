@@ -182,4 +182,17 @@ class FirebaseFirestoreServices {
       throw Exception('Failed to mark conversation read: ${e.message}');
     }
   }
+
+  /// Fetch all user profiles once, for the "start new chat" search.
+  /// MVP-scale only: fetches the whole users collection client-side and
+  /// filtering happens on the Dart side. Revisit with a proper indexed
+  /// query (e.g. name prefix range query) if the user base grows.
+  Future<List<UserModel>> getAllUsers() async {
+    try {
+      final snapshot = await _usersRef.get();
+      return snapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to fetch users: ${e.message}');
+    }
+  }
 }
