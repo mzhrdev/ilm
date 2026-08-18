@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/chat/data/model/call_model.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/chat/data/provider/active_call_provider.dart';
@@ -105,7 +106,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               // 1. Create a CallModel for this session
               final callModel = CallModel(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
-                contactName: widget.userName,                
+                contactName: widget.userName,
                 callType: CallType.video,
                 status: CallStatus.answeredOutgoing,
                 timestamp: DateTime.now(),
@@ -140,7 +141,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -2)),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
               ],
             ),
             child: Row(
@@ -186,7 +191,8 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   }
 
   Widget _buildMessageBubble(DirectMessage message) {
-    final isMe = message.isMe;
+    final currentUser = ref.watch(currentUserProvider);
+    final isMe = message.isMe(currentUser?.id ?? '');
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,

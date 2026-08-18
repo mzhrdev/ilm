@@ -14,19 +14,22 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
     DirectMessage(
       id: '1',
       text: "Hi, How's you? How's everything?",
-      isMe: false,
+      senderId: '1.0',
+      receiverId: '1.1',
       time: DateTime.now().subtract(const Duration(minutes: 5)),
     ),
     DirectMessage(
       id: '2',
       text: "I'm doing great! Just finished the new UI design for the lms app.",
-      isMe: true,
+      senderId: '1.0',
+      receiverId: '1.1',
       time: DateTime.now().subtract(const Duration(minutes: 4)),
     ),
     DirectMessage(
       id: '3',
       text: "That sounds awesome! Can you share a preview?",
-      isMe: false,
+      senderId: '1.0',
+      receiverId: '1.1',
       time: DateTime.now().subtract(const Duration(minutes: 3)),
     ),
   ];
@@ -37,7 +40,8 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
     final newMessage = DirectMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       text: text,
-      isMe: true,
+      senderId: '1.0',
+      receiverId: '1.1',
       time: DateTime.now(),
     );
     state = [...state, newMessage];
