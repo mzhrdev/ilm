@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/chat/data/model/call_model.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/chat/data/provider/active_call_provider.dart';
-import 'package:lms/features/chat/data/provider/direct_message_provider.dart';
+import 'package:lms/features/chat/data/provider/conversation_provider.dart';
 
 // Renamed from ChatScreen to ConversationScreen
 class ConversationScreen extends ConsumerStatefulWidget {
+  final String userId;
   final String userName;
 
-  const ConversationScreen({super.key, required this.userName});
+  const ConversationScreen({super.key, required this.userId, required this.userName});
 
   @override
   ConsumerState<ConversationScreen> createState() => _ConversationScreenState();
@@ -22,17 +24,38 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final ScrollController _scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(conversationProvider.notifier).startConversation(widget.userId);
+    });
+  }
+
+  // Dispose Method override
+  @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _sendMessage() {
-    ref.read(conversationProvider.notifier).sendMessage(_messageController.text);
-    _messageController.clear();
+  // Send Message Method
+  Future<void> _sendMessage() async {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
 
-    // Scroll to bottom
+    final currentUser = ref.read(currentUserProvider);
+
+    await ref
+        .read(conversationProvider.notifier)
+        .sendMessage(
+          text: text,
+          receiverId: widget.userId,
+          senderName: currentUser?.name ?? 'Unknown', // adjust field name to match your UserModel
+          receiverName: widget.userName,
+        );
+
+    _messageController.clear();
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
@@ -42,6 +65,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     }
   }
 
+  // Time Format Method
   String _formatTime(DateTime time) {
     final hour = time.hour;
     final minute = time.minute.toString().padLeft(2, '0');
@@ -50,6 +74,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     return '$displayHour:$minute $period';
   }
 
+  // Build Method
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(conversationProvider);
@@ -74,9 +99,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             ),
             const SizedBox(width: 12),
             // User Name
-            Text(
-              widget.userName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+            Expanded(
+              child: Text(
+                widget.userName,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
             ),
           ],
         ),
@@ -105,7 +132,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               // 1. Create a CallModel for this session
               final callModel = CallModel(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
-                contactName: widget.userName,                
+                contactName: widget.userName,
                 callType: CallType.video,
                 status: CallStatus.answeredOutgoing,
                 timestamp: DateTime.now(),
@@ -140,7 +167,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -2)),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
               ],
             ),
             child: Row(
@@ -160,7 +191,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                       fillColor: Colors.grey[100],
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
-                    onSubmitted: (_) => _sendMessage(),
+                    onSubmitted: (_) async => _sendMessage(),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -185,8 +216,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     );
   }
 
+  // Message Bubble
   Widget _buildMessageBubble(DirectMessage message) {
-    final isMe = message.isMe;
+    final currentUser = ref.watch(currentUserProvider);
+    final isMe = message.isMe(currentUser?.id ?? '');
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,

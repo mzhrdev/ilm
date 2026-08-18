@@ -6,6 +6,7 @@ import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/model/user_model.dart';
 import 'package:lms/features/chat/data/model/chat_model.dart';
 import 'package:lms/features/chat/data/provider/call_provider.dart';
 import 'package:lms/features/chat/data/provider/chat_provider.dart';
@@ -146,27 +147,62 @@ class ChatScreen extends ConsumerWidget {
     }
 
     final List<ChatModel> messages = chatState.filteredMessages;
+    final List<UserModel> matchingUsers = chatState.matchingUsers;
+    final bool isSearching = chatState.searchQuery.isNotEmpty;
 
-    if (messages.isEmpty) {
+    if (messages.isEmpty && (!isSearching || matchingUsers.isEmpty)) {
       return _buildEmptyState(
         context: context,
         isChat: true,
         title: 'No messages yet',
-        subtitle: 'When you receive messages, they will appear here',
+        subtitle: isSearching ? 'No users found' : 'Search above to start a conversation',
       );
     }
 
-    return ListView.separated(
-      itemCount: messages.length,
-      separatorBuilder: (_, __) => Divider(height: context.h(0.05)),
-      itemBuilder: (context, index) {
-        final message = messages[index];
-        return ChatListItem(
-          message: message,
-          onTap: () {
-            ref.read(chatProvider.notifier).markAsRead(message.id);
-            context.push('${Routes.conversation}?name=${Uri.encodeComponent(message.senderName)}');
-          },
+    return ListView(
+      children: [
+        if (isSearching && matchingUsers.isNotEmpty) ...[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
+            child: const Text('Start new chat', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
+          ...matchingUsers.map((user) => _buildUserSearchItem(context, user)),
+          if (messages.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
+              child: const Text('Conversations', style: TextStyle(fontWeight: FontWeight.w600)),
+            ),
+        ],
+        ...messages.map(
+          (message) => ChatListItem(
+            message: message,
+            onTap: () {
+              ref.read(chatProvider.notifier).markAsRead(message.id);
+              context.push(
+                '${Routes.conversation}'
+                '?userId=${Uri.encodeComponent(message.senderId)}'
+                '&name=${Uri.encodeComponent(message.senderName)}',
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserSearchItem(BuildContext context, UserModel user) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Colors.grey[300],
+        backgroundImage: user.profileImageUrl != null ? NetworkImage(user.profileImageUrl!) : null,
+        child: user.profileImageUrl == null ? const Icon(Icons.person, color: Colors.grey) : null,
+      ),
+      title: Text(user.name),
+      onTap: () {
+        context.push(
+          '${Routes.conversation}'
+          '?userId=${Uri.encodeComponent(user.id)}'
+          '&name=${Uri.encodeComponent(user.name)}',
         );
       },
     );

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
+import 'package:lms/features/chat/data/model/chat_model.dart';
+import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/courses/data/mappers/course_mapper.dart';
 import 'package:lms/features/courses/data/model/course_draft_model.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
@@ -99,5 +101,98 @@ class FirebaseFirestoreServices {
         .collection('courses')
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => CourseModel.fromFirestore(doc)).toList());
+  }
+
+  // ---------------------------------------------------------------------------
+  // CHAT
+  // ---------------------------------------------------------------------------
+
+  CollectionReference<Map<String, dynamic>> get _conversationsRef => _firestore.collection('conversations');
+
+  /// Creates a deterministic conversation ID for two users.
+  ///
+  /// Sorting the UIDs ensures that:
+  /// userA -> userB
+  /// and
+  /// userB -> userA
+  /// always produce the same conversation ID.
+  String getConversationId(String userId1, String userId2) {
+    final ids = [userId1, userId2]..sort();
+    return '${ids[0]}_${ids[1]}';
+  }
+
+  /// Listen to all messages in a conversation in real time.
+  Stream<List<DirectMessage>> getMessages(String conversationId) {
+    return _conversationsRef
+        .doc(conversationId)
+        .collection('messages')
+        .orderBy('timestamp', descending: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => DirectMessage.fromFirestore(doc)).toList());
+  }
+
+  /// Send a message to Firestore. Also denormalizes names/avatars onto the
+  /// conversation doc (for inbox display) and increments the receiver's
+  /// unread count.
+  Future<void> sendMessage({
+    required String conversationId,
+    required DirectMessage message,
+    required String senderName,
+    required String receiverName,
+    String? senderAvatar,
+    String? receiverAvatar,
+  }) async {
+    try {
+      final conversationRef = _conversationsRef.doc(conversationId);
+
+      await conversationRef.collection('messages').doc(message.id).set(message.toFirestore());
+
+      await conversationRef.set({
+        'participantIds': [message.senderId, message.receiverId],
+        'participantNames': {message.senderId: senderName, message.receiverId: receiverName},
+        'participantAvatars': {message.senderId: senderAvatar, message.receiverId: receiverAvatar},
+        'lastMessage': message.text,
+        'lastMessageAt': Timestamp.fromDate(message.time),
+        'unreadCounts.${message.receiverId}': FieldValue.increment(1),
+      }, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to send message: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error while sending message: $e');
+    }
+  }
+
+  /// Stream the current user's conversation list for the inbox.
+  Stream<List<ChatModel>> getConversationsForUser(String userId) {
+    return _conversationsRef
+        .where('participantIds', arrayContains: userId)
+        .orderBy('lastMessageAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => ChatModel.fromConversationDoc(doc, currentUserId: userId)).toList(),
+        );
+  }
+
+  /// Reset the current user's unread count for a conversation to 0.
+  Future<void> markConversationRead({required String conversationId, required String userId}) async {
+    try {
+      await _conversationsRef.doc(conversationId).set({'unreadCounts.$userId': 0}, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to mark conversation read: ${e.message}');
+    }
+  }
+
+  /// Fetch all user profiles once, for the "start new chat" search.
+  /// MVP-scale only: fetches the whole users collection client-side and
+  /// filtering happens on the Dart side. Revisit with a proper indexed
+  /// query (e.g. name prefix range query) if the user base grows.
+  Future<List<UserModel>> getAllUsers() async {
+    try {
+      final snapshot = await _usersRef.get();
+      return snapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to fetch users: ${e.message}');
+    }
   }
 }

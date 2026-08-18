@@ -128,9 +128,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.conversation,
         builder: (context, state) {
-          // Extract the 'name' query parameter from the URL
+          final userId = state.uri.queryParameters['userId'] ?? '';
           final name = state.uri.queryParameters['name'] ?? 'User';
-          return ConversationScreen(userName: name);
+
+          return ConversationScreen(userId: userId, userName: name);
         },
       ),
       // Audio Call Screen
