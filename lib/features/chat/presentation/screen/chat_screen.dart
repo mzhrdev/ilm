@@ -165,7 +165,11 @@ class ChatScreen extends ConsumerWidget {
           message: message,
           onTap: () {
             ref.read(chatProvider.notifier).markAsRead(message.id);
-            context.push('${Routes.conversation}?name=${Uri.encodeComponent(message.senderName)}');
+            context.push(
+              '${Routes.conversation}'
+              '?userId=${Uri.encodeComponent(message.senderId)}'
+              '&name=${Uri.encodeComponent(message.senderName)}',
+            );
           },
         );
       },

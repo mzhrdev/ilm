@@ -6,13 +6,14 @@ import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/chat/data/model/call_model.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/chat/data/provider/active_call_provider.dart';
-import 'package:lms/features/chat/data/provider/direct_message_provider.dart';
+import 'package:lms/features/chat/data/provider/conversation_provider.dart';
 
 // Renamed from ChatScreen to ConversationScreen
 class ConversationScreen extends ConsumerStatefulWidget {
+  final String userId;
   final String userName;
 
-  const ConversationScreen({super.key, required this.userName});
+  const ConversationScreen({super.key, required this.userId, required this.userName});
 
   @override
   ConsumerState<ConversationScreen> createState() => _ConversationScreenState();
@@ -22,6 +23,17 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  // InitState() called
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(conversationProvider.notifier).startConversation(widget.userId);
+    });
+  }
+
+  // Dispose Method override
   @override
   void dispose() {
     _messageController.dispose();
@@ -29,8 +41,14 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     super.dispose();
   }
 
-  void _sendMessage() {
-    ref.read(conversationProvider.notifier).sendMessage(_messageController.text);
+  // Send Message Method
+  Future<void> _sendMessage() async {
+    final text = _messageController.text.trim();
+
+    if (text.isEmpty) return;
+
+    await ref.read(conversationProvider.notifier).sendMessage(text: text, receiverId: widget.userId);
+
     _messageController.clear();
 
     // Scroll to bottom
@@ -43,6 +61,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     }
   }
 
+  // Time Format Method
   String _formatTime(DateTime time) {
     final hour = time.hour;
     final minute = time.minute.toString().padLeft(2, '0');
@@ -51,6 +70,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     return '$displayHour:$minute $period';
   }
 
+  // Build Method
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(conversationProvider);
@@ -165,7 +185,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                       fillColor: Colors.grey[100],
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
-                    onSubmitted: (_) => _sendMessage(),
+                    onSubmitted: (_) async => _sendMessage(),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -190,6 +210,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     );
   }
 
+  // Message Bubble
   Widget _buildMessageBubble(DirectMessage message) {
     final currentUser = ref.watch(currentUserProvider);
     final isMe = message.isMe(currentUser?.id ?? '');
