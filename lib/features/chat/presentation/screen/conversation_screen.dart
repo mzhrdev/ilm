@@ -99,9 +99,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             ),
             const SizedBox(width: 12),
             // User Name
-            Text(
-              widget.userName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+            Expanded(
+              child: Text(
+                widget.userName,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
             ),
           ],
         ),
