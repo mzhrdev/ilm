@@ -17,7 +17,6 @@ final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {
 
 class ChatState {
   final List<ChatModel> messages;
-
   final MessageTab currentTab;
   final bool isLoading;
   final String searchQuery;
@@ -72,13 +71,27 @@ class ChatState {
 class ChatNotifier extends StateNotifier<ChatState> {
   ChatNotifier(this._firestoreServices)
     : super(ChatState(messages: [], isLoading: true, searchController: TextEditingController())) {
-    _subscribeToConversations();
-    _loadAllUsers();
+    _listenToAuth();
   }
 
   final FirebaseFirestoreServices _firestoreServices;
+  StreamSubscription<User?>? _authSubscription;
   StreamSubscription<List<ChatModel>>? _conversationsSubscription;
   List<UserModel> _allUsers = [];
+  void _listenToAuth() {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user == null) {
+        _conversationsSubscription?.cancel();
+
+        state = state.copyWith(messages: [], matchingUsers: const [], isLoading: false);
+
+        return;
+      }
+
+      _subscribeToConversations();
+      _loadAllUsers();
+    });
+  }
 
   void _subscribeToConversations() {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
@@ -94,9 +107,14 @@ class ChatNotifier extends StateNotifier<ChatState> {
         .getConversationsForUser(currentUserId)
         .listen(
           (conversations) {
+            debugPrint(
+              '------------------------------------------------CHAT CONVERSATIONS ---------------------------------------------------------------------------',
+            );
             state = state.copyWith(messages: conversations, isLoading: false);
           },
           onError: (error) {
+            debugPrint('CHAT CONVERSATIONS STREAM ERROR: $error');
+
             state = state.copyWith(isLoading: false);
           },
         );
@@ -139,6 +157,8 @@ class ChatNotifier extends StateNotifier<ChatState> {
   @override
   void dispose() {
     _conversationsSubscription?.cancel();
+    _authSubscription?.cancel();
+    state.searchController.dispose();
     super.dispose();
   }
 

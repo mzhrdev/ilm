@@ -166,7 +166,7 @@ class ChatScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
             child: const Text('Start new chat', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
-          ...matchingUsers.map((user) => _buildUserSearchItem(context, user, ref)),
+          ...matchingUsers.map((user) => _buildUserSearchItem(context, user,ref)),
           if (messages.isNotEmpty)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
