@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum MessageType { chat, call }
 
 class ChatModel {
@@ -93,6 +95,35 @@ class ChatModel {
       unreadCount: unreadCount ?? this.unreadCount,
       isOnline: isOnline ?? this.isOnline,
       type: type ?? this.type,
+    );
+  }
+
+  /// Build an inbox row from a `conversations/{id}` document, from the
+  /// perspective of [currentUserId].
+  factory ChatModel.fromConversationDoc(
+    DocumentSnapshot<Map<String, dynamic>> doc, {
+    required String currentUserId,
+  }) {
+    final data = doc.data() ?? {};
+
+    final participantIds = List<String>.from(data['participantIds'] as List? ?? []);
+    final otherUserId = participantIds.firstWhere((id) => id != currentUserId, orElse: () => currentUserId);
+
+    final names = Map<String, dynamic>.from(data['participantNames'] as Map? ?? {});
+    final avatars = Map<String, dynamic>.from(data['participantAvatars'] as Map? ?? {});
+    final unreadCounts = Map<String, dynamic>.from(data['unreadCounts'] as Map? ?? {});
+
+    final lastMessageAt = data['lastMessageAt'];
+
+    return ChatModel(
+      id: doc.id,
+      senderId: otherUserId,
+      senderName: names[otherUserId] as String? ?? 'Unknown',
+      senderAvatar: avatars[otherUserId] as String?,
+      lastMessage: data['lastMessage'] as String? ?? '',
+      timestamp: lastMessageAt is Timestamp ? lastMessageAt.toDate() : DateTime.now(),
+      unreadCount: (unreadCounts[currentUserId] as num?)?.toInt() ?? 0,
+      isOnline: false, // presence isn't tracked yet — see note below
     );
   }
 }

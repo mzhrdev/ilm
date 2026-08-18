@@ -24,41 +24,37 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
   /// Start listening to a conversation.
   void startConversation(String otherUserId) {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-
     if (currentUserId == null) {
       state = [];
       return;
     }
 
     _messagesSubscription?.cancel();
-
     _conversationId = _firestoreServices.getConversationId(currentUserId, otherUserId);
+
+    _firestoreServices.markConversationRead(conversationId: _conversationId!, userId: currentUserId);
 
     _messagesSubscription = _firestoreServices
         .getMessages(_conversationId!)
-        .listen(
-          (messages) {
-            state = messages;
-          },
-          onError: (error) {
-            // Keep the existing state if Firestore produces an error.
-            // We can add proper error state later.
-          },
-        );
+        .listen((messages) => state = messages, onError: (error) {});
   }
 
   /// Send a new message.
-  Future<void> sendMessage({required String text, required String receiverId}) async {
+  Future<void> sendMessage({
+    required String text,
+    required String receiverId,
+    required String senderName,
+    required String receiverName,
+    String? senderAvatar,
+    String? receiverAvatar,
+  }) async {
     final trimmedText = text.trim();
-
     if (trimmedText.isEmpty) return;
 
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-
     if (currentUserId == null) return;
 
     final conversationId = _conversationId ?? _firestoreServices.getConversationId(currentUserId, receiverId);
-
     _conversationId = conversationId;
 
     final messageId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -71,7 +67,14 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
       time: DateTime.now(),
     );
 
-    await _firestoreServices.sendMessage(conversationId: conversationId, message: message);
+    await _firestoreServices.sendMessage(
+      conversationId: conversationId,
+      message: message,
+      senderName: senderName,
+      receiverName: receiverName,
+      senderAvatar: senderAvatar,
+      receiverAvatar: receiverAvatar,
+    );
   }
 
   /// Stop listening to the current conversation.

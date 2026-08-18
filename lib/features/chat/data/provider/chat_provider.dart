@@ -1,12 +1,16 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/chat/data/dummy_data/mock_messages.dart';
+import 'package:lms/core/data/services/firebase_firestore_services.dart';
 import 'package:lms/features/chat/data/model/chat_model.dart';
 
 enum MessageTab { chat, calls }
 
 final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {
-  return ChatNotifier();
+  final firestoreServices = FirebaseFirestoreServices();
+  return ChatNotifier(firestoreServices);
 });
 
 class ChatState {
@@ -58,50 +62,55 @@ class ChatState {
 }
 
 class ChatNotifier extends StateNotifier<ChatState> {
-  ChatNotifier()
-    : super(ChatState(messages: mockMessages, isLoading: true, searchController: TextEditingController())) {
-    loadMessages();
+  ChatNotifier(this._firestoreServices)
+    : super(ChatState(messages: [], isLoading: true, searchController: TextEditingController())) {
+    _subscribeToConversations();
   }
 
-  Future<void> loadMessages() async {
+  final FirebaseFirestoreServices _firestoreServices;
+  StreamSubscription<List<ChatModel>>? _conversationsSubscription;
+
+  void _subscribeToConversations() {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      state = state.copyWith(messages: [], isLoading: false);
+      return;
+    }
+
     state = state.copyWith(isLoading: true);
 
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    state = state.copyWith(messages: mockMessages, isLoading: false);
+    _conversationsSubscription?.cancel();
+    _conversationsSubscription = _firestoreServices
+        .getConversationsForUser(currentUserId)
+        .listen(
+          (conversations) {
+            state = state.copyWith(messages: conversations, isLoading: false);
+          },
+          onError: (error) {
+            state = state.copyWith(isLoading: false);
+          },
+        );
   }
 
-  // tab switching handled here
   void switchTab(MessageTab tab) {
     if (state.currentTab == tab) return;
     state = state.copyWith(currentTab: tab);
   }
 
-  void setSearchQuery(String query) {
-    state = state.copyWith(searchQuery: query);
+  void setSearchQuery(String query) => state = state.copyWith(searchQuery: query);
+
+  Future<void> markAsRead(String messageId) async {
+    // messageId here is actually the conversation doc id (ChatModel.id)
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) return;
+    await _firestoreServices.markConversationRead(conversationId: messageId, userId: currentUserId);
   }
 
-  void markAsRead(String messageId) {
-    state = state.copyWith(
-      messages: state.messages.map((message) {
-        if (message.id == messageId) {
-          return message.copyWith(unreadCount: 0);
-        }
-        return message;
-      }).toList(),
-    );
-  }
+  Future<void> refreshMessages() async => _subscribeToConversations();
 
-  void markAllAsRead() {
-    state = state.copyWith(
-      messages: state.messages.map((message) {
-        return message.copyWith(unreadCount: 0);
-      }).toList(),
-    );
-  }
-
-  Future<void> refreshMessages() async {
-    await loadMessages();
+  @override
+  void dispose() {
+    _conversationsSubscription?.cancel();
+    super.dispose();
   }
 }

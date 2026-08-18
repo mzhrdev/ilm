@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
+import 'package:lms/features/chat/data/model/chat_model.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/courses/data/mappers/course_mapper.dart';
 import 'package:lms/features/courses/data/model/course_draft_model.dart';
@@ -130,24 +131,55 @@ class FirebaseFirestoreServices {
         .map((snapshot) => snapshot.docs.map((doc) => DirectMessage.fromFirestore(doc)).toList());
   }
 
-  /// Send a message to Firestore.
-  Future<void> sendMessage({required String conversationId, required DirectMessage message}) async {
+  /// Send a message to Firestore. Also denormalizes names/avatars onto the
+  /// conversation doc (for inbox display) and increments the receiver's
+  /// unread count.
+  Future<void> sendMessage({
+    required String conversationId,
+    required DirectMessage message,
+    required String senderName,
+    required String receiverName,
+    String? senderAvatar,
+    String? receiverAvatar,
+  }) async {
     try {
       final conversationRef = _conversationsRef.doc(conversationId);
 
-      // Add the message.
       await conversationRef.collection('messages').doc(message.id).set(message.toFirestore());
 
-      // Update conversation metadata.
       await conversationRef.set({
         'participantIds': [message.senderId, message.receiverId],
+        'participantNames': {message.senderId: senderName, message.receiverId: receiverName},
+        'participantAvatars': {message.senderId: senderAvatar, message.receiverId: receiverAvatar},
         'lastMessage': message.text,
         'lastMessageAt': Timestamp.fromDate(message.time),
+        'unreadCounts.${message.receiverId}': FieldValue.increment(1),
       }, SetOptions(merge: true));
     } on FirebaseException catch (e) {
       throw Exception('Failed to send message: ${e.message}');
     } catch (e) {
       throw Exception('Unexpected error while sending message: $e');
+    }
+  }
+
+  /// Stream the current user's conversation list for the inbox.
+  Stream<List<ChatModel>> getConversationsForUser(String userId) {
+    return _conversationsRef
+        .where('participantIds', arrayContains: userId)
+        .orderBy('lastMessageAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => ChatModel.fromConversationDoc(doc, currentUserId: userId)).toList(),
+        );
+  }
+
+  /// Reset the current user's unread count for a conversation to 0.
+  Future<void> markConversationRead({required String conversationId, required String userId}) async {
+    try {
+      await _conversationsRef.doc(conversationId).set({'unreadCounts.$userId': 0}, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to mark conversation read: ${e.message}');
     }
   }
 }

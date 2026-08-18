@@ -23,11 +23,9 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  // InitState() called
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(conversationProvider.notifier).startConversation(widget.userId);
     });
@@ -44,14 +42,20 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   // Send Message Method
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-
     if (text.isEmpty) return;
 
-    await ref.read(conversationProvider.notifier).sendMessage(text: text, receiverId: widget.userId);
+    final currentUser = ref.read(currentUserProvider);
+
+    await ref
+        .read(conversationProvider.notifier)
+        .sendMessage(
+          text: text,
+          receiverId: widget.userId,
+          senderName: currentUser?.name ?? 'Unknown', // adjust field name to match your UserModel
+          receiverName: widget.userName,
+        );
 
     _messageController.clear();
-
-    // Scroll to bottom
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
