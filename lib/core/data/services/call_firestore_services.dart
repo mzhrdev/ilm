@@ -3,13 +3,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lms/features/calls/data/model/call_model.dart';
 
-
 class CallFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Collection reference for call history
-  CollectionReference<Map<String, dynamic>> get _callsRef =>
-      _firestore.collection('calls');
+  CollectionReference<Map<String, dynamic>> get _callsRef => _firestore.collection('calls');
 
   /// Saves a completed or missed call entry to Firestore
   Future<void> logCall(CallModel call) async {
@@ -32,9 +30,7 @@ class CallFirestoreService {
         .orderBy('startedAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => CallModel.fromFirestore(doc, currentUserId))
-          .toList();
-    });
+          return snapshot.docs.map((doc) => CallModel.fromFirestore(doc, currentUserId)).toList();
+        });
   }
 }
