@@ -8,9 +8,9 @@ import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
 import 'package:lms/features/chat/data/model/chat_model.dart';
-import 'package:lms/features/chat/data/provider/call_provider.dart';
+import 'package:lms/features/calls/data/providers/call_provider.dart';
 import 'package:lms/features/chat/data/provider/chat_provider.dart';
-import 'package:lms/features/chat/presentation/widget/call_list_item.dart';
+import 'package:lms/features/calls/presentation/widget/call_list_item.dart';
 import 'package:lms/features/chat/presentation/widget/chat_list_item.dart';
 
 class ChatScreen extends ConsumerWidget {

@@ -6,9 +6,9 @@ import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
-import 'package:lms/features/chat/data/model/call_model.dart';
+import 'package:lms/features/calls/data/model/call_model.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
-import 'package:lms/features/chat/data/provider/active_call_provider.dart';
+import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/chat/data/provider/conversation_provider.dart';
 
 // Renamed from ChatScreen to ConversationScreen

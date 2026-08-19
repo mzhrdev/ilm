@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../data/provider/active_call_provider.dart';
+import '../../data/providers/active_call_provider.dart';
 
 class AudioCallScreen extends ConsumerWidget {
   const AudioCallScreen({super.key});

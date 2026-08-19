@@ -1,7 +1,7 @@
 // lib/features/calls/data/provider/calls_provider.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/chat/data/dummy_data/mock_calls.dart';
+import 'package:lms/features/calls/data/dummy_data/mock_calls.dart';
 
 import '../model/call_model.dart';
 
