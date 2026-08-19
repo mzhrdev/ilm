@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
     required this.textInputAction,
     required this.validator,
     this.onSubmitted,
+    this.onChanged,
     this.readOnly = false,
     this.isPrefixIconEnabled = false,
     this.preFixIcon = Icons.abc,
@@ -56,6 +57,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final String? Function(String?)? validator;
   final void Function(String?)? onSubmitted;
+  final void Function(String)? onChanged;
   final bool? isPrefixIconEnabled;
   final IconData? preFixIcon;
   final bool? isSuffixIconEnabled;
@@ -137,10 +139,11 @@ class CustomTextField extends StatelessWidget {
       textInputAction: textInputAction,
       validator: validator,
       onFieldSubmitted: onSubmitted,
+      onChanged: onChanged,
       onTap: onTap,
       onTapOutside: (_) {
         //FocusScope.of(context).unfocus();
-        FocusManager.instance.primaryFocus!.unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
       },
     );
   }

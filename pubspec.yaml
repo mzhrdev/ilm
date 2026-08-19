@@ -31,6 +31,8 @@ dependencies:
   google_sign_in: ^7.2.0
   uuid: ^4.6.0
   flutter_launcher_icons: ^0.14.4
+  firebase_storage: ^13.4.6
+  image_picker: ^1.2.3
 
 dev_dependencies:
   flutter_test:

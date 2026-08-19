@@ -1,11 +1,14 @@
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
-import 'package:lms/features/chat/data/model/call_model.dart';
+import 'package:lms/features/calls/data/model/call_model.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
-import 'package:lms/features/chat/data/provider/active_call_provider.dart';
+import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/chat/data/provider/conversation_provider.dart';
 
 // Renamed from ChatScreen to ConversationScreen
@@ -22,6 +25,7 @@ class ConversationScreen extends ConsumerStatefulWidget {
 class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final int _lastMessageCount = 0;
 
   @override
   void initState() {
@@ -39,30 +43,39 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     super.dispose();
   }
 
+  void _scrollToBottom({bool animated = true}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+
+      final position = _scrollController.position.maxScrollExtent;
+
+      if (animated) {
+        _scrollController.animateTo(
+          position,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      } else {
+        _scrollController.jumpTo(position);
+      }
+    });
+  }
+
   // Send Message Method
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
     final currentUser = ref.read(currentUserProvider);
-
+    _messageController.clear();
     await ref
         .read(conversationProvider.notifier)
         .sendMessage(
           text: text,
           receiverId: widget.userId,
-          senderName: currentUser?.name ?? 'Unknown', // adjust field name to match your UserModel
+          senderName: currentUser?.name ?? 'Unknown',
           receiverName: widget.userName,
         );
-
-    _messageController.clear();
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
   }
 
   // Time Format Method
@@ -79,6 +92,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   Widget build(BuildContext context) {
     final messages = ref.watch(conversationProvider);
 
+    ref.listen<List<DirectMessage>>(conversationProvider, (previous, next) {
+      if (previous?.length != next.length) {
+        _scrollToBottom();
+      }
+    });
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -196,17 +214,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                 ),
                 const SizedBox(width: 8),
                 // Send Button
-                GestureDetector(
+                CustomIconButton(
+                  splashColor: AppColors.kGrey,
+                  highlightColor: AppColors.kGrey,
                   onTap: _sendMessage,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: const BoxDecoration(
-                      color: Colors.black, // Matches app theme
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.send, color: Colors.white, size: 20),
-                  ),
+                  icon: Icons.send,
+                  iconColor: AppColors.kBlack,
+                  iconSize: context.w(6.5),
                 ),
               ],
             ),

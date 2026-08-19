@@ -43,7 +43,7 @@ class FirebaseFirestoreServices {
       throw Exception('Unexpected error while saving user: $e');
     }
   }
-
+  
   // Fetches the currently logged-in user's document from Firestore.
   Future<UserModel?> getUser() async {
     final uid = _auth.currentUser?.uid;

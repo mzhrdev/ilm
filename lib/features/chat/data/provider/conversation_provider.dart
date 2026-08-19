@@ -18,8 +18,10 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
   final FirebaseFirestoreServices _firestoreServices;
 
   StreamSubscription<List<DirectMessage>>? _messagesSubscription;
+  
 
   String? _conversationId;
+  
 
   /// Start listening to a conversation.
   void startConversation(String otherUserId) {

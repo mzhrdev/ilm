@@ -12,12 +12,13 @@ enum MessageTab { chat, calls }
 
 final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {
   final firestoreServices = ref.watch(firestoreServicesProvider);
-  return ChatNotifier(firestoreServices);
+  final authState = ref.watch(authProvider);
+
+  return ChatNotifier(firestoreServices, authState.user);
 });
 
 class ChatState {
   final List<ChatModel> messages;
-
   final MessageTab currentTab;
   final bool isLoading;
   final String searchQuery;
@@ -70,33 +71,42 @@ class ChatState {
 }
 
 class ChatNotifier extends StateNotifier<ChatState> {
-  ChatNotifier(this._firestoreServices)
+  ChatNotifier(this._firestoreServices, this._user)
     : super(ChatState(messages: [], isLoading: true, searchController: TextEditingController())) {
-    _subscribeToConversations();
-    _loadAllUsers();
+    _initialize();
   }
 
+  final UserModel? _user;
   final FirebaseFirestoreServices _firestoreServices;
   StreamSubscription<List<ChatModel>>? _conversationsSubscription;
   List<UserModel> _allUsers = [];
 
-  void _subscribeToConversations() {
-    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-    if (currentUserId == null) {
+  Future<void> _initialize() async {
+    if (_user == null) {
       state = state.copyWith(messages: [], isLoading: false);
       return;
     }
 
+    await _loadAllUsers();
+    _subscribeToConversations(_user.id);
+  }
+
+  void _subscribeToConversations(String userId) {
     state = state.copyWith(isLoading: true);
 
     _conversationsSubscription?.cancel();
+
     _conversationsSubscription = _firestoreServices
-        .getConversationsForUser(currentUserId)
+        .getConversationsForUser(userId)
         .listen(
           (conversations) {
+            debugPrint('CHAT: Loaded ${conversations.length} conversations');
+
             state = state.copyWith(messages: conversations, isLoading: false);
           },
           onError: (error) {
+            debugPrint('CHAT CONVERSATIONS STREAM ERROR: $error');
+
             state = state.copyWith(isLoading: false);
           },
         );
@@ -134,11 +144,21 @@ class ChatNotifier extends StateNotifier<ChatState> {
     await _firestoreServices.markConversationRead(conversationId: messageId, userId: currentUserId);
   }
 
-  Future<void> refreshMessages() async => _subscribeToConversations();
+  Future<void> refreshMessages() async {
+    if (_user == null) return;
+
+    _subscribeToConversations(_user.id);
+  }
 
   @override
   void dispose() {
     _conversationsSubscription?.cancel();
+    state.searchController.dispose();
     super.dispose();
+  }
+
+  void clearSearch() {
+    state.searchController.clear();
+    state = state.copyWith(searchQuery: '', matchingUsers: const []);
   }
 }

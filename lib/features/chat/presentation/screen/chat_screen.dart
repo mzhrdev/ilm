@@ -8,9 +8,9 @@ import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
 import 'package:lms/features/chat/data/model/chat_model.dart';
-import 'package:lms/features/chat/data/provider/call_provider.dart';
+import 'package:lms/features/calls/data/providers/call_provider.dart';
 import 'package:lms/features/chat/data/provider/chat_provider.dart';
-import 'package:lms/features/chat/presentation/widget/call_list_item.dart';
+import 'package:lms/features/calls/presentation/widget/call_list_item.dart';
 import 'package:lms/features/chat/presentation/widget/chat_list_item.dart';
 
 class ChatScreen extends ConsumerWidget {
@@ -70,8 +70,7 @@ class ChatScreen extends ConsumerWidget {
       isPrefixIconEnabled: true,
       enabledBorderColor: AppColors.kGrey,
       focusedBorderColor: AppColors.kGrey,
-      onSubmitted: (value) {
-        if (value == null) return;
+      onChanged: (value) {
         if (isChatTab) {
           ref.read(chatProvider.notifier).setSearchQuery(value);
         } else {
@@ -166,7 +165,7 @@ class ChatScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
             child: const Text('Start new chat', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
-          ...matchingUsers.map((user) => _buildUserSearchItem(context, user)),
+          ...matchingUsers.map((user) => _buildUserSearchItem(context, user, ref)),
           if (messages.isNotEmpty)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
@@ -178,6 +177,7 @@ class ChatScreen extends ConsumerWidget {
             message: message,
             onTap: () {
               ref.read(chatProvider.notifier).markAsRead(message.id);
+              ref.read(chatProvider.notifier).clearSearch();
               context.push(
                 '${Routes.conversation}'
                 '?userId=${Uri.encodeComponent(message.senderId)}'
@@ -190,7 +190,7 @@ class ChatScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserSearchItem(BuildContext context, UserModel user) {
+  Widget _buildUserSearchItem(BuildContext context, UserModel user, WidgetRef ref) {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: Colors.grey[300],
@@ -199,6 +199,7 @@ class ChatScreen extends ConsumerWidget {
       ),
       title: Text(user.name),
       onTap: () {
+        ref.read(chatProvider.notifier).clearSearch();
         context.push(
           '${Routes.conversation}'
           '?userId=${Uri.encodeComponent(user.id)}'
