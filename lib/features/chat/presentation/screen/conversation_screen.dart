@@ -7,8 +7,8 @@ import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/calls/data/model/call_model.dart';
-import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/calls/data/providers/active_call_provider.dart';
+import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/chat/data/provider/conversation_provider.dart';
 
 // Renamed from ChatScreen to ConversationScreen
@@ -130,9 +130,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           IconButton(
             icon: const Icon(Icons.call, color: Colors.black),
             onPressed: () {
+              final currentUser = ref.read(currentUserProvider);
               // 1. Create a CallModel for this session
               final callModel = CallModel(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
+                callerUid: currentUser?.id ?? '',
+                receiverUid: widget.userId,
                 contactName: widget.userName,
                 callType: CallType.audio,
                 status: CallStatus.answeredOutgoing,
@@ -147,9 +150,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           IconButton(
             icon: const Icon(Icons.videocam, color: Colors.black),
             onPressed: () {
+              final currentUser = ref.read(currentUserProvider);
               // 1. Create a CallModel for this session
               final callModel = CallModel(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
+                callerUid: currentUser?.id ?? '',
+                receiverUid: widget.userId,
                 contactName: widget.userName,
                 callType: CallType.video,
                 status: CallStatus.answeredOutgoing,
