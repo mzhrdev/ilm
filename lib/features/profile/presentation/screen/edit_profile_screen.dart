@@ -1,8 +1,11 @@
 // lib/features/profile/presentation/screens/edit_profile_screen.dart
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
 
 import '../../data/provider/profile_provider.dart';
@@ -16,6 +19,8 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  File? _selectedImage;
+  bool _isUploadingImage = false;
 
   // Controllers for form fields
   final _nameController = TextEditingController();
@@ -46,6 +51,43 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _aboutController.dispose();
     _skillsController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+
+    if (pickedFile == null) return;
+
+    final imageFile = File(pickedFile.path);
+
+    setState(() {
+      _selectedImage = imageFile;
+      _isUploadingImage = true;
+    });
+
+    try {
+      await ref.read(profileProvider.notifier).updateProfileImage(imageFile);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile picture updated successfully!'), backgroundColor: Colors.green),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile picture: $e'), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUploadingImage = false;
+        });
+      }
+    }
   }
 
   // Function to handle saving the profile
@@ -84,6 +126,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profileState = ref.watch(profileProvider);
+    final currentUser = profileState.userProfile;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -125,18 +169,28 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.person, size: 60, color: Colors.grey),
-                    // TODO: Replace with actual Image.network if user has an image
+                    child: ClipOval(
+                      child: _selectedImage != null
+                          ? Image.file(_selectedImage!, width: 120, height: 120, fit: BoxFit.cover)
+                          : currentUser?.profileImageUrl != null
+                          ? Image.network(
+                              currentUser!.profileImageUrl!,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) {
+                                return const Icon(Icons.person, size: 60, color: Colors.grey);
+                              },
+                            )
+                          : const Icon(Icons.person, size: 60, color: Colors.grey),
+                    ),
                   ),
                   // Camera Icon to change picture
                   Positioned(
                     bottom: 0,
                     right: 0,
                     child: GestureDetector(
-                      onTap: () {
-                        // TODO: Implement image picker (e.g., using image_picker package)
-                        // _pickImage();
-                      },
+                      onTap: _isUploadingImage ? null : _pickImage,
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -144,7 +198,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
-                        child: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
+                        child: _isUploadingImage
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              )
+                            : const Icon(Icons.camera_alt, color: Colors.white, size: 18),
                       ),
                     ),
                   ),

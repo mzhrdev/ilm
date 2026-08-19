@@ -13,6 +13,7 @@ class FirebaseStorageService {
       final storageRef = _storage.ref().child('profile_images/$userId.jpg');
 
       final uploadTask = await storageRef.putFile(imageFile, SettableMetadata(contentType: 'image/jpeg'));
+      
 
       return await uploadTask.ref.getDownloadURL();
     } on FirebaseException catch (e) {
