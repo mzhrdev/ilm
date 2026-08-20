@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/calls/data/providers/incoming_call_provider.dart';
@@ -67,7 +66,7 @@ class CallListenerWrapper extends ConsumerWidget {
                         child: const Icon(Icons.call_end, color: Colors.white),
                       ),
 
-                      // ACCEPT BUTTON
+                      // Accept Button
                       FloatingActionButton(
                         heroTag: 'accept_call_btn',
                         backgroundColor: Colors.green,
@@ -85,18 +84,19 @@ class CallListenerWrapper extends ConsumerWidget {
                             ref.read(activeCallProvider.notifier).startCall(incomingCall);
                             ref.read(activeCallProvider.notifier).connectCall();
 
-                            // 4. Navigate to the appropriate call screen
-                            if (!context.mounted) return;
+                            // 4. NAVIGATE TO CALL SCREEN FIX:
+                            // Use Riverpod to grab the GoRouter instance globally instead of context.push
+                            final router = ref.read(routerProvider);
                             if (incomingCall.callType == CallType.video) {
-                              context.push(Routes.videoCall);
+                              router.push(Routes.videoCall);
                             } else {
-                              context.push(Routes.audioCall);
+                              router.push(Routes.audioCall);
                             }
                           } catch (e) {
                             debugPrint('❌ Error accepting call: $e');
                           }
                         },
-                        child: const Icon(Icons.call),
+                        child: const Icon(Icons.call, color: Colors.white),
                       ),
                     ],
                   ),
