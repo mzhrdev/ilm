@@ -58,7 +58,7 @@ class AudioCallScreen extends ConsumerWidget {
 
               Text(
                 callState.phase == ActiveCallPhase.connected ? callState.formattedDuration : 'Calling...',
-                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16),
               ),
 
               const Spacer(),
@@ -68,7 +68,7 @@ class AudioCallScreen extends ConsumerWidget {
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.2), width: 3),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 3),
                 ),
                 child: ClipOval(
                   child: callState.call.contactAvatar != null
@@ -94,7 +94,7 @@ class AudioCallScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(32),
                     topRight: Radius.circular(32),
@@ -188,7 +188,7 @@ class AudioCallScreen extends ConsumerWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withOpacity(0.1),
+              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: isActive ? Colors.black : Colors.white, size: 28),
@@ -205,7 +205,7 @@ class PatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withValues(alpha: 0.1)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
