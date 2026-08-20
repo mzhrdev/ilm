@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// 👉 Add the StreamVideoService import
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
 
 import '../model/call_model.dart';
@@ -59,16 +58,26 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
   ActiveCallNotifier() : super(null);
 
   Timer? _timer;
+  StreamSubscription<DocumentSnapshot>? _outgoingCallSub;
 
   void startCall(CallModel call) {
     state = ActiveCallState(call: call, phase: ActiveCallPhase.dialing);
 
-    // If it's an outgoing call, wait a moment then "connect"
-    // (In a full production app, this would wait for the receiver to accept)
+    // If it's an outgoing call, listen to Firestore for the receiver's response
     if (!call.isIncoming) {
-      Future.delayed(const Duration(seconds: 3), () {
-        if (state != null && state!.phase == ActiveCallPhase.dialing) {
-          connectCall();
+      _outgoingCallSub?.cancel();
+      _outgoingCallSub = FirebaseFirestore.instance.collection('calls').doc(call.id).snapshots().listen((
+        snapshot,
+      ) {
+        if (!snapshot.exists) return;
+
+        final status = snapshot.data()?['status'] as String?;
+
+        if (status == 'answered') {
+          connectCall(); // They picked up! Start the timer.
+          _outgoingCallSub?.cancel();
+        } else if (status == 'rejected') {
+          endCall(); // They declined! Hang up.
         }
       });
     }
@@ -148,6 +157,7 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
   @override
   void dispose() {
     _timer?.cancel();
+    _outgoingCallSub?.cancel();
     super.dispose();
   }
 }
