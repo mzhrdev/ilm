@@ -1,7 +1,10 @@
-// lib/features/calls/data/provider/active_call_provider.dart
-
 import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// 👉 Add the StreamVideoService import
+import 'package:lms/features/calls/data/services/stream_video_service.dart';
+
 import '../model/call_model.dart';
 
 enum ActiveCallPhase { dialing, ringing, connected, ended }
@@ -58,69 +61,86 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
   Timer? _timer;
 
   void startCall(CallModel call) {
-    state = ActiveCallState(
-      call: call,
-      phase: ActiveCallPhase.dialing,
-    );
+    state = ActiveCallState(call: call, phase: ActiveCallPhase.dialing);
 
-    Future.delayed(const Duration(seconds: 3), () {
-      if (state != null && state!.phase == ActiveCallPhase.dialing) {
-        connectCall();
-      }
-    });
+    // If it's an outgoing call, wait a moment then "connect"
+    // (In a full production app, this would wait for the receiver to accept)
+    if (!call.isIncoming) {
+      Future.delayed(const Duration(seconds: 3), () {
+        if (state != null && state!.phase == ActiveCallPhase.dialing) {
+          connectCall();
+        }
+      });
+    }
   }
 
   void connectCall() {
     if (state == null) return;
-    
+
     state = state!.copyWith(phase: ActiveCallPhase.connected);
-    
+
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (state != null && state!.phase == ActiveCallPhase.connected) {
-        state = state!.copyWith(
-          callDuration: state!.callDuration + const Duration(seconds: 1),
-        );
+        state = state!.copyWith(callDuration: state!.callDuration + const Duration(seconds: 1));
       }
     });
   }
 
-  void endCall() {
+  Future<void> endCall() async {
     _timer?.cancel();
-    
+
     if (state != null) {
+      // 1. Tell Stream SDK to disconnect the WebRTC connection
+      await StreamVideoService.instance.leaveCall();
+
       final updatedCall = state!.call.copyWith(
-        status: state!.callDuration.inSeconds > 0 
+        status: state!.callDuration.inSeconds > 0
             ? (state!.call.isIncoming ? CallStatus.answeredIncoming : CallStatus.answeredOutgoing)
             : (state!.call.isIncoming ? CallStatus.missedIncoming : CallStatus.missedOutgoing),
         timestamp: DateTime.now(),
+        durationSeconds: state!.callDuration.inSeconds,
       );
 
-      state = state!.copyWith(
-        call: updatedCall,
-        phase: ActiveCallPhase.ended,
-      );
+      // 2. Update Firestore so the call history reflects the final duration
+      await FirebaseFirestore.instance.collection('calls').doc(updatedCall.id).update({
+        'status':
+            updatedCall.status == CallStatus.answeredIncoming ||
+                updatedCall.status == CallStatus.answeredOutgoing
+            ? 'answered'
+            : 'missed',
+        'durationSeconds': updatedCall.durationSeconds,
+      });
+
+      state = state!.copyWith(call: updatedCall, phase: ActiveCallPhase.ended);
     }
-    
+
     Future.delayed(const Duration(milliseconds: 800), () {
       state = null;
     });
   }
 
-  void toggleMute() {
+  Future<void> toggleMute() async {
     if (state != null) {
+      // Hardware Action: Mute the microphone via Stream SDK
+      await StreamVideoService.instance.toggleMicrophone();
+      // UI Action: Update the icon
       state = state!.copyWith(isMuted: !state!.isMuted);
     }
   }
 
-  void toggleSpeaker() {
+  Future<void> toggleSpeaker() async {
     if (state != null) {
+      // (Stream SDK handles audio routing natively, but we update the UI state here)
       state = state!.copyWith(isSpeakerOn: !state!.isSpeakerOn);
     }
   }
 
-  void toggleVideo() {
+  Future<void> toggleVideo() async {
     if (state != null) {
+      // Hardware Action: Turn on/off camera
+      await StreamVideoService.instance.toggleCamera();
+      // UI Action: Update the icon
       state = state!.copyWith(isVideoOn: !state!.isVideoOn);
     }
   }

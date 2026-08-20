@@ -47,7 +47,7 @@ class CallListItem extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  call.contactName + (call.callCount > 1 ? ' (${call.callCount})' : ''),
+                  call.contactName ,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

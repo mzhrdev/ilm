@@ -7,6 +7,7 @@ import 'package:lms/features/auth/presentation/screens/reset_password/reset_pass
 import 'package:lms/features/auth/presentation/screens/signin_screen.dart';
 import 'package:lms/features/auth/presentation/screens/signup_screen.dart';
 import 'package:lms/features/calls/presentation/screen/audio_call_screen.dart';
+import 'package:lms/features/calls/presentation/tests/test.dart';
 import 'package:lms/features/chat/presentation/screen/chat_screen.dart';
 import 'package:lms/features/chat/presentation/screen/conversation_screen.dart';
 import 'package:lms/features/calls/presentation/screen/video_call_screen.dart';
@@ -51,6 +52,7 @@ class Routes {
   static const String payment = '/payment';
   static const String helpCenter = '/helpCenter';
   static const String createCourse = '/create_course';
+  static const String test = '/test_widget';
 }
 
 // Global navigator key
@@ -71,6 +73,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.signup, builder: (context, index) => SignupScreen()),
       // ForgotPassword
       GoRoute(path: Routes.resetPassEmail, builder: (context, index) => ResetPasswordEmailScreen()),
+      // Test Screen for Stream & Cloud fare token
+      GoRoute(path: Routes.test, builder: (context, index) => TestWidget()),
       // Course Detailed Screen
       GoRoute(
         path: Routes.courseDetail,

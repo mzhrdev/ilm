@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/calls/presentation/widget/call_listener_wrapper.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -13,6 +14,11 @@ class MyApp extends ConsumerWidget {
       title: 'lms',
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
+      // 👉 ADD THIS BUILDER RIGHT HERE:
+      // This safely places your call overlay inside the MaterialApp environment
+      builder: (context, child) {
+        return CallListenerWrapper(child: child!);
+      },
       theme: ThemeData(
         colorSchemeSeed: Ext.getMaterialColor(AppColors.kWhite),
         elevatedButtonTheme: ElevatedButtonThemeData(

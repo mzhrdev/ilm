@@ -146,7 +146,8 @@ class SigninScreen extends ConsumerWidget {
                   onPress: () async {
                     final success = await authNotifier.signInWithGoogle();
                     if (success) {
-                      context.go(Routes.home);
+                      // REPLACED: context.go(Routes.home);
+                      context.go(Routes.test);
                     }
                   },
                   buttonColor: AppColors.kTransparent,
@@ -157,7 +158,7 @@ class SigninScreen extends ConsumerWidget {
                   question: "Don't have an account?",
                   bText: "Sign Up Here",
                   onTap: () {
-                    authNotifier.clearAuth();   // ADD
+                    authNotifier.clearAuth(); // ADD
                     context.go(Routes.signup);
                   },
                 ).centerWidget,
