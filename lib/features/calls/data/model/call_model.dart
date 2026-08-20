@@ -56,16 +56,27 @@ class CallModel {
 
   // Convert Firestore DocumentSnapshot to CallModel
   factory CallModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc, String currentUserId) {
-    final data = doc.data()!;
+    final data = doc.data() ?? <String, dynamic>{};
     final isCaller = data['callerUid'] == currentUserId;
     final rawStatus = data['status'] as String? ?? 'missed';
 
     CallStatus mappedStatus;
-    if (rawStatus == 'answered') {
-      mappedStatus = isCaller ? CallStatus.answeredOutgoing : CallStatus.answeredIncoming;
-    } else {
-      mappedStatus = isCaller ? CallStatus.missedOutgoing : CallStatus.missedIncoming;
+    switch (rawStatus) {
+      case 'answered':
+        mappedStatus = isCaller ? CallStatus.answeredOutgoing : CallStatus.answeredIncoming;
+      case 'rejected':
+        mappedStatus = CallStatus.rejected;
+      case 'missed':
+      default:
+        mappedStatus = isCaller ? CallStatus.missedOutgoing : CallStatus.missedIncoming;
     }
+
+    final startedAt = data['startedAt'];
+    final timestamp = startedAt is Timestamp
+        ? startedAt.toDate()
+        : startedAt is DateTime
+        ? startedAt
+        : DateTime.now();
 
     return CallModel(
       id: doc.id,
@@ -75,8 +86,8 @@ class CallModel {
       contactAvatar: isCaller ? data['receiverAvatar'] : data['callerAvatar'],
       callType: data['callType'] == 'video' ? CallType.video : CallType.audio,
       status: mappedStatus,
-      timestamp: (data['startedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      durationSeconds: data['durationSeconds'] ?? 0,
+      timestamp: timestamp,
+      durationSeconds: (data['durationSeconds'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -88,9 +99,11 @@ class CallModel {
       'callerName': contactName,
       'callerAvatar': contactAvatar,
       'callType': callType.name,
-      'status': status == CallStatus.answeredIncoming || status == CallStatus.answeredOutgoing
-          ? 'answered'
-          : 'missed',
+      'status': switch (status) {
+        CallStatus.answeredIncoming || CallStatus.answeredOutgoing => 'answered',
+        CallStatus.rejected => 'rejected',
+        CallStatus.missedIncoming || CallStatus.missedOutgoing => 'missed',
+      },
       'startedAt': Timestamp.fromDate(timestamp),
       'durationSeconds': durationSeconds,
     };

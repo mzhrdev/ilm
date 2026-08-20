@@ -2,8 +2,10 @@
 
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User, UserInfo;
 import 'package:http/http.dart' as http;
+import 'package:lms/features/calls/data/model/call_model.dart';
 import 'package:stream_video_flutter/stream_video_flutter.dart' as stream;
 
 class StreamVideoService {
@@ -16,6 +18,7 @@ class StreamVideoService {
   stream.Call? _currentCall;
 
   stream.Call? get currentCall => _currentCall;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Local cached media states
   bool _microphoneEnabled = true;
@@ -26,6 +29,9 @@ class StreamVideoService {
   // --------------------------------------------------
 
   static const String _tokenEndpoint = 'https://lms-api.saleemmazhar348.workers.dev/stream-token';
+
+
+ 
 
   // --------------------------------------------------
   // FETCH STREAM TOKEN
@@ -78,6 +84,50 @@ class StreamVideoService {
   // INITIALIZE STREAM VIDEO
   // --------------------------------------------------
 
+  // We are creating a NEW method that combines Stream + Firestore
+  Future<stream.Call> initiateCall({
+    required String receiverUid,
+    required String receiverName,
+    String? receiverAvatar,
+    required CallType callType,
+  }) async {
+    if (!stream.StreamVideo.isInitialized()) {
+      throw Exception('StreamVideo client is not initialized');
+    }
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) throw Exception('No authenticated user');
+
+    // 1. Generate a unique Call ID
+    final callDocRef = _firestore.collection('calls').doc();
+    final callId = callDocRef.id;
+
+    // 2. Start the call on Stream's servers
+    final call = stream.StreamVideo.instance.makeCall(
+      callType: stream.StreamCallType.defaultType(),
+      id: callId,
+    );
+    await call.getOrCreate();
+    await call.join();
+    _currentCall = call;
+
+    // 3. Create the CallModel for Firestore
+    final callModel = CallModel(
+      id: callId,
+      callerUid: currentUser.uid,
+      receiverUid: receiverUid,
+      contactName: receiverName, // The receiver's name from the caller's perspective
+      contactAvatar: receiverAvatar,
+      callType: callType,
+      status: CallStatus.missedOutgoing, // Default state, updated when answered
+      timestamp: DateTime.now(),
+    );
+
+    // 4. Push to Firestore to trigger signaling for the receiver
+    await callDocRef.set(callModel.toFirestore());
+
+    return call;
+  }
   Future<void> initStreamVideo({required String uid, required String name, String? avatarUrl}) async {
     // Don't initialize twice
     if (stream.StreamVideo.isInitialized()) {

@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lms/features/calls/data/model/call_model.dart';
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
 
 class TestWidget extends ConsumerStatefulWidget {
@@ -49,15 +51,24 @@ class _TestWidgetState extends ConsumerState<TestWidget> {
             ? ElevatedButton(
                 onPressed: () async {
                   try {
-                    debugPrint('⏳ Attempting to create a call...');
-                    // Generating a dummy call ID for this test
-                    final call = await StreamVideoService.instance.makeCall(
-                      callId: 'test-call-123',
-                      callType: 'audio',
-                    );
-                    debugPrint('✅ Call Created and Joined successfully. ID: ${call.id}');
+                    debugPrint('⏳ Injecting fake incoming call...');
+
+                    final user = FirebaseAuth.instance.currentUser!;
+
+                    // Directly write to Firestore simulating SOMEONE ELSE calling you
+                    await FirebaseFirestore.instance.collection('calls').doc('test-call-123').set({
+                      'callerUid': 'fake_external_user_123', // Someone else's UID
+                      'receiverUid': user.uid, // You are the receiver
+                      'callerName': 'John Doe', // The fake caller's name
+                      'callType': 'audio',
+                      'status': 'missed',
+                      'startedAt': FieldValue.serverTimestamp(),
+                      'durationSeconds': 0,
+                    });
+
+                    debugPrint('✅ Fake incoming call injected!');
                   } catch (e) {
-                    debugPrint('❌ Call Creation Error: $e');
+                    debugPrint('❌ Fake Call Error: $e');
                   }
                 },
                 child: const Text('Test Make Call'),
