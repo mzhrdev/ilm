@@ -2,10 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/calls/data/model/call_model.dart';
-import 'package:lms/features/calls/data/providers/active_call_provider.dart';
+import 'package:lms/features/calls/data/services/stream_video_service.dart';
 
 // ✅ CHANGE 1: Extend ConsumerWidget instead of StatelessWidget
 class CallListItem extends ConsumerWidget {
@@ -47,7 +46,7 @@ class CallListItem extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  call.contactName ,
+                  call.contactName,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -69,15 +68,24 @@ class CallListItem extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: () {
-              // Start the call using existing CallModel
-              ref.read(activeCallProvider.notifier).startCall(call);
+            onTap: () async {
+              final currentUser = ref.read(currentUserProvider);
+              final currentUserId = currentUser?.id ?? '';
 
-              // Navigate to appropriate screen
-              if (call.callType == CallType.video) {
-                context.push(Routes.videoCall);
-              } else {
-                context.push(Routes.audioCall);
+              // Identify the target recipient UID (the opposite party in the call model)
+              final targetUid = call.callerUid == currentUserId ? call.receiverUid : call.callerUid;
+
+              try {
+                await StreamVideoService.instance.initiateAudioCall(
+                  ref: ref,
+                  receiverUid: targetUid,
+                  receiverName: call.contactName,
+                  receiverAvatar: call.contactAvatar,
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Failed to place call: $e')));
               }
             },
             child: Container(

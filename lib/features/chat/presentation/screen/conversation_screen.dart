@@ -8,6 +8,7 @@ import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/calls/data/model/call_model.dart';
 import 'package:lms/features/calls/data/providers/active_call_provider.dart';
+import 'package:lms/features/calls/data/services/stream_video_service.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/chat/data/provider/conversation_provider.dart';
 
@@ -128,22 +129,21 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         actions: [
           // Audio Call Button
           IconButton(
-            icon: const Icon(Icons.call, color: Colors.black),
-            onPressed: () {
-              final currentUser = ref.read(currentUserProvider);
-              // 1. Create a CallModel for this session
-              final callModel = CallModel(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
-                callerUid: currentUser?.id ?? '',
-                receiverUid: widget.userId,
-                contactName: widget.userName,
-                callType: CallType.audio,
-                status: CallStatus.answeredOutgoing,
-                timestamp: DateTime.now(),
-              );
-              // 2. Start the call in the provider (this removes the 'null' state)
-              ref.read(activeCallProvider.notifier).startCall(callModel);
-              context.push(Routes.audioCall);
+            icon: const Icon(Icons.call),
+            onPressed: () async {
+              try {
+                await StreamVideoService.instance.initiateAudioCall(
+                  ref: ref,
+                  receiverUid: widget.userId,
+                  receiverName: widget.userName,
+                  //receiverAvatar: chatUser.profileImageUrl,
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(
+                  // ignore: use_build_context_synchronously
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Failed to start call: $e')));
+              }
             },
           ),
           // Video Call Button
