@@ -9,6 +9,7 @@ import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/calls/data/providers/incoming_call_provider.dart';
 import 'package:lms/features/calls/data/services/call_audio_service.dart';
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CallListenerWrapper extends ConsumerWidget {
   final Widget child;
@@ -93,6 +94,11 @@ class CallListenerWrapper extends ConsumerWidget {
                           CallAudioService.instance.stop();
 
                           try {
+                            // Request Mic Permission
+                      final micStatus = await Permission.microphone.request();
+                      if (!micStatus.isGranted) {
+                        throw Exception('Microphone permission is required to place a call.');
+                      }
                             await FirebaseFirestore.instance.collection('calls').doc(incomingCall.id).update({
                               'status': 'answered',
                             });

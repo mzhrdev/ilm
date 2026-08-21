@@ -65,24 +65,31 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
   void startCall(CallModel call) {
     state = ActiveCallState(call: call, phase: ActiveCallPhase.dialing);
 
-    // If it's an outgoing call, listen to Firestore for the receiver's response
-    if (!call.isIncoming) {
-      _outgoingCallSub?.cancel();
-      _outgoingCallSub = FirebaseFirestore.instance.collection('calls').doc(call.id).snapshots().listen((
-        snapshot,
-      ) {
-        if (!snapshot.exists) return;
+    // Cancel any previous active subscriptions
+    _outgoingCallSub?.cancel();
 
-        final status = snapshot.data()?['status'] as String?;
+    // Listen to Firestore for BOTH caller and receiver to keep them synced
+    _outgoingCallSub = FirebaseFirestore.instance.collection('calls').doc(call.id).snapshots().listen((
+      snapshot,
+    ) {
+      if (!snapshot.exists) return;
 
+      final status = snapshot.data()?['status'] as String?;
+
+      // 1. Outgoing Dialing Logic (Only applies if YOU are the caller)
+      if (!call.isIncoming && state?.phase == ActiveCallPhase.dialing) {
         if (status == 'answered') {
           connectCall(); // They picked up! Start the timer.
-          _outgoingCallSub?.cancel();
         } else if (status == 'rejected') {
-          endCall(); // They declined! Hang up.
+          endCall(isRemote: true); // They declined! Hang up.
         }
-      });
-    }
+      }
+
+      // 2. Remote Hang-up Logic (Applies to BOTH caller and receiver)
+      if (status == 'completed' || status == 'ended' || status == 'missed') {
+        endCall(isRemote: true); // The other person hung up, end the call locally
+      }
+    });
   }
 
   // Answer To Incoming Call
@@ -100,8 +107,11 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
   }
 
   // Ending Voice Call Method
-  Future<void> endCall() async {
+  // Ending Voice Call Method
+  Future<void> endCall({bool isRemote = false}) async {
     _timer?.cancel();
+    _outgoingCallSub?.cancel();
+
     // Stop any active dial or ring tones immediately
     CallAudioService.instance.stop();
 
@@ -117,15 +127,13 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
         durationSeconds: state!.callDuration.inSeconds,
       );
 
-      // 2. Update Firestore so the call history reflects the final duration
-      await FirebaseFirestore.instance.collection('calls').doc(updatedCall.id).update({
-        'status':
-            updatedCall.status == CallStatus.answeredIncoming ||
-                updatedCall.status == CallStatus.answeredOutgoing
-            ? 'answered'
-            : 'missed',
-        'durationSeconds': updatedCall.durationSeconds,
-      });
+      // 2. ONLY update Firestore if you pressed the button (not if the remote user did)
+      if (!isRemote) {
+        await FirebaseFirestore.instance.collection('calls').doc(updatedCall.id).update({
+          'status': updatedCall.durationSeconds > 0 ? 'completed' : 'missed',
+          'durationSeconds': updatedCall.durationSeconds,
+        });
+      }
 
       state = state!.copyWith(call: updatedCall, phase: ActiveCallPhase.ended);
     }
@@ -162,7 +170,6 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
       state = state!.copyWith(isVideoOn: !state!.isVideoOn);
     }
   }
-
 
   // Dispose Method
   @override

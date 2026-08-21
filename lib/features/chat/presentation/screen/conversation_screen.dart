@@ -11,6 +11,7 @@ import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/chat/data/provider/conversation_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // Renamed from ChatScreen to ConversationScreen
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -142,6 +143,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                     setState(() => _isInitiatingCall = true);
 
                     try {
+                      // Request Mic Permission
+                      final micStatus = await Permission.microphone.request();
+                      if (!micStatus.isGranted) {
+                        throw Exception('Microphone permission is required to place a call.');
+                      }
                       await StreamVideoService.instance.initiateAudioCall(
                         ref: ref,
                         receiverUid: widget.userId,
