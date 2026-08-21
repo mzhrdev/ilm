@@ -38,17 +38,19 @@ class CallsNotifier extends StateNotifier<CallsState> {
   }
 
  
-
+  // Load Calls for Call History
   Future<void> _loadCalls() async {
     state = state.copyWith(isLoading: true);
     await Future.delayed(const Duration(milliseconds: 500));
     state = state.copyWith(calls: mockCalls, isLoading: false);
   }
 
+  // Calls Search Query
   void setSearchQuery(String query) {
     state = state.copyWith(searchQuery: query);
   }
 
+  // Refresh Calls to update the UI 
   Future<void> refreshCalls() async {
     await _loadCalls();
   }

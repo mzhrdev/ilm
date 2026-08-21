@@ -8,6 +8,10 @@ import '../model/call_model.dart';
 
 enum ActiveCallPhase { dialing, ringing, connected, ended }
 
+final activeCallProvider = StateNotifierProvider<ActiveCallNotifier, ActiveCallState?>((ref) {
+  return ActiveCallNotifier();
+});
+
 class ActiveCallState {
   final CallModel call;
   final ActiveCallPhase phase;
@@ -50,16 +54,13 @@ class ActiveCallState {
   }
 }
 
-final activeCallProvider = StateNotifierProvider<ActiveCallNotifier, ActiveCallState?>((ref) {
-  return ActiveCallNotifier();
-});
-
 class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
   ActiveCallNotifier() : super(null);
 
   Timer? _timer;
   StreamSubscription<DocumentSnapshot>? _outgoingCallSub;
 
+  // startVoiceCall method
   void startCall(CallModel call) {
     state = ActiveCallState(call: call, phase: ActiveCallPhase.dialing);
 
@@ -83,6 +84,7 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     }
   }
 
+  // Answer To Incoming Call
   void connectCall() {
     if (state == null) return;
 
@@ -96,6 +98,7 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     });
   }
 
+  // Ending Voice Call Method
   Future<void> endCall() async {
     _timer?.cancel();
 
@@ -129,6 +132,7 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     });
   }
 
+  // Toggle Microphone Method
   Future<void> toggleMute() async {
     if (state != null) {
       // Hardware Action: Mute the microphone via Stream SDK
@@ -138,6 +142,7 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     }
   }
 
+  // Toggle Speaker Method
   Future<void> toggleSpeaker() async {
     if (state != null) {
       // (Stream SDK handles audio routing natively, but we update the UI state here)
@@ -145,6 +150,7 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     }
   }
 
+  // Toggle Video Method
   Future<void> toggleVideo() async {
     if (state != null) {
       // Hardware Action: Turn on/off camera
@@ -154,6 +160,8 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     }
   }
 
+
+  // Dispose Method
   @override
   void dispose() {
     _timer?.cancel();
