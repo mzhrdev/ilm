@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lms/features/calls/data/services/call_audio_service.dart';
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
 
 import '../model/call_model.dart';
@@ -101,6 +102,8 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
   // Ending Voice Call Method
   Future<void> endCall() async {
     _timer?.cancel();
+    // Stop any active dial or ring tones immediately
+    CallAudioService.instance.stop();
 
     if (state != null) {
       // 1. Tell Stream SDK to disconnect the WebRTC connection

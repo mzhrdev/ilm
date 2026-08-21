@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/core/routing/app_routing.dart';
-import 'package:lms/features/auth/data/model/user_model.dart';
-import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/calls/data/model/call_model.dart';
 import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/calls/data/providers/incoming_call_provider.dart';
+import 'package:lms/features/calls/data/services/call_audio_service.dart';
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
-
-import '../../data/model/call_model.dart';
 
 class CallListenerWrapper extends ConsumerWidget {
   final Widget child;
@@ -17,36 +15,21 @@ class CallListenerWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Watch the stream that listens for incoming calls in Firestore
     final incomingCallAsync = ref.watch(incomingCallStreamProvider);
     final incomingCall = incomingCallAsync.valueOrNull;
-    // 👉 ADD THIS TO EXPOSE THE SILENT ERROR:
-    if (incomingCallAsync.hasError) {
-      debugPrint('🚨 FIRESTORE STREAM ERROR: ${incomingCallAsync.error}');
+
+    // Trigger or stop incoming ringtone based on call presence
+    if (incomingCall != null) {
+      CallAudioService.instance.startRingtone();
+    } else {
+      CallAudioService.instance.stop();
     }
-    // 👉 ADD THIS PRINT:
-    debugPrint('📱 WRAPPER UI REBUILDING. Current call state: ${incomingCall?.contactName ?? "NULL"}');
-    ref.listen<UserModel?>(currentUserProvider, (previous, user) async {
-  if (user != null) {
-    try {
-      await StreamVideoService.instance.initStreamVideo(
-        uid: user.id,
-        name: user.name,
-        avatarUrl: user.profileImageUrl,
-      );
-      debugPrint('✅ Stream SDK Initialized for ${user.name}');
-    } catch (e) {
-      debugPrint('❌ Stream SDK Init Error: $e');
-    }
-  }
-});
+
     return Stack(
       textDirection: TextDirection.ltr,
       children: [
-        // The rest of your application UI
         child,
 
-        // 2. The UI Overlay: Only shows up when an incoming call is active
         if (incomingCall != null)
           Positioned.fill(
             child: Material(
@@ -74,7 +57,9 @@ class CallListenerWrapper extends ConsumerWidget {
                         heroTag: 'reject_call_btn',
                         backgroundColor: Colors.red,
                         onPressed: () async {
-                          // Update Firestore status to rejected
+                          // Stop sound immediately on user interaction
+                          CallAudioService.instance.stop();
+
                           await FirebaseFirestore.instance.collection('calls').doc(incomingCall.id).update({
                             'status': 'rejected',
                           });
@@ -82,26 +67,24 @@ class CallListenerWrapper extends ConsumerWidget {
                         child: const Icon(Icons.call_end, color: Colors.white),
                       ),
 
-                      // Accept Button
+                      // ACCEPT BUTTON
                       FloatingActionButton(
                         heroTag: 'accept_call_btn',
                         backgroundColor: Colors.green,
                         onPressed: () async {
+                          // Stop sound immediately on user interaction
+                          CallAudioService.instance.stop();
+
                           try {
-                            // 1. Update Firestore status to answered
                             await FirebaseFirestore.instance.collection('calls').doc(incomingCall.id).update({
                               'status': 'answered',
                             });
 
-                            // 2. Join the Stream call using the call ID
                             await StreamVideoService.instance.joinCall(incomingCall.id);
 
-                            // 3. Set active call state in provider
                             ref.read(activeCallProvider.notifier).startCall(incomingCall);
                             ref.read(activeCallProvider.notifier).connectCall();
 
-                            // 4. NAVIGATE TO CALL SCREEN FIX:
-                            // Use Riverpod to grab the GoRouter instance globally instead of context.push
                             final router = ref.read(routerProvider);
                             if (incomingCall.callType == CallType.video) {
                               router.push(Routes.videoCall);
@@ -109,7 +92,7 @@ class CallListenerWrapper extends ConsumerWidget {
                               router.push(Routes.audioCall);
                             }
                           } catch (e) {
-                            debugPrint('❌ Error accepting call: $e');
+                            debugPrint('Error accepting call: $e');
                           }
                         },
                         child: const Icon(Icons.call, color: Colors.white),
