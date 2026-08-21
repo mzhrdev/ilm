@@ -108,6 +108,18 @@ class StreamVideoService {
   }
 
   // --------------------------------------------------
+  // INITIALIZED STREAM SDK
+  // --------------------------------------------------
+  Future<void> _ensureInitialized() async {
+    if (!stream.StreamVideo.isInitialized()) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('No logged in user found.');
+
+      await initStreamVideo(uid: user.uid, name: user.displayName ?? 'User', avatarUrl: user.photoURL);
+    }
+  }
+
+  // --------------------------------------------------
   // INITIATE AUDIO CALL (CHAT & HISTORY INTEGRATION)
   // --------------------------------------------------
 
@@ -117,6 +129,8 @@ class StreamVideoService {
     required String receiverName,
     String? receiverAvatar,
   }) async {
+    await _ensureInitialized();
+    // TODO: Replace it with auth Provider
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
       throw Exception('User must be logged in to place a call');
@@ -178,7 +192,7 @@ class StreamVideoService {
     if (!stream.StreamVideo.isInitialized()) {
       throw Exception('StreamVideo client is not initialized');
     }
-
+    await _ensureInitialized();
     final call = stream.StreamVideo.instance.makeCall(
       callType: stream.StreamCallType.defaultType(),
       id: callId,

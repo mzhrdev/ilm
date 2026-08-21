@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/model/user_model.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/calls/data/providers/incoming_call_provider.dart';
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
@@ -24,6 +26,20 @@ class CallListenerWrapper extends ConsumerWidget {
     }
     // 👉 ADD THIS PRINT:
     debugPrint('📱 WRAPPER UI REBUILDING. Current call state: ${incomingCall?.contactName ?? "NULL"}');
+    ref.listen<UserModel?>(currentUserProvider, (previous, user) async {
+  if (user != null) {
+    try {
+      await StreamVideoService.instance.initStreamVideo(
+        uid: user.id,
+        name: user.name,
+        avatarUrl: user.profileImageUrl,
+      );
+      debugPrint('✅ Stream SDK Initialized for ${user.name}');
+    } catch (e) {
+      debugPrint('❌ Stream SDK Init Error: $e');
+    }
+  }
+});
     return Stack(
       textDirection: TextDirection.ltr,
       children: [

@@ -146,8 +146,8 @@ class SigninScreen extends ConsumerWidget {
                   onPress: () async {
                     final success = await authNotifier.signInWithGoogle();
                     if (success) {
-                      // REPLACED: context.go(Routes.home);
-                      context.go(Routes.test);
+                      context.go(Routes.home);
+                      
                     }
                   },
                   buttonColor: AppColors.kTransparent,
