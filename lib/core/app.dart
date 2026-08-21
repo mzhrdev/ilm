@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/calls/data/providers/stream_pre_warm_provider.dart';
 import 'package:lms/features/calls/presentation/widget/call_listener_wrapper.dart';
 
 class MyApp extends ConsumerWidget {
@@ -10,12 +11,14 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Activate Stream pre-warming across the entire app lifecycle
+    ref.watch(streamPrewarmProvider);
     return MaterialApp.router(
       title: 'lms',
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
-      // 👉 ADD THIS BUILDER RIGHT HERE:
-      // This safely places your call overlay inside the MaterialApp environment
+
+      //  Call Overlay Builder Method
       builder: (context, child) {
         return CallListenerWrapper(child: child!);
       },

@@ -26,7 +26,7 @@ class ConversationScreen extends ConsumerStatefulWidget {
 class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final int _lastMessageCount = 0;
+  bool _isInitiatingCall = false;
 
   @override
   void initState() {
@@ -129,24 +129,39 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         actions: [
           // Audio Call Button
           IconButton(
-            icon: const Icon(Icons.call),
-            onPressed: () async {
-              try {
-                await StreamVideoService.instance.initiateAudioCall(
-                  ref: ref,
-                  receiverUid: widget.userId,
-                  receiverName: widget.userName,
-                  //receiverAvatar: chatUser.profileImageUrl,
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(
-                  // ignore: use_build_context_synchronously
-                  context,
-                ).showSnackBar(SnackBar(content: Text('Failed to start call: $e')));
-              }
-            },
+            icon: _isInitiatingCall
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                  )
+                : const Icon(Icons.call, color: Colors.black),
+            onPressed: _isInitiatingCall
+                ? null
+                : () async {
+                    setState(() => _isInitiatingCall = true);
+
+                    try {
+                      await StreamVideoService.instance.initiateAudioCall(
+                        ref: ref,
+                        receiverUid: widget.userId,
+                        receiverName: widget.userName,
+                        receiverAvatar: null,
+                      );
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text('Failed to start call: $e')));
+                      }
+                    } finally {
+                      if (mounted) {
+                        setState(() => _isInitiatingCall = false);
+                      }
+                    }
+                  },
           ),
-          // Video Call Button
+          //Video Call Button
           IconButton(
             icon: const Icon(Icons.videocam, color: Colors.black),
             onPressed: () {
