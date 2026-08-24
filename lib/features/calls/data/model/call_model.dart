@@ -63,6 +63,7 @@ class CallModel {
     CallStatus mappedStatus;
     switch (rawStatus) {
       case 'answered':
+      case 'completed':
         mappedStatus = isCaller ? CallStatus.answeredOutgoing : CallStatus.answeredIncoming;
       case 'rejected':
         mappedStatus = CallStatus.rejected;

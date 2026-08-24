@@ -43,7 +43,7 @@ class FirebaseFirestoreServices {
       throw Exception('Unexpected error while saving user: $e');
     }
   }
-  
+
   // Fetches the currently logged-in user's document from Firestore.
   Future<UserModel?> getUser() async {
     final uid = _auth.currentUser?.uid;
@@ -193,6 +193,51 @@ class FirebaseFirestoreServices {
       return snapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
     } on FirebaseException catch (e) {
       throw Exception('Failed to fetch users: ${e.message}');
+    }
+  }
+
+  /// Verifies an instructor against the instructors collection.
+  ///
+  /// Returns true if the provided instructor ID and name match
+  /// an existing instructor document.
+  Future<bool> verifyInstructor({required String instructorId, required String instructorName}) async {
+    try {
+      final instructorDoc = await _firestore.collection('instructors').doc(instructorId).get();
+
+      if (!instructorDoc.exists) {
+        return false;
+      }
+
+      final data = instructorDoc.data();
+
+      if (data == null) {
+        return false;
+      }
+
+      final storedName = data['name'] as String?;
+
+      return storedName != null && storedName.trim().toLowerCase() == instructorName.trim().toLowerCase();
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to verify instructor: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error while verifying instructor: $e');
+    }
+  }
+
+  /// Updates the current user's role to instructor.
+  Future<void> updateUserRole(String role) async {
+    final uid = _auth.currentUser?.uid;
+
+    if (uid == null) {
+      throw StateError('Cannot update role: no authenticated user found.');
+    }
+
+    try {
+      await _usersRef.doc(uid).set({'role': role}, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      throw Exception('Failed to update user role: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error while updating user role: $e');
     }
   }
 }

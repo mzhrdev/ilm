@@ -27,10 +27,11 @@ class CallFirestoreService {
             Filter('receiverUid', isEqualTo: currentUserId),
           ),
         )
-        .orderBy('startedAt', descending: true)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) => CallModel.fromFirestore(doc, currentUserId)).toList();
+          final calls = snapshot.docs.map((doc) => CallModel.fromFirestore(doc, currentUserId)).toList();
+          calls.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return calls;
         });
   }
 }

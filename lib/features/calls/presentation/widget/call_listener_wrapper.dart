@@ -95,10 +95,12 @@ class CallListenerWrapper extends ConsumerWidget {
 
                           try {
                             // Request Mic Permission
-                      final micStatus = await Permission.microphone.request();
-                      if (!micStatus.isGranted) {
-                        throw Exception('Microphone permission is required to place a call.');
-                      }
+                            final statuses = await [Permission.microphone, Permission.camera].request();
+
+                            if (statuses[Permission.microphone] != PermissionStatus.granted) {
+                              debugPrint('Microphone permission denied.');
+                              return;
+                            }
                             await FirebaseFirestore.instance.collection('calls').doc(incomingCall.id).update({
                               'status': 'answered',
                             });

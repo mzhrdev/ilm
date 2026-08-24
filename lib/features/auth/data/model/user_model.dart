@@ -5,11 +5,13 @@ class UserModel {
   final String? profileImageUrl;
   final List<String>? skills;
   final String? about;
+  final String role;
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
+     this.role='student',
     this.profileImageUrl,
     this.skills,
     this.about,
@@ -23,6 +25,7 @@ class UserModel {
     String? profileImageUrl,
     List<String>? skills,
     String? about,
+    String? role,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -31,6 +34,7 @@ class UserModel {
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       skills: skills ?? this.skills,
       about: about ?? this.about,
+      role: role ?? this.role,
     );
   }
 
@@ -43,6 +47,7 @@ class UserModel {
       'profileImageUrl': profileImageUrl,
       'skills': skills,
       'about': about,
+      'role': role,
     };
   }
 
@@ -55,6 +60,7 @@ class UserModel {
       profileImageUrl: json['profileImageUrl'],
       skills: json['skills'] != null ? List<String>.from(json['skills']) : null,
       about: json['about'],
+      role:json['role'] ?? 'student',
     );
   }
 }

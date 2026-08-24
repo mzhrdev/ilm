@@ -143,9 +143,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                     setState(() => _isInitiatingCall = true);
 
                     try {
-                      // Request Mic Permission
-                      final micStatus = await Permission.microphone.request();
-                      if (!micStatus.isGranted) {
+                      // Request Mic & Camera Permissions
+                      final statuses = await [Permission.microphone, Permission.camera].request();
+
+                      if (statuses[Permission.microphone] != PermissionStatus.granted) {
                         throw Exception('Microphone permission is required to place a call.');
                       }
                       await StreamVideoService.instance.initiateAudioCall(

@@ -86,7 +86,7 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
       }
 
       // 2. Remote Hang-up Logic (Applies to BOTH caller and receiver)
-      if (status == 'completed' || status == 'ended' || status == 'missed') {
+      if (status == 'completed' || status == 'ended') {
         endCall(isRemote: true); // The other person hung up, end the call locally
       }
     });
