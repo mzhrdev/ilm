@@ -1,211 +1,219 @@
 // lib/features/calls/presentation/screens/video_call_screen.dart
 
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
+import 'package:lms/features/calls/presentation/widget/build_floating_button.dart';
+import 'package:lms/features/calls/presentation/widget/videoCallBottomControlButton.dart';
 
 import '../../data/providers/active_call_provider.dart';
 
 class VideoCallScreen extends ConsumerWidget {
   const VideoCallScreen({super.key});
 
-  // 🟢 MAIN BUILD METHOD: Constructs the entire Video Call screen UI
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watch the active call state to get current call details (name, duration, mute status, etc.)
     final callState = ref.watch(activeCallProvider);
 
-    // Fallback: If there is no active call state (e.g., call just ended), show a loading spinner
+    // On Call Error UI
     if (callState == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return CustomSafeArea(
+        child: Scaffold(
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Error Icon
+              Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(10)).padBottom(context.h(3)),
+              // Error Message
+              Center(
+                child: Text(
+                  " Error placing call! \n Retry or Navigate \n to Conversation Screen",
+                  style: AppTextStyle.kBodyLarge.copyWith(color: AppColors.kBlack),
+                  textAlign: TextAlign.center,
+                ),
+              ).padBottom(context.h(3)),
+              // Retry Button
+              CustomElevatedButton(
+                buttonColor: AppColors.kSecondary,
+                title: "Retry",
+                onPress: () {
+                  //TODO: Implement the Retry Logic here
+                },
+                bWidth: context.w(70),
+              ).padBottom(context.h(3)),
+              // Screen pop Button
+              CustomElevatedButton(
+                buttonColor: AppColors.kGreen,
+                title: "Navigate Back",
+                onPress: () => context.pop(),
+                bWidth: context.w(70),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      // We use a Stack to layer different UI elements on top of each other (background, top bar, buttons)
-      body: Stack(
-        children: [
-          // 1️⃣ BACKGROUND: Simulates the camera feed with a gradient and a "camera off" icon
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF2C3E50), Color(0xFF34495E), Color(0xFF7F8C8D)],
-                ),
-              ),
-              child: const Center(child: Icon(Icons.videocam_off, color: Colors.white24, size: 100)),
-            ),
-          ),
-
-          // 2️⃣ TOP BAR: Shows the contact's name, call duration/status, and an "add person" icon
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 16, // Accounts for phone notch/status bar
-                left: 16,
-                right: 16,
-                bottom: 16,
-              ),
-              // Adds a subtle dark gradient at the top so the white text is always readable
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black.withValues(alpha: 0.6), Colors.transparent],
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Displays the name of the person being called
-                        Text(
-                          callState.call.contactName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        // Shows "Calling..." or the live timer (e.g., "01:23") if connected
-                        Text(
-                          callState.phase == ActiveCallPhase.connected
-                              ? callState.formattedDuration
-                              : 'Calling...',
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  // Icon to add another person to the call (placeholder functionality for now)
-                  const Icon(Icons.person_add, color: Colors.white, size: 28),
-                ],
-              ),
-            ),
-          ),
-
-          // 3️⃣ RIGHT SIDE FLOATING BUTTONS: Quick actions like flip camera or flash
-          Positioned(
-            right: 16,
-            top: MediaQuery.of(context).size.height * 0.25, // Positions it about 25% down the screen
-            child: Column(
-              children: [
-                _buildFloatingButton(icon: Icons.person_add, onTap: () {}),
-                const SizedBox(height: 16),
-                _buildFloatingButton(icon: Icons.flip_camera_android, onTap: () {}),
-                const SizedBox(height: 16),
-                _buildFloatingButton(icon: Icons.flash_on, onTap: () {}),
+    return CustomSafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.kBlue.withAlpha(200),
+                AppColors.kBlue.withAlpha(180),
+                AppColors.kBlue.withAlpha(50),
               ],
             ),
           ),
-
-          // 4️⃣ BOTTOM CONTROL BAR: The main call controls (mute, speaker, video, end call)
-          Positioned(
-            bottom: 40,
-            left: 16,
-            right: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.8), // Semi-transparent background
-                borderRadius: BorderRadius.circular(32), // Rounded pill shape
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  // More options button
-                  _buildBottomControlButton(icon: Icons.more_horiz, isActive: false, onTap: () {}),
-
-                  // Video toggle button (changes icon and color based on isVideoOn state)
-                  _buildBottomControlButton(
-                    icon: callState.isVideoOn ? Icons.videocam : Icons.videocam_off,
-                    isActive: callState.isVideoOn,
-                    onTap: () => ref.read(activeCallProvider.notifier).toggleVideo(),
+          child: Column(
+            children: [
+              // Top Bar- With Gradient
+              Container(
+                padding: EdgeInsets.only(
+                  top: context.h(3),
+                  left: context.w(4),
+                  right: context.w(4),
+                  bottom: context.h(4),
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [AppColors.kBlack.withAlpha(180), AppColors.kTransparent],
                   ),
-
-                  // Speaker toggle button
-                  _buildBottomControlButton(
-                    icon: callState.isSpeakerOn ? Icons.volume_up : Icons.volume_off,
-                    isActive: callState.isSpeakerOn,
-                    onTap: () => ref.read(activeCallProvider.notifier).toggleSpeaker(),
-                  ),
-
-                  // Mute toggle button
-                  _buildBottomControlButton(
-                    icon: callState.isMuted ? Icons.mic_off : Icons.mic,
-                    isActive: callState.isMuted,
-                    onTap: () => ref.read(activeCallProvider.notifier).toggleMute(),
-                  ),
-
-                  // End Call button (Red circle)
-                  GestureDetector(
-                    onTap: () {
-                      // 1. End the call and update the provider state (saves to history)
-                      ref.read(activeCallProvider.notifier).endCall();
-
-                      // 2. Navigate back to the previous screen (Chat/Messages screen)
-                      context.pop();
-                    },
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: const BoxDecoration(color: Color(0xFFE91E63), shape: BoxShape.circle),
-                      child: const Icon(Icons.call_end, color: Colors.white, size: 28),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Call Receiver Name
+                          Text(
+                            callState.call.contactName,
+                            style: AppTextStyle.kDisplayTitle.copyWith(color: AppColors.kWhite),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: context.h(0.85)),
+                          // Call State
+                          Text(
+                            callState.phase == ActiveCallPhase.connected
+                                ? callState.formattedDuration
+                                : 'Calling...',
+                            style: AppTextStyle.kBodyLarge.copyWith(color: AppColors.kWhite),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    // Add More People to Call Button
+                    Icon(Icons.person_add, color: AppColors.kWhite, size: context.h(4)),
+                  ],
+                ),
               ),
-            ),
+
+              //  Middle Section (Main Icon + Right Side Buttons)
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Spacing b/w right side button and centered icon
+                    SizedBox(width: context.w(10)),
+
+                    // Centered Video Cam Icon
+                    Expanded(
+                      child: Center(
+                        child: Icon(Icons.videocam_off, color: AppColors.kWhite, size: context.h(12)),
+                      ),
+                    ),
+
+                    // Right Floating Buttons
+                    SizedBox(
+                      width: context.w(20),
+                      child: Column(
+                        children: [
+                          SizedBox(height: context.h(15)),
+                          // Flip Camera Button
+                          buildFloatingButton(icon: Icons.flip_camera_android, onTap: () {}, cont: context),
+                          SizedBox(height: context.h(2)),
+                          // Flash Toggle Button
+                          buildFloatingButton(icon: Icons.flash_on, onTap: () {}, cont: context),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Bottom Control Bar
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(2)),
+                decoration: BoxDecoration(
+                  color: AppColors.kBlack.withAlpha(150),
+                  borderRadius: BorderRadius.circular(context.w(8)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    // More Button
+                    videoCallBottomControlButton(
+                      icon: Icons.more_horiz,
+                      isActive: false,
+                      onTap: () {},
+                      context: context,
+                    ),
+                    // Video Cam Toggle Button
+                    videoCallBottomControlButton(
+                      icon: callState.isVideoOn ? Icons.videocam : Icons.videocam_off,
+                      isActive: callState.isVideoOn,
+                      onTap: () => ref.read(activeCallProvider.notifier).toggleVideo(),
+                      context: context,
+                    ),
+                    // Speaker Button
+                    videoCallBottomControlButton(
+                      icon: callState.isSpeakerOn ? Icons.volume_up : Icons.volume_off,
+                      isActive: callState.isSpeakerOn,
+                      onTap: () => ref.read(activeCallProvider.notifier).toggleSpeaker(),
+                      context: context,
+                    ),
+                    // Mic Toggle Button
+                    videoCallBottomControlButton(
+                      icon: callState.isMuted ? Icons.mic_off : Icons.mic,
+                      isActive: callState.isMuted,
+                      onTap: () => ref.read(activeCallProvider.notifier).toggleMute(),
+                      context: context,
+                    ),
+                    // End Call Button
+                    GestureDetector(
+                      onTap: () {
+                        ref.read(activeCallProvider.notifier).endCall();
+                        context.pop();
+                      },
+                      child: Container(
+                        width: context.w(15),
+                        height: context.h(7.5),
+                        decoration: const BoxDecoration(color: AppColors.kCallEndB, shape: BoxShape.circle),
+                        child: Icon(Icons.call_end, color: AppColors.kWhite, size: context.h(4)),
+                      ),
+                    ),
+                  ],
+                ),
+              ).padOnly(bottom: context.h(5), left: context.w(5), right: context.w(5)),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  // 🟡 HELPER FUNCTION 1: Builds the circular floating buttons on the right side of the screen.
-  // It takes an icon and an onTap action, and styles them with a semi-transparent black background.
-  Widget _buildFloatingButton({required IconData icon, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.6), shape: BoxShape.circle),
-        child: Icon(icon, color: Colors.white, size: 24),
-      ),
-    );
-  }
-
-  // 🟡 HELPER FUNCTION 2: Builds the circular control buttons at the bottom of the screen.
-  // It changes its background and icon color based on the `isActive` state.
-  // Example: White background + black icon when muted/speaker is ON.
-  // Transparent background + white icon when OFF.
-  Widget _buildBottomControlButton({
-    required IconData icon,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.1),
-          shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: isActive ? Colors.black : Colors.white, size: 24),
       ),
     );
   }

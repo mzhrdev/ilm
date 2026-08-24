@@ -9,8 +9,7 @@ import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
-import 'package:lms/core/routing/app_routing.dart';
-import 'package:lms/features/calls/presentation/widget/custom_action_button.dart';
+import 'package:lms/features/calls/presentation/widget/audioCallControlButton.dart';
 
 import '../../data/providers/active_call_provider.dart';
 
@@ -20,7 +19,6 @@ class AudioCallScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final callState = ref.watch(activeCallProvider);
-    final callNotifier = ref.read(activeCallProvider.notifier);
 
     // On Call Error UI
     if (callState == null) {
@@ -31,22 +29,28 @@ class AudioCallScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Error Icon
-              Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(10)),
+              Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(10)).padBottom(context.h(3)),
               // Error Message
-              Text(
-                "There was error placing the call!\n Retry or Navigate to Conversation Screen",
-                style: AppTextStyle.kBodyLarge.copyWith(color: AppColors.kGrey),
-              ),
+              Center(
+                child: Text(
+                  " Error placing call! \n Retry or Navigate \n to Conversation Screen",
+                  style: AppTextStyle.kBodyLarge.copyWith(color: AppColors.kBlack),
+                ),
+              ).padBottom(context.h(3)),
               // Retry Button
               CustomElevatedButton(
+                buttonColor: AppColors.kSecondary,
                 title: "Retry",
-                onPress: () => callNotifier.startCall(callState!.call),
+                onPress: () {
+                  //TODO: Implement the Retry Logic here
+                },
                 bWidth: context.w(70),
-              ),
+              ).padBottom(context.h(3)),
               // Screen pop Button
               CustomElevatedButton(
+                buttonColor: AppColors.kGreen,
                 title: "Navigate Back",
-                onPress: () => context.go(Routes.conversation),
+                onPress: () => context.pop(),
                 bWidth: context.w(70),
               ),
             ],
@@ -74,7 +78,7 @@ class AudioCallScreen extends ConsumerWidget {
             // Call Receiver Name
             Text(
               callState.call.contactName,
-              style: AppTextStyle.kBodyLarge.copyWith(fontSize: context.h(3), color: AppColors.kWhite),
+              style: AppTextStyle.kDisplayTitle.copyWith(fontSize: context.h(3), color: AppColors.kWhite),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: context.h(1.5)),
@@ -124,7 +128,7 @@ class AudioCallScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       // Speaker Button
-                      buildControlButton(
+                      audioCallControlButton(
                         icon: callState.isSpeakerOn ? Icons.volume_up : Icons.volume_off,
                         label: 'Speaker',
                         isActive: callState.isSpeakerOn,
@@ -132,7 +136,7 @@ class AudioCallScreen extends ConsumerWidget {
                         context: context,
                       ),
                       // Video Button
-                      buildControlButton(
+                      audioCallControlButton(
                         icon: Icons.videocam,
                         label: 'Video',
                         isActive: false,
@@ -140,7 +144,7 @@ class AudioCallScreen extends ConsumerWidget {
                         context: context,
                       ),
                       // Mute Button
-                      buildControlButton(
+                      audioCallControlButton(
                         icon: callState.isMuted ? Icons.mic_off : Icons.mic,
                         label: 'Mute',
                         isActive: callState.isMuted,
@@ -154,7 +158,7 @@ class AudioCallScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       // More... Button
-                      buildControlButton(
+                      audioCallControlButton(
                         icon: Icons.more_horiz,
                         label: 'More',
                         isActive: false,
@@ -162,7 +166,7 @@ class AudioCallScreen extends ConsumerWidget {
                         context: context,
                       ),
                       // Share Button
-                      buildControlButton(
+                      audioCallControlButton(
                         icon: Icons.upload,
                         label: 'Share',
                         isActive: false,
