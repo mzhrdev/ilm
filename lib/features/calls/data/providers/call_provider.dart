@@ -1,9 +1,11 @@
 // lib/features/calls/data/provider/calls_provider.dart
 
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/core/data/services/call_firestore_services.dart';
-import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/auth/data/providers/current_user_provider.dart';
+
 import '../model/call_model.dart';
 
 // Call Firestore Provider
@@ -20,26 +22,16 @@ class CallsState {
   final bool isLoading;
   final String searchQuery;
 
-  CallsState({
-    required this.calls,
-    this.isLoading = false,
-    this.searchQuery = '',
-  });
+  CallsState({required this.calls, this.isLoading = false, this.searchQuery = ''});
 
   List<CallModel> get filteredCalls {
     if (searchQuery.isEmpty) {
       return calls;
     }
-    return calls
-        .where((call) => call.contactName.toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
+    return calls.where((call) => call.contactName.toLowerCase().contains(searchQuery.toLowerCase())).toList();
   }
 
-  CallsState copyWith({
-    List<CallModel>? calls,
-    bool? isLoading,
-    String? searchQuery,
-  }) {
+  CallsState copyWith({List<CallModel>? calls, bool? isLoading, String? searchQuery}) {
     return CallsState(
       calls: calls ?? this.calls,
       isLoading: isLoading ?? this.isLoading,
@@ -72,13 +64,13 @@ class CallsNotifier extends StateNotifier<CallsState> {
         .read(callFirestoreServiceProvider)
         .getCallHistoryStream(currentUser.id)
         .listen(
-      (history) {
-        state = state.copyWith(calls: history, isLoading: false);
-      },
-      onError: (error) {
-        state = state.copyWith(isLoading: false);
-      },
-    );
+          (history) {
+            state = state.copyWith(calls: history, isLoading: false);
+          },
+          onError: (error) {
+            state = state.copyWith(isLoading: false);
+          },
+        );
   }
 
   void setSearchQuery(String query) {

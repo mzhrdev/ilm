@@ -10,7 +10,7 @@ import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/presentation/widgets/custom_text_button.dart';
 import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
-import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
 import 'package:lms/features/courses/data/provider/continue_watching_provider.dart';
 import 'package:lms/features/home/data/providers/home_provider.dart';

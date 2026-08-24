@@ -5,7 +5,7 @@ import 'package:lms/core/data/services/firebase_firestore_services.dart';
 import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
 import 'package:lms/core/presentation/widgets/snackbar.dart';
 import 'package:lms/core/routing/app_routing.dart';
-import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 import 'package:lms/features/courses/data/model/lesson_model.dart';
 import 'package:lms/features/courses/data/model/module_model.dart';
 import 'package:lms/features/courses/data/provider/create_course_provider.dart';

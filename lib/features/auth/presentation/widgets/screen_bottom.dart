@@ -12,7 +12,9 @@ class ScreenBottom extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // Already Question
         Text(question),
+        // Text Button for Navigation
         CustomTextButton(onPressed: onTap, text: bText, color: AppColors.kSecondary),
       ],
     );

@@ -2,7 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
-import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
 
 final streamPrewarmProvider = Provider<void>((ref) {

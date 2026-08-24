@@ -84,7 +84,6 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
           endCall(isRemote: true); // They declined! Hang up.
         }
       }
-
       // 2. Remote Hang-up Logic (Applies to BOTH caller and receiver)
       if (status == 'completed' || status == 'ended') {
         endCall(isRemote: true); // The other person hung up, end the call locally
@@ -106,7 +105,6 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     });
   }
 
-  // Ending Voice Call Method
   // Ending Voice Call Method
   Future<void> endCall({bool isRemote = false}) async {
     _timer?.cancel();
@@ -143,6 +141,9 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     });
   }
 
+  //--------------------------
+  // HARDWARE METHODS
+  //--------------------------
   // Toggle Microphone Method
   Future<void> toggleMute() async {
     if (state != null) {
@@ -171,7 +172,7 @@ class ActiveCallNotifier extends StateNotifier<ActiveCallState?> {
     }
   }
 
-  // Dispose Method
+  // Cleanup: Dispose Method
   @override
   void dispose() {
     _timer?.cancel();

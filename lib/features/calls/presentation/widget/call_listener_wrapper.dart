@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
-import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 import 'package:lms/features/calls/data/model/call_model.dart';
 import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/calls/data/providers/incoming_call_provider.dart';

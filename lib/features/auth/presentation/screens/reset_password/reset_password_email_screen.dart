@@ -60,7 +60,6 @@ class ResetPasswordEmailScreen extends ConsumerWidget {
               CustomElevatedButton(
                 buttonColor: AppColors.kPrimary,
                 elevation: 0,
-
                 bWidth: context.w(95),
                 borderRadius: context.w(3),
                 fontSize: context.h(2.75),
@@ -69,13 +68,11 @@ class ResetPasswordEmailScreen extends ConsumerWidget {
                 title: "Send",
                 onPress: () async {
                   final success = await resetNotifier.resetPassword();
-
                   if (success && context.mounted) {
                     ShowSnackbar1.success(
                       context,
                       'Reset link sent to ${reset.resetPassEmailController.text.trim()}. Please check your inbox.',
                     );
-
                     // Route to the Sign-In screen
                     context.go(Routes.signin);
                     resetNotifier.clearReset();

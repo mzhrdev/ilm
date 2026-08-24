@@ -253,24 +253,6 @@ class StreamVideoService {
       _cameraEnabled = true;
     }
   }
-
-  Future<void> testTokenEndpoint() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      throw Exception('No Firebase user logged in');
-    }
-
-    final idToken = await user.getIdToken(true);
-
-    final response = await http.post(
-      Uri.parse('https://lms-api.saleemmazhar348.workers.dev/stream-token'),
-      headers: {'Authorization': 'Bearer $idToken', 'Content-Type': 'application/json'},
-    );
-
-    print('STATUS: ${response.statusCode}');
-    print('BODY: ${response.body}');
-  }
 }
 
 // ======================================================

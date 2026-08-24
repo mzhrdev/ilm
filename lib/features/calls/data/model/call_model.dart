@@ -110,6 +110,11 @@ class CallModel {
     };
   }
 
+  //-----------------------
+  // UI HELPER GETTERS
+  //-----------------------
+
+  // Formatted Time
   String get formattedTime {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
@@ -127,9 +132,11 @@ class CallModel {
     }
   }
 
+  // Bools for isMissed and isIncoming
   bool get isMissed => status == CallStatus.missedIncoming || status == CallStatus.missedOutgoing;
   bool get isIncoming => status == CallStatus.missedIncoming || status == CallStatus.answeredIncoming;
 
+  // Direction Icon
   IconData get directionIcon {
     return isIncoming ? Icons.call_received : Icons.call_made;
   }

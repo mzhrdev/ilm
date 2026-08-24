@@ -16,11 +16,7 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(firestoreServices);
 });
 
-/// Convenience provider for widgets that only need the profile data
-/// and shouldn't rebuild on unrelated loading/error state changes.
-final currentUserProvider = Provider<UserModel?>((ref) {
-  return ref.watch(authProvider).user;
-});
+
 
 class AuthState {
   AuthState({

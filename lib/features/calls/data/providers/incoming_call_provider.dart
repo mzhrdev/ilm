@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lms/features/auth/data/providers/auth_provider.dart';
+import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 
 import '../model/call_model.dart';
 
 final incomingCallStreamProvider = StreamProvider<CallModel?>((ref) {
-  // 1. Watch your existing convenience provider.
-  // This automatically rebuilds the stream whenever the user logs in or out.
+  
   final currentUser = ref.watch(currentUserProvider);
 
   if (currentUser == null) {
@@ -18,7 +17,6 @@ final incomingCallStreamProvider = StreamProvider<CallModel?>((ref) {
   debugPrint('📡 Stream: Connected for UID ${currentUser.id}. Listening to Firestore...');
 
   // 2. Listen to Firestore using currentUser.id
-  // We keep the local sorting logic to bypass the composite index requirement.
   return FirebaseFirestore.instance
       .collection('calls')
       .where('receiverUid', isEqualTo: currentUser.id)
