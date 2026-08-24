@@ -5,6 +5,7 @@ import 'package:lms/core/data/services/firebase_firestore_services.dart';
 import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
 import 'package:lms/core/presentation/widgets/snackbar.dart';
 import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/auth/data/providers/auth_provider.dart';
 import 'package:lms/features/courses/data/model/lesson_model.dart';
 import 'package:lms/features/courses/data/model/module_model.dart';
 import 'package:lms/features/courses/data/provider/create_course_provider.dart';
@@ -18,6 +19,7 @@ class CreateCourseScreen extends ConsumerWidget {
     final draft = ref.watch(createCourseProvider);
 
     final notifier = ref.read(createCourseProvider.notifier);
+    final currentUser = ref.read(currentUserProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Create Course')),
@@ -152,12 +154,8 @@ class CreateCourseScreen extends ConsumerWidget {
 
                 await FirebaseFirestoreServices().saveCourseFromDraft(
                   draft: draft,
-
-                  // Temporary values
-                  // Replace with auth/instructor provider later
-                  instructorId: 'instructor_123',
-
-                  instructorName: 'John Doe',
+                  instructorId: currentUser!.id,
+                  instructorName: currentUser.name,
                 );
 
                 ShowSnackbar1.success(context, 'Course Saved');

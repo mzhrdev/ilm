@@ -338,6 +338,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return _auth.currentUser != null;
   }
 
+  // UPDATE CURRENT USER ROLE
+  Future<void> updateUserRole(String role) async {
+  final currentUser = state.user;
+
+  if (currentUser == null) {
+    throw StateError('No authenticated user found.');
+  }
+
+  await _firestoreServices.updateUserRole(role);
+
+  final updatedUser = currentUser.copyWith(role: role);
+
+  state = state.copyWith(user: updatedUser);
+}
+
   // Clear Sign Up/Sign In Controllers
   void clearAuth() {
     state.userNameController.clear();

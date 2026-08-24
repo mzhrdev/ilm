@@ -10,12 +10,10 @@ class InstructorVerificationScreen extends ConsumerStatefulWidget {
   const InstructorVerificationScreen({super.key});
 
   @override
-  ConsumerState<InstructorVerificationScreen> createState() =>
-      _InstructorVerificationScreenState();
+  ConsumerState<InstructorVerificationScreen> createState() => _InstructorVerificationScreenState();
 }
 
-class _InstructorVerificationScreenState
-    extends ConsumerState<InstructorVerificationScreen> {
+class _InstructorVerificationScreenState extends ConsumerState<InstructorVerificationScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _instructorIdController = TextEditingController();
@@ -55,10 +53,7 @@ class _InstructorVerificationScreenState
 
       if (!isVerified) {
         if (mounted) {
-          ShowSnackbar1.error(
-            context,
-            'Invalid Instructor ID or Name.',
-          );
+          ShowSnackbar1.error(context, 'Invalid Instructor ID or Name.');
         }
         return;
       }
@@ -68,20 +63,14 @@ class _InstructorVerificationScreenState
 
       if (!mounted) return;
 
-      ShowSnackbar1.success(
-        context,
-        'Instructor verified successfully.',
-      );
+      ShowSnackbar1.success(context, 'Instructor verified successfully.');
 
       // Navigate to Create Course
       context.push(Routes.createCourse);
     } catch (e) {
       if (!mounted) return;
 
-      ShowSnackbar1.error(
-        context,
-        e.toString().replaceFirst('Exception: ', ''),
-      );
+      ShowSnackbar1.error(context, e.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) {
         setState(() {
@@ -94,9 +83,7 @@ class _InstructorVerificationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Instructor Verification'),
-      ),
+      appBar: AppBar(title: const Text('Instructor Verification')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -109,10 +96,7 @@ class _InstructorVerificationScreenState
 
                 const Text(
                   'Become an Instructor',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 ),
 
                 const SizedBox(height: 10),
@@ -120,11 +104,7 @@ class _InstructorVerificationScreenState
                 Text(
                   'Enter your instructor credentials to verify '
                   'your instructor account.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey[600],
-                    height: 1.5,
-                  ),
+                  style: TextStyle(fontSize: 15, color: Colors.grey[600], height: 1.5),
                 ),
 
                 const SizedBox(height: 35),
@@ -181,9 +161,7 @@ class _InstructorVerificationScreenState
                   width: double.infinity,
                   child: CustomElevatedButton(
                     onPress: _isLoading ? null : _verifyInstructor,
-                    title: _isLoading
-                        ? 'Verifying...'
-                        : 'Verify Instructor',
+                    title: _isLoading ? 'Verifying...' : 'Verify Instructor',
                   ),
                 ),
               ],

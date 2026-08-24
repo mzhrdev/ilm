@@ -125,7 +125,7 @@ class HomeScreen extends ConsumerWidget {
               iconColor: AppColors.kPrimary,
             ),
             CustomIconButton(
-              onTap: () => context.push(Routes.createCourse),
+              onTap: () => context.push(Routes.instructorVerification),
               icon: Icons.add_circle_outline,
               iconColor: AppColors.kBlack,
             ),
