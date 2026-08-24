@@ -1,8 +1,16 @@
 // lib/features/calls/presentation/screens/audio_call_screen.dart
 
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
+import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/features/calls/presentation/widget/custom_action_button.dart';
 
 import '../../data/providers/active_call_provider.dart';
 
@@ -12,208 +20,182 @@ class AudioCallScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final callState = ref.watch(activeCallProvider);
+    final callNotifier = ref.read(activeCallProvider.notifier);
 
+    // On Call Error UI
     if (callState == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F1419),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Opacity(opacity: 0.05, child: CustomPaint(painter: PatternPainter())),
-          ),
-
-          Column(
+      return CustomSafeArea(
+        child: Scaffold(
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 60),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                      onPressed: () {
-                        ref.read(activeCallProvider.notifier).endCall();
-                        context.pop();
-                      },
-                    ),
-                    const Icon(Icons.person_add, color: Colors.white, size: 28),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
+              // Error Icon
+              Icon(Icons.error_outline, color: AppColors.kRed, size: context.h(10)),
+              // Error Message
               Text(
-                callState.call.contactName,
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
-                textAlign: TextAlign.center,
+                "There was error placing the call!\n Retry or Navigate to Conversation Screen",
+                style: AppTextStyle.kBodyLarge.copyWith(color: AppColors.kGrey),
               ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                callState.phase == ActiveCallPhase.connected ? callState.formattedDuration : 'Calling...',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 16),
+              // Retry Button
+              CustomElevatedButton(
+                title: "Retry",
+                onPress: () => callNotifier.startCall(callState!.call),
+                bWidth: context.w(70),
               ),
-
-              const Spacer(),
-
-              Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 3),
-                ),
-                child: ClipOval(
-                  child: callState.call.contactAvatar != null
-                      ? Image.network(
-                          callState.call.contactAvatar!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[800],
-                              child: const Icon(Icons.person, size: 100, color: Colors.white),
-                            );
-                          },
-                        )
-                      : Container(
-                          color: Colors.grey[800],
-                          child: const Icon(Icons.person, size: 100, color: Colors.white),
-                        ),
-                ),
-              ),
-
-              const Spacer(),
-
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildControlButton(
-                          icon: callState.isSpeakerOn ? Icons.volume_up : Icons.volume_off,
-                          label: 'Speaker',
-                          isActive: callState.isSpeakerOn,
-                          onTap: () => ref.read(activeCallProvider.notifier).toggleSpeaker(),
-                        ),
-                        _buildControlButton(
-                          icon: Icons.videocam,
-                          label: 'Video',
-                          isActive: false,
-                          onTap: () {},
-                        ),
-                        _buildControlButton(
-                          icon: callState.isMuted ? Icons.mic_off : Icons.mic,
-                          label: 'Mute',
-                          isActive: callState.isMuted,
-                          onTap: () => ref.read(activeCallProvider.notifier).toggleMute(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildControlButton(
-                          icon: Icons.more_horiz,
-                          label: 'More',
-                          isActive: false,
-                          onTap: () {},
-                        ),
-                        _buildControlButton(
-                          icon: Icons.upload,
-                          label: 'Share',
-                          isActive: false,
-                          onTap: () {},
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            ref.read(activeCallProvider.notifier).endCall();
-                            context.pop();
-                          },
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 64,
-                                height: 64,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFE91E63),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.call_end, color: Colors.white, size: 32),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text('End', style: TextStyle(color: Colors.white, fontSize: 14)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              // Screen pop Button
+              CustomElevatedButton(
+                title: "Navigate Back",
+                onPress: () => context.go(Routes.conversation),
+                bWidth: context.w(70),
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildControlButton({
-    required IconData icon,
-    required String label,
-    required bool isActive,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: isActive ? Colors.black : Colors.white, size: 28),
-          ),
-          const SizedBox(height: 8),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
-        ],
-      ),
-    );
-  }
-}
-
-class PatternPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1)
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    for (int i = 0; i < 20; i++) {
-      canvas.drawCircle(Offset(size.width * 0.1 * i, size.height * 0.1 * (i % 10)), 20, paint);
+        ),
+      );
     }
-  }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+    return CustomSafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.kBlack.withAlpha(170),
+        body: Column(
+          children: [
+            // Padding from top
+            SizedBox(height: context.h(1)),
+            // Add Person to Call Button
+            CustomIconButton(
+              icon: Icons.person_add,
+              onTap: () {
+                //TODO: Implement Group Call Functionality
+              },
+              iconSize: context.h(4),
+            ).topRightAlign,
+            SizedBox(height: context.h(2.5)),
+            // Call Receiver Name
+            Text(
+              callState.call.contactName,
+              style: AppTextStyle.kBodyLarge.copyWith(fontSize: context.h(3), color: AppColors.kWhite),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: context.h(1.5)),
+            // Call State (Calling, Ringing, Call Minutes Count)
+            Text(
+              callState.phase == ActiveCallPhase.connected ? callState.formattedDuration : 'Calling...',
+              style: AppTextStyle.kBodyLarge.copyWith(color: AppColors.kWhite),
+            ),
+            const Spacer(),
+            // Call Receiver Profile Image
+            SizedBox(
+              height: context.h(25),
+              width: context.w(55),
+              child: ClipOval(
+                child: callState.call.contactAvatar != null
+                    ? Image.network(
+                        callState.call.contactAvatar!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: AppColors.kBlack.withAlpha(150),
+                            child: Icon(Icons.person, size: context.h(13), color: AppColors.kWhite),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: AppColors.kBlack.withAlpha(150),
+                        child: Icon(Icons.person, size: context.h(13), color: AppColors.kWhite),
+                      ),
+              ),
+            ),
+            const Spacer(),
+            // Box of Buttons for Actions
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.kBlack.withAlpha(150),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(32),
+                  topRight: Radius.circular(32),
+                  bottomLeft: Radius.circular(32),
+                  bottomRight: Radius.circular(32),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      // Speaker Button
+                      buildControlButton(
+                        icon: callState.isSpeakerOn ? Icons.volume_up : Icons.volume_off,
+                        label: 'Speaker',
+                        isActive: callState.isSpeakerOn,
+                        onTap: () => ref.read(activeCallProvider.notifier).toggleSpeaker(),
+                        context: context,
+                      ),
+                      // Video Button
+                      buildControlButton(
+                        icon: Icons.videocam,
+                        label: 'Video',
+                        isActive: false,
+                        onTap: () {},
+                        context: context,
+                      ),
+                      // Mute Button
+                      buildControlButton(
+                        icon: callState.isMuted ? Icons.mic_off : Icons.mic,
+                        label: 'Mute',
+                        isActive: callState.isMuted,
+                        onTap: () => ref.read(activeCallProvider.notifier).toggleMute(),
+                        context: context,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      // More... Button
+                      buildControlButton(
+                        icon: Icons.more_horiz,
+                        label: 'More',
+                        isActive: false,
+                        onTap: () {},
+                        context: context,
+                      ),
+                      // Share Button
+                      buildControlButton(
+                        icon: Icons.upload,
+                        label: 'Share',
+                        isActive: false,
+                        onTap: () {},
+                        context: context,
+                      ),
+                      // End Call Button
+                      GestureDetector(
+                        onTap: () {
+                          ref.read(activeCallProvider.notifier).endCall();
+                          context.pop();
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: context.w(19),
+                              height: context.h(8),
+                              decoration: BoxDecoration(color: AppColors.kCallEndB, shape: BoxShape.circle),
+                              child: Icon(Icons.call_end, color: AppColors.kWhite, size: context.h(4)),
+                            ),
+                            SizedBox(height: context.h(1)),
+                            Text('End', style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kWhite)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ).padAll(context.h(2)),
+            ).padOnly(bottom: context.h(5), left: context.w(6), right: context.w(6)),
+          ],
+        ),
+      ),
+    );
+  }
 }
