@@ -331,7 +331,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (var i = 0; i < course.modules.length; i++)
-          // Chapter Card
+            // Chapter Card
             _buildChapterCard(
               chapterNumber: i + 1,
               chapterTitle: course.modules[i].title,
@@ -351,19 +351,19 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
     required bool isExpanded,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+      margin: EdgeInsets.only(bottom: context.h(2)),
+      decoration: BoxDecoration(
+        color: AppColors.kGrey.withAlpha(100),
+        borderRadius: BorderRadius.circular(context.w(3)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Chapter Header
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'Chapter $chapterNumber: $chapterTitle',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
+          Text(
+            'Chapter $chapterNumber: $chapterTitle',
+            style: AppTextStyle.kBodyLarge.copyWith(fontSize: context.h(2), fontWeight: FontWeight.w600),
+          ).padAll(context.w(4)),
           // Lessons (if expanded)
           if (isExpanded) ...[
             const Divider(height: 1, indent: 16, endIndent: 16),
@@ -375,36 +375,33 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
   }
 
   Widget _buildLessonItem(LessonModel lesson) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          // Icon based on lesson type
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-            child: Icon(
-              lesson.type == 'video' ? Icons.play_arrow : Icons.description,
-              color: Colors.white,
-              size: 18,
-            ),
+    return Row(
+      children: [
+        // Icon based on lesson type
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+          child: Icon(
+            lesson.type == 'video' ? Icons.play_arrow : Icons.description,
+            color: Colors.white,
+            size: 18,
           ),
-          const SizedBox(width: 12),
-          // Lesson title
-          Expanded(
-            child: Text(lesson.title, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+        ),
+        const SizedBox(width: 12),
+        // Lesson title
+        Expanded(
+          child: Text(
+            lesson.title,
+            style: AppTextStyle.kBodyMedium.copyWith(fontSize: context.h(1.75), color: AppColors.kBlack),
           ),
-          // Lock icon if not free
-          if (!lesson.isFree) const Icon(Icons.lock_outline, size: 18, color: Colors.grey),
-        ],
-      ),
-    );
+        ),
+        // Lock icon if not free
+        if (!lesson.isFree)
+          Icon(Icons.lock_outline, size: context.h(2), color: AppColors.kBlack.withAlpha(150)),
+      ],
+    ).padSymmetric(horizontal: context.w(3), vertical: context.h(1.5));
   }
-
-  // In lib/features/course_detail/presentation/screens/course_detail_screen.dart
-
-  // Replace the _buildReviewsTab method with this:
 
   Widget _buildReviewsTab(CourseModel course) {
     if (course.reviews.isEmpty) {
@@ -414,14 +411,17 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(context.w(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Optional: Show average rating summary
           Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(12)),
+            padding: EdgeInsets.all(context.w(5)),
+            decoration: BoxDecoration(
+              color: AppColors.kBlue,
+              borderRadius: BorderRadius.circular(context.w(5)),
+            ),
             child: Row(
               children: [
                 // Average Rating
@@ -430,22 +430,26 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
                   children: [
                     Text(
                       course.rating.toString(),
-                      style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.black),
+                      style: AppTextStyle.kBodyMedium.copyWith(
+                        fontSize: context.h(3),
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.kBlack,
+                      ),
                     ),
                     Row(
                       children: [
                         ...List.generate(5, (index) {
                           return Icon(
                             index < course.rating.floor() ? Icons.star : Icons.star_border,
-                            color: Colors.amber[700],
-                            size: 20,
+                            color: AppColors.kAmber,
+                            size: context.h(3),
                           );
                         }),
                       ],
                     ),
                     Text(
                       '${course.totalRatings} reviews',
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      style: AppTextStyle.kBodyLarge.copyWith(fontSize: context.h(3), color: AppColors.kGrey),
                     ),
                   ],
                 ),
@@ -464,40 +468,40 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: context.h(5)),
           // Reviews List
-          const Text('All Reviews', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 12),
+          Text(
+            'All Reviews',
+            style: AppTextStyle.kBodyLarge.copyWith(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: context.h(4)),
           ...course.reviews.map((review) => ReviewCard(review: review)),
-          const SizedBox(height: 80), // Space for bottom navigation
+          SizedBox(height: context.h(40)),
         ],
       ),
     );
   }
 
   Widget _buildRatingBar(int stars, int percentage) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Text('$stars', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-          const SizedBox(width: 4),
-          const Icon(Icons.star, size: 12, color: Colors.amber),
-          const SizedBox(width: 8),
-          Container(
-            width: 80,
-            height: 6,
-            decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(3)),
-            child: Container(
-              decoration: BoxDecoration(color: Colors.amber[700], borderRadius: BorderRadius.circular(3)),
-              width: 80 * (percentage / 100),
-            ),
+    return Row(
+      children: [
+        Text('$stars', style: AppTextStyle.kBodyLarge.copyWith(fontSize: 12, fontWeight: FontWeight.w500)),
+        SizedBox(width: context.w(2)),
+        Icon(Icons.star, size: 12, color: AppColors.kAmber),
+        SizedBox(width: context.w(2)),
+        Container(
+          width: context.w(80),
+          height: context.h(2),
+          decoration: BoxDecoration(color: AppColors.kGrey, borderRadius: BorderRadius.circular(3)),
+          child: Container(
+            decoration: BoxDecoration(color: AppColors.kAmber, borderRadius: BorderRadius.circular(3)),
+            width: 80 * (percentage / 100),
           ),
-          const SizedBox(width: 8),
-          Text('$percentage%', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-        ],
-      ),
-    );
+        ),
+        const SizedBox(width: 8),
+        Text('$percentage%', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+      ],
+    ).padSymmetric(vertical: context.h(2));
   }
 }
 
