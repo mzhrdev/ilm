@@ -1,6 +1,7 @@
 // lib/features/home/data/providers/course_provider.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
@@ -20,28 +21,28 @@ import '../model/course_model.dart';
 // -----------------------------------------------------------------------------
 
 final coursesProvider = FutureProvider<List<CourseModel>>((ref) async {
-  print('');
-  print('==================================================');
-  print('[coursesProvider] BUILD STARTED');
-  print('==================================================');
+  debugPrint('');
+  debugPrint('==================================================');
+  debugPrint('[coursesProvider] BUILD STARTED');
+  debugPrint('==================================================');
 
   try {
     final snapshot = await FirebaseFirestore.instance.collection('courses').get();
 
-    print(
+    debugPrint(
       '[coursesProvider] '
       'Firestore documents loaded=${snapshot.docs.length}',
     );
 
     final courses = snapshot.docs.map((doc) {
-      print(
+      debugPrint(
         '[coursesProvider] '
         'documentId=${doc.id}',
       );
 
       final course = CourseModel.fromFirestore(doc);
 
-      print(
+      debugPrint(
         '[coursesProvider] '
         'courseId=${course.id} | '
         'title=${course.title}',
@@ -50,26 +51,26 @@ final coursesProvider = FutureProvider<List<CourseModel>>((ref) async {
       return course;
     }).toList();
 
-    print(
+    debugPrint(
       '[coursesProvider] '
       'FINAL COURSE COUNT=${courses.length}',
     );
 
-    print('==================================================');
-    print('[coursesProvider] BUILD COMPLETED');
-    print('==================================================');
-    print('');
+    debugPrint('==================================================');
+    debugPrint('[coursesProvider] BUILD COMPLETED');
+    debugPrint('==================================================');
+    debugPrint('');
 
     return courses;
   } catch (error, stackTrace) {
-    print('');
-    print('==================================================');
-    print('[coursesProvider] ERROR');
-    print('==================================================');
-    print('[coursesProvider] error=$error');
-    print('[coursesProvider] stackTrace=$stackTrace');
-    print('==================================================');
-    print('');
+    debugPrint('');
+    debugPrint('==================================================');
+    debugPrint('[coursesProvider] ERROR');
+    debugPrint('==================================================');
+    debugPrint('[coursesProvider] error=$error');
+    debugPrint('[coursesProvider] stackTrace=$stackTrace');
+    debugPrint('==================================================');
+    debugPrint('');
 
     rethrow;
   }
@@ -83,22 +84,22 @@ final coursesProvider = FutureProvider<List<CourseModel>>((ref) async {
 // -----------------------------------------------------------------------------
 
 final courseDetailProvider = FutureProvider.family<CourseModel, String>((ref, courseId) async {
-  print('');
-  print('==================================================');
-  print('[courseDetailProvider] FETCH');
-  print('courseId=$courseId');
-  print('==================================================');
+  debugPrint('');
+  debugPrint('==================================================');
+  debugPrint('[courseDetailProvider] FETCH');
+  debugPrint('courseId=$courseId');
+  debugPrint('==================================================');
 
   try {
     final doc = await FirebaseFirestore.instance.collection('courses').doc(courseId).get();
 
-    print(
+    debugPrint(
       '[courseDetailProvider] '
       'document exists=${doc.exists}',
     );
 
     if (!doc.exists) {
-      print(
+      debugPrint(
         '[courseDetailProvider] '
         'COURSE NOT FOUND: $courseId',
       );
@@ -108,24 +109,26 @@ final courseDetailProvider = FutureProvider.family<CourseModel, String>((ref, co
 
     final course = CourseModel.fromFirestore(doc);
 
-    print(
+    debugPrint(
       '[courseDetailProvider] '
       'course loaded: ${course.title}',
     );
 
-    print(
+    debugPrint(
       '[courseDetailProvider] '
       'course.id=${course.id}',
     );
 
     return course;
   } catch (error, stackTrace) {
-    print(
+    debugPrint(
       '[courseDetailProvider] '
       'ERROR: $error',
     );
 
-    print(stackTrace);
+    if (kDebugMode) {
+      print(stackTrace);
+    }
 
     rethrow;
   }
@@ -142,10 +145,10 @@ final courseDetailProvider = FutureProvider.family<CourseModel, String>((ref, co
 // -----------------------------------------------------------------------------
 
 final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
-  print('');
-  print('##################################################');
-  print('[courseEnrollmentsProvider] BUILD STARTED');
-  print('##################################################');
+  debugPrint('');
+  debugPrint('##################################################');
+  debugPrint('[courseEnrollmentsProvider] BUILD STARTED');
+  debugPrint('##################################################');
 
   // ---------------------------------------------------------------------------
   // Load courses from Firebase
@@ -153,13 +156,13 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
 
   final courses = await ref.watch(coursesProvider.future);
 
-  print(
+  debugPrint(
     '[courseEnrollmentsProvider] '
     'courses loaded=${courses.length}',
   );
 
   for (final course in courses) {
-    print(
+    debugPrint(
       '[courseEnrollmentsProvider] '
       'COURSE -> '
       'id=${course.id} | '
@@ -173,13 +176,13 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
 
   final user = ref.watch(currentUserProvider);
 
-  print(
+  debugPrint(
     '[courseEnrollmentsProvider] '
     'currentUser=${user == null ? 'NULL' : 'FOUND'}',
   );
 
   if (user != null) {
-    print(
+    debugPrint(
       '[courseEnrollmentsProvider] '
       'userId=${user.id}',
     );
@@ -190,14 +193,14 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
   // ---------------------------------------------------------------------------
 
   if (user == null || user.id.isEmpty) {
-    print(
+    debugPrint(
       '[courseEnrollmentsProvider] '
       'NO USER -> returning courses with null enrollment',
     );
 
     final result = courses.map((course) => CourseEnrollmentModel(course: course, enrollment: null)).toList();
 
-    print(
+    debugPrint(
       '[courseEnrollmentsProvider] '
       'result count=${result.length}',
     );
@@ -209,16 +212,16 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
   // Enrollment lookup
   // ---------------------------------------------------------------------------
 
-  print('');
-  print(
+  debugPrint('');
+  debugPrint(
     '[courseEnrollmentsProvider] '
     'STARTING ENROLLMENT LOOKUPS',
   );
-  print('');
+  debugPrint('');
 
   final enrollments = await Future.wait(
     courses.map((course) async {
-      print(
+      debugPrint(
         '[courseEnrollmentsProvider] '
         'LOOKUP START '
         'courseId=${course.id}',
@@ -230,43 +233,43 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
         );
 
         if (enrollment == null) {
-          print(
+          debugPrint(
             '[courseEnrollmentsProvider] '
             'LOOKUP RESULT '
             'courseId=${course.id} '
             '=> NOT ENROLLED',
           );
         } else {
-          print(
+          debugPrint(
             '[courseEnrollmentsProvider] '
             'LOOKUP RESULT '
             'courseId=${course.id} '
             '=> ENROLLED',
           );
 
-          print(
+          debugPrint(
             '[courseEnrollmentsProvider] '
             'enrollment.courseId=${enrollment.courseId}',
           );
 
-          print(
+          debugPrint(
             '[courseEnrollmentsProvider] '
             'enrollment.userId=${enrollment.userId}',
           );
 
-          print(
+          debugPrint(
             '[courseEnrollmentsProvider] '
             'progress=${enrollment.progress}',
           );
 
-          print(
+          debugPrint(
             '[courseEnrollmentsProvider] '
             'paidAmount=${enrollment.paidAmount}',
           );
 
           // Useful sanity check for the exact ID mismatch
           if (enrollment.courseId != course.id) {
-            print(
+            debugPrint(
               '[courseEnrollmentsProvider] '
               'WARNING: COURSE ID MISMATCH '
               'course.id=${course.id} '
@@ -277,25 +280,27 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
 
         return enrollment;
       } catch (error, stackTrace) {
-        print('');
-        print(
+        debugPrint('');
+        debugPrint(
           '[courseEnrollmentsProvider] '
           'LOOKUP ERROR '
           'courseId=${course.id}',
         );
 
-        print(
+        debugPrint(
           '[courseEnrollmentsProvider] '
           'ERROR: $error',
         );
 
-        print(
+        debugPrint(
           '[courseEnrollmentsProvider] '
           'STACK:',
         );
 
-        print(stackTrace);
-        print('');
+        if (kDebugMode) {
+          print(stackTrace);
+        }
+        debugPrint('');
 
         // One failed lookup should not prevent other courses
         // from appearing.
@@ -308,8 +313,8 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
   // Enrollment lookup summary
   // ---------------------------------------------------------------------------
 
-  print('');
-  print(
+  debugPrint('');
+  debugPrint(
     '[courseEnrollmentsProvider] '
     'ENROLLMENT LOOKUPS COMPLETED',
   );
@@ -318,7 +323,7 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
     final course = courses[i];
     final enrollment = enrollments[i];
 
-    print(
+    debugPrint(
       '[courseEnrollmentsProvider] '
       '${course.title} '
       '(courseId=${course.id}) '
@@ -331,8 +336,8 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
   // Combine Course + Enrollment
   // ---------------------------------------------------------------------------
 
-  print('');
-  print(
+  debugPrint('');
+  debugPrint(
     '[courseEnrollmentsProvider] '
     'BUILDING CourseEnrollmentModel LIST',
   );
@@ -341,7 +346,7 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
     final course = courses[index];
     final enrollment = enrollments[index];
 
-    print(
+    debugPrint(
       '[courseEnrollmentsProvider] '
       'COMBINING '
       'courseId=${course.id} '
@@ -361,21 +366,21 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
     return course.enrollment != null;
   }).length;
 
-  print('');
-  print(
+  debugPrint('');
+  debugPrint(
     '[courseEnrollmentsProvider] '
     'FINAL RESULT COUNT=${result.length}',
   );
 
-  print(
+  debugPrint(
     '[courseEnrollmentsProvider] '
     'FINAL ENROLLED COUNT=$enrolledCount',
   );
 
-  print('##################################################');
-  print('[courseEnrollmentsProvider] BUILD COMPLETED');
-  print('##################################################');
-  print('');
+  debugPrint('##################################################');
+  debugPrint('[courseEnrollmentsProvider] BUILD COMPLETED');
+  debugPrint('##################################################');
+  debugPrint('');
 
   return result;
 });
@@ -392,26 +397,26 @@ final courseEnrollmentsProvider = FutureProvider<List<CourseEnrollmentModel>>((r
 // -----------------------------------------------------------------------------
 
 final myCoursesProvider = Provider<AsyncValue<List<CourseEnrollmentModel>>>((ref) {
-  print('');
-  print('--------------------------------------------------');
-  print('[myCoursesProvider] BUILD');
-  print('--------------------------------------------------');
+  debugPrint('');
+  debugPrint('--------------------------------------------------');
+  debugPrint('[myCoursesProvider] BUILD');
+  debugPrint('--------------------------------------------------');
 
   final courseEnrollmentsState = ref.watch(courseEnrollmentsProvider);
 
-  print(
+  debugPrint(
     '[myCoursesProvider] '
     'state=${courseEnrollmentsState.runtimeType}',
   );
 
   return courseEnrollmentsState.whenData((courses) {
-    print(
+    debugPrint(
       '[myCoursesProvider] '
       'received=${courses.length} courses',
     );
 
     for (final course in courses) {
-      print(
+      debugPrint(
         '[myCoursesProvider] '
         'course=${course.title} '
         '| id=${course.id} '
@@ -422,13 +427,13 @@ final myCoursesProvider = Provider<AsyncValue<List<CourseEnrollmentModel>>>((ref
 
     final enrolledCourses = courses.where((courseEnrollment) => courseEnrollment.enrollment != null).toList();
 
-    print(
+    debugPrint(
       '[myCoursesProvider] '
       'ENROLLED COURSES=${enrolledCourses.length}',
     );
 
     for (final course in enrolledCourses) {
-      print(
+      debugPrint(
         '[myCoursesProvider] '
         'MY COURSE -> '
         '${course.title} '
@@ -451,14 +456,14 @@ final myCoursesProvider = Provider<AsyncValue<List<CourseEnrollmentModel>>>((ref
 // -----------------------------------------------------------------------------
 
 final completedCoursesProvider = FutureProvider<List<CourseEnrollmentModel>>((ref) async {
-  print('');
-  print('--------------------------------------------------');
-  print('[completedCoursesProvider] BUILD');
-  print('--------------------------------------------------');
+  debugPrint('');
+  debugPrint('--------------------------------------------------');
+  debugPrint('[completedCoursesProvider] BUILD');
+  debugPrint('--------------------------------------------------');
 
   final courses = await ref.watch(courseEnrollmentsProvider.future);
 
-  print(
+  debugPrint(
     '[completedCoursesProvider] '
     'received=${courses.length} courses',
   );
@@ -467,13 +472,13 @@ final completedCoursesProvider = FutureProvider<List<CourseEnrollmentModel>>((re
       .where((courseEnrollment) => courseEnrollment.enrollment != null && courseEnrollment.isCompleted)
       .toList();
 
-  print(
+  debugPrint(
     '[completedCoursesProvider] '
     'completedCount=${completedCourses.length}',
   );
 
   for (final course in completedCourses) {
-    print(
+    debugPrint(
       '[completedCoursesProvider] '
       'COMPLETED -> '
       '${course.title} '

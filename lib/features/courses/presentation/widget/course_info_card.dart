@@ -1,6 +1,9 @@
 // lib/features/course_detail/widgets/course_info_card.dart
 
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 
 class CourseInfoCard extends StatelessWidget {
   final int lectures;
@@ -18,40 +21,32 @@ class CourseInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Main Container - Blue Background
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(context.w(3)),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.kBlue.withAlpha(70),
+        borderRadius: BorderRadius.circular(context.w(6)),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _InfoItem(
-                icon: Icons.play_circle_outline,
-                label: '$lectures+ Lectures',
-              ),
-              _InfoItem(
-                icon: Icons.schedule,
-                label: duration,
-              ),
+              // Lectures - 1+ Lectures
+              _InfoItem(icon: Icons.play_circle_outline, label: '$lectures+ Lectures'),
+              // Duration - e.g; 0 Weeks
+              _InfoItem(icon: Icons.schedule, label: duration),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.h(3)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              if (hasCertificate)
-                _InfoItem(
-                  icon: Icons.verified_user,
-                  label: 'Certificate',
-                ),
-              _InfoItem(
-                icon: Icons.local_offer,
-                label: '$discount% Off',
-              ),
+              // Certificate Icon
+              if (hasCertificate) _InfoItem(icon: Icons.verified_user, label: 'Certificate'),
+              // Offer - e.g; 10% off
+              _InfoItem(icon: Icons.local_offer, label: '$discount% Off'),
             ],
           ),
         ],
@@ -60,29 +55,21 @@ class CourseInfoCard extends StatelessWidget {
   }
 }
 
+// Info Item
 class _InfoItem extends StatelessWidget {
   final IconData icon;
   final String label;
-
-  const _InfoItem({
-    required this.icon,
-    required this.label,
-  });
+  const _InfoItem({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: Colors.blue[700]),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[700],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        // Icon
+        Icon(icon, color: AppColors.kBlue),
+        SizedBox(height: context.h(1)),
+        // Label
+        Text(label, style: AppTextStyle.kBodySmall),
       ],
     );
   }

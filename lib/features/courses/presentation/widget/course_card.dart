@@ -22,10 +22,10 @@ class CourseCard extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.kWhite,
+          borderRadius: BorderRadius.circular(context.w(4)),
           boxShadow: [
-            BoxShadow(color: AppColors.kBlack.withAlpha(30), blurRadius: 10, offset: const Offset(0, 2)),
+            BoxShadow(color: AppColors.kBlack.withAlpha(35), blurRadius: 10, offset: const Offset(0, 1)),
           ],
         ),
         child: Column(
@@ -44,6 +44,7 @@ class CourseCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Course Title
                 Text(
                   courseEnrollment.title,
                   style: AppTextStyle.kBodyMedium.copyWith(fontWeight: FontWeight.bold),
@@ -53,6 +54,7 @@ class CourseCard extends StatelessWidget {
 
                 SizedBox(height: context.h(0.35)),
 
+                // Instructor Name
                 Text(
                   'By ${courseEnrollment.instructorName}',
                   style: AppTextStyle.kBodySmall.copyWith(fontWeight: FontWeight.bold),
@@ -65,14 +67,13 @@ class CourseCard extends StatelessWidget {
                 // Rating and Course Status
                 Row(
                   children: [
-                    const Icon(Icons.star, size: 16, color: AppColors.kAmber),
-
+                    // Star Icon
+                    Icon(Icons.star, size: context.w(5), color: AppColors.kAmber),
                     SizedBox(width: context.w(2)),
-
+                    // Rating
                     Text(courseEnrollment.rating.toString(), style: AppTextStyle.kBodySmall),
-
                     const Spacer(),
-
+                    // Course Status (Enrolled, Free, Price Tag)
                     _buildCourseStatus(context),
                   ],
                 ),
@@ -85,17 +86,17 @@ class CourseCard extends StatelessWidget {
   }
 
   Widget _buildCourseStatus(BuildContext context) {
-    // User is already enrolled.
+    // Status == Enrolled
     if (courseEnrollment.enrollment != null) {
       return _buildStatusBadge(context, label: 'Enrolled', icon: Icons.check_circle_outline);
     }
 
-    // Course is free.
+    // Status == Free
     if (courseEnrollment.course.price == 0) {
       return _buildStatusBadge(context, label: 'Free', icon: Icons.card_giftcard_outlined);
     }
 
-    // Course is paid but user is not enrolled.
+    // Status == Paid
     return _buildStatusBadge(
       context,
       label: '\$${courseEnrollment.course.price.toStringAsFixed(0)}',
@@ -103,6 +104,7 @@ class CourseCard extends StatelessWidget {
     );
   }
 
+  // Status Badge
   Widget _buildStatusBadge(BuildContext context, {required String label, required IconData icon}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: context.w(2.5), vertical: context.h(0.4)),
@@ -121,6 +123,7 @@ class CourseCard extends StatelessWidget {
     );
   }
 
+  // Widget For Building Thumbnail
   Widget _buildThumbnail() {
     if (courseEnrollment.thumbnailUrl.isNotEmpty) {
       return Image.network(
@@ -129,7 +132,9 @@ class CourseCard extends StatelessWidget {
         height: double.infinity,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return const Center(child: Icon(Icons.image, size: 40, color: Colors.grey));
+          return Center(
+            child: Icon(Icons.image, size: context.w(10), color: AppColors.kGrey),
+          );
         },
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) {

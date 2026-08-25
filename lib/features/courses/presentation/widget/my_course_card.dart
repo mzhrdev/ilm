@@ -9,7 +9,6 @@ import 'package:lms/features/courses/data/model/course_enrollment_model.dart';
 
 class MyCourseCard extends StatelessWidget {
   final CourseEnrollmentModel courseEnrollment;
-
   const MyCourseCard({super.key, required this.courseEnrollment});
 
   @override
@@ -17,18 +16,16 @@ class MyCourseCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         final id = courseEnrollment.id;
-
         if (id.isEmpty) {
           debugPrint('Course ID is empty');
           return;
         }
-
         context.push(Routes.courseDetail.replaceAll(':id', id));
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
         padding: EdgeInsets.all(context.w(3)),
-        decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: AppColors.kGrey, borderRadius: BorderRadius.circular(context.w(5))),
         child: Row(
           children: [
             // Thumbnail
@@ -36,7 +33,7 @@ class MyCourseCard extends StatelessWidget {
               width: context.w(17),
               height: context.h(6.5),
               decoration: BoxDecoration(
-                color: AppColors.kGrey,
+                color: AppColors.kBlack.withAlpha(100),
                 borderRadius: BorderRadius.circular(context.w(3)),
               ),
               child: _buildThumbnail(context),
@@ -48,6 +45,7 @@ class MyCourseCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Title
                   Text(
                     courseEnrollment.title,
                     style: AppTextStyle.kBodyLarge,
@@ -55,7 +53,7 @@ class MyCourseCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: context.h(0.75)),
-
+                  // Instructor Name
                   Text(
                     'By ${courseEnrollment.instructorName}',
                     style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kBlack.withAlpha(90)),
@@ -70,7 +68,7 @@ class MyCourseCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: courseEnrollment.progress,
                       minHeight: 4,
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: AppColors.kWhite,
                       valueColor: const AlwaysStoppedAnimation<Color>(AppColors.kBlack),
                     ),
                   ),
@@ -81,7 +79,7 @@ class MyCourseCard extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: Text(
                       '${(courseEnrollment.progress * 100).toInt()}% Done',
-                      style: AppTextStyle.kBodySmall.copyWith(color: AppColors.kBlack.withAlpha(90)),
+                      style: AppTextStyle.kBodySmall.copyWith(color: AppColors.kBlack.withAlpha(150)),
                     ),
                   ),
                 ],
@@ -93,12 +91,14 @@ class MyCourseCard extends StatelessWidget {
     );
   }
 
+
+  // Thumbnail Widget
   Widget _buildThumbnail(BuildContext context) {
     final thumbnailUrl = courseEnrollment.thumbnailUrl;
 
     if (thumbnailUrl.isNotEmpty) {
       return Image.network(
-        thumbnailUrl, // ✅ FIXED
+        thumbnailUrl,
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,

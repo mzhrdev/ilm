@@ -1,8 +1,11 @@
-// lib/features/course_detail/presentation/screens/course_detail_screen.dart
-
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 import 'package:lms/features/courses/data/model/lesson_model.dart';
@@ -17,9 +20,7 @@ import '../widget/course_info_card.dart';
 
 class CourseDetailScreen extends ConsumerStatefulWidget {
   final String courseId;
-
   const CourseDetailScreen({super.key, required this.courseId});
-
   @override
   ConsumerState<CourseDetailScreen> createState() => _CourseDetailScreenState();
 }
@@ -27,12 +28,14 @@ class CourseDetailScreen extends ConsumerStatefulWidget {
 class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  // Init State Method
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
   }
 
+  // Dispose Method
   @override
   void dispose() {
     _tabController.dispose();
@@ -42,46 +45,44 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
   @override
   Widget build(BuildContext context) {
     final courseAsync = ref.watch(courseDetailProvider(widget.courseId));
-
     final userId = ref.watch(currentUserProvider)?.id;
-
     final enrollmentAsync = ref.watch(enrollmentLookupProvider((courseId: widget.courseId, userId: userId)));
 
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return CustomSafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.kWhite,
+        body: courseAsync.when(
+          // Course Detail Content
+          data: (course) => _buildCourseDetailContent(course),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Error Icon
+                Icon(Icons.error_outline, color: AppColors.kCallEndB, size: context.w(15)),
+                SizedBox(height: context.h(3)),
+                // Error Message
+                Text('Error: $error'),
+                SizedBox(height: context.h(6)),
 
-      body: courseAsync.when(
-        data: (course) => _buildCourseDetailContent(course),
-
-        loading: () => const Center(child: CircularProgressIndicator()),
-
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 48),
-
-              const SizedBox(height: 8),
-
-              Text('Error: $error'),
-
-              const SizedBox(height: 16),
-
-              ElevatedButton(
-                onPressed: () {
-                  ref.invalidate(courseDetailProvider(widget.courseId));
-                },
-                child: const Text('Retry'),
-              ),
-            ],
+                ElevatedButton(
+                  onPressed: () {
+                    ref.invalidate(courseDetailProvider(widget.courseId));
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
 
-      bottomNavigationBar: _buildEnrollButton(courseAsync.value, enrollmentAsync),
+        bottomNavigationBar: _buildEnrollButton(courseAsync.value, enrollmentAsync),
+      ),
     );
   }
 
+  // Enrollment Button Widget
   Widget _buildEnrollButton(CourseModel? course, AsyncValue<EnrollmentModel?> enrollmentAsync) {
     if (course == null) {
       return const SizedBox.shrink();
@@ -101,172 +102,151 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
-
+      padding: EdgeInsets.all(context.w(5)),
       decoration: BoxDecoration(
-        color: Colors.white,
-
+        borderRadius: BorderRadius.circular(context.w(5)),
+        color: AppColors.kWhite,
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -2)),
+          BoxShadow(
+            color: AppColors.kBlack.withValues(alpha: 0.1),
+            blurRadius: context.h(1),
+            offset: const Offset(2, -3),
+          ),
         ],
       ),
 
-      child: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          height: 50,
-
-          child: ElevatedButton(
-            onPressed: isCheckingEnrollment
-                ? null
-                : isEnrolled
-                ? null
-                : () {
-                    final userId = ref.read(currentUserProvider)?.id ?? '';
-
-                    if (userId.isEmpty) {
-                      return;
-                    }
-
-                    ref.read(enrollmentProvider.notifier).initializeFromCourse(course, userId: userId);
-
-                    context.push(Routes.enrollmentScreen);
-                  },
-
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-
-              disabledBackgroundColor: isEnrolled ? Colors.grey[300] : Colors.grey[400],
-
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-
-            child: Text(
-              buttonText,
-
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-
-                color: isEnrolled ? Colors.black87 : Colors.white,
-              ),
-            ),
-          ),
-        ),
+      child: CustomElevatedButton(
+        buttonColor: AppColors.kBlack,
+        buttonDisabledColor: isEnrolled ? AppColors.kGrey : AppColors.kGrey.withAlpha(150),
+        title: buttonText,
+        borderRadius: context.w(2.5),
+        textColor: isEnrolled ? AppColors.kBlack : AppColors.kWhite,
+        onPress: isCheckingEnrollment
+            ? null
+            : isEnrolled
+            ? null
+            : () {
+                final userId = ref.read(currentUserProvider)?.id ?? '';
+                if (userId.isEmpty) {
+                  return;
+                }
+                ref.read(enrollmentProvider.notifier).initializeFromCourse(course, userId: userId);
+                context.push(Routes.enrollmentScreen);
+              },
       ),
-    );
+    ).padAll(context.w(3));
   }
 
   Widget _buildCourseDetailContent(CourseModel course) {
-    return CustomScrollView(
-      slivers: [
-        // Video Thumbnail with Back Button
-        SliverToBoxAdapter(
-          child: Stack(
-            children: [
-              Container(
-                height: 300,
-                width: double.infinity,
-                color: Colors.grey[300],
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const Icon(Icons.play_circle_outline, size: 80, color: Colors.white),
-                    Container(
-                      width: 70,
-                      height: 70,
-                      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                      child: const Icon(Icons.play_arrow, color: Colors.black, size: 40),
+    return Column(
+      children: [
+        Stack(
+          children: [
+            // Video Thumbnail
+            Container(
+              height: context.h(35),
+              width: double.infinity,
+              color: AppColors.kGrey,
+              child: Container(
+                width: context.w(20),
+                height: context.h(10),
+                decoration: BoxDecoration(color: AppColors.kWhite, shape: BoxShape.circle),
+                child: Icon(Icons.play_arrow, color: AppColors.kBlack, size: context.h(5)),
+              ).centerWidget,
+            ),
+            Positioned(
+              top: context.h(2),
+              left: context.w(4),
+              right: context.w(4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Back Button
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
+                      padding: EdgeInsets.all(context.w(2.18)),
+                      decoration: BoxDecoration(
+                        color: AppColors.kWhite,
+                        borderRadius: BorderRadius.circular(context.w(2.25)),
+                      ),
+                      child: Icon(Icons.arrow_back_ios_new, size: context.h(2.35)),
                     ),
-                  ],
+                  ),
+                  // Bookmark Button
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      padding: EdgeInsets.all(context.w(2.18)),
+                      decoration: BoxDecoration(
+                        color: AppColors.kWhite,
+                        borderRadius: BorderRadius.circular(context.w(2.25)),
+                      ),
+                      child: Icon(Icons.bookmark_border, size: context.h(2.35)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: CustomScrollView(
+            slivers: [
+              // Tabs
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _SliverHeaderDelegate(
+                  minExtent: 50,
+                  maxExtent: 50,
+                  child: TabBar(
+                    controller: _tabController,
+                    labelColor: Colors.black,
+                    unselectedLabelColor: Colors.grey,
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    indicatorColor: Colors.black,
+                    indicatorWeight: 3,
+                    tabs: const [
+                      Tab(text: 'Overview'),
+                      Tab(text: 'Lessons'),
+                      Tab(text: 'Reviews'),
+                    ],
+                  ),
                 ),
               ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () => context.pop(),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.arrow_back_ios_new, size: 20),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.bookmark_border, size: 20),
-                          ),
-                        ),
-                      ],
-                    ),
+
+              // Tab Content
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  // This bounded height is required by TabBarView
+                  height: context.h(50),
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      // OverView Tab
+                      _buildOverviewTab(course),
+                      // Lessons Tab
+                      _buildLessonsTab(course),
+                      // Reviews Tab
+                      _buildReviewsTab(course),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
         ),
-
-        // Tabs
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: _SliverHeaderDelegate(
-            minExtent: 50,
-            maxExtent: 50,
-            child: TabBar(
-              controller: _tabController,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.grey,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-              indicatorColor: Colors.black,
-              indicatorWeight: 3,
-              tabs: const [
-                Tab(text: 'Overview'),
-                Tab(text: 'Lessons'),
-                Tab(text: 'Reviews'),
-              ],
-            ),
-          ),
-        ),
-
-        // Tab Content
-        SliverToBoxAdapter(
-          child: SizedBox(
-            // This bounded height is required by TabBarView
-            height: MediaQuery.of(context).size.height - 450,
-            child: TabBarView(
-              controller: _tabController,
-              children: [_buildOverviewTab(course), _buildLessonsTab(course), _buildReviewsTab(course)],
-            ),
-          ),
-        ),
       ],
     );
   }
 
-  // ✅ FIX: Wrapped in SingleChildScrollView to prevent overflow
   Widget _buildOverviewTab(CourseModel course) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(context.w(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title and Price
+          // Course Main Info (Title, Teacher, Reviews, Price)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -274,41 +254,42 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(course.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    Text(
-                      'By ${course.instructorName}',
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 8),
+                    // Course Title
+                    Text(course.title, style: AppTextStyle.kHeading),
+                    SizedBox(height: context.h(1)),
+                    // Instructor Name
+                    Text('By ${course.instructorName}', style: AppTextStyle.kBodyMedium),
+                    SizedBox(height: context.h(2)),
+                    // Reviews (Stars, Int)
                     Row(
                       children: [
                         ...List.generate(5, (index) {
                           return Icon(
                             index < course.rating.floor() ? Icons.star : Icons.star_border,
-                            color: Colors.amber[700],
-                            size: 20,
+                            color: AppColors.kAmber,
+                            size: context.w(5),
                           );
                         }),
                         const SizedBox(width: 8),
-                        Text('${course.rating}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                        Text('${course.rating}', style: AppTextStyle.kBodyMedium),
                       ],
                     ),
                   ],
                 ),
               ),
-              Text('${course.price}\$', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              // Course Price
+              Text('${course.price}\$', style: AppTextStyle.kHeading),
             ],
           ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: context.h(3.75)),
 
-          // Description
-          const Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 12),
-          Text(course.description, style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5)),
-
-          const SizedBox(height: 24),
+          // Description Title
+          Text('Description', style: AppTextStyle.kSectionTitle.copyWith(fontWeight: FontWeight.bold)),
+          SizedBox(height: context.h(1.25)),
+          // Description Title
+          Text(course.description, style: AppTextStyle.kBodyMedium),
+          SizedBox(height: context.h(2)),
 
           // Course Info Card
           CourseInfoCard(
@@ -318,11 +299,11 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
             discount: 10,
           ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: context.h(2)),
 
           // Skills
-          const Text('Skills', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 12),
+          Text('Skills', style: AppTextStyle.kSectionTitle.copyWith(fontWeight: FontWeight.bold)),
+          SizedBox(height: context.h(2)),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -330,13 +311,13 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
           ),
 
           // Extra bottom padding to ensure it clears the bottom nav when scrolling
-          const SizedBox(height: 20),
+          SizedBox(height: context.h(5)),
         ],
       ),
     );
   }
-  // Replace the _buildLessonsTab method with this:
 
+  // Lessons Tab
   Widget _buildLessonsTab(CourseModel course) {
     if (course.modules.isEmpty) {
       return const Center(
@@ -350,13 +331,14 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (var i = 0; i < course.modules.length; i++)
+          // Chapter Card
             _buildChapterCard(
               chapterNumber: i + 1,
               chapterTitle: course.modules[i].title,
               lessons: course.modules[i].lessons,
-              isExpanded: i == 0, // Expand first chapter by default
+              isExpanded: i == 0,
             ),
-          const SizedBox(height: 80), // Space for bottom navigation
+          SizedBox(height: context.h(3)),
         ],
       ),
     );

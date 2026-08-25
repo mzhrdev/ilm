@@ -10,6 +10,7 @@ class CustomElevatedButton extends StatelessWidget {
     this.tWidth,
     this.fontSize = 16,
     this.buttonColor = AppColors.kPrimary,
+    this.buttonDisabledColor = AppColors.kGrey,
     this.textColor = AppColors.kWhite,
     required this.title,
     this.loading = false,
@@ -28,7 +29,7 @@ class CustomElevatedButton extends StatelessWidget {
   final bool? loading;
   final String? title;
   final double? height, bWidth, fontSize, borderRadius, tWidth;
-  final Color? textColor, buttonColor, loadingIndicatorColor;
+  final Color? textColor, buttonColor, loadingIndicatorColor, buttonDisabledColor;
   final void Function()? onPress;
   final BorderSide borderSide;
   final String? fontFamily;
@@ -46,6 +47,7 @@ class CustomElevatedButton extends StatelessWidget {
           elevation: elevation,
           surfaceTintColor: AppColors.kTransparent,
           backgroundColor: buttonColor,
+          disabledBackgroundColor: buttonDisabledColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius!), side: borderSide),
         ),
         onPressed: onPress,
