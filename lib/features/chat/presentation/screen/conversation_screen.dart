@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 import 'package:lms/features/calls/data/model/call_model.dart';
@@ -17,9 +19,7 @@ import 'package:permission_handler/permission_handler.dart';
 class ConversationScreen extends ConsumerStatefulWidget {
   final String userId;
   final String userName;
-
   const ConversationScreen({super.key, required this.userId, required this.userName});
-
   @override
   ConsumerState<ConversationScreen> createState() => _ConversationScreenState();
 }
@@ -29,6 +29,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _isInitiatingCall = false;
 
+  // InitState
   @override
   void initState() {
     super.initState();
@@ -45,6 +46,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     super.dispose();
   }
 
+  // ScrollToBottom Method
   void _scrollToBottom({bool animated = true}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollController.hasClients) return;
@@ -94,166 +96,166 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   Widget build(BuildContext context) {
     final messages = ref.watch(conversationProvider);
 
+    // Method To Animate To Latest Message
     ref.listen<List<DirectMessage>>(conversationProvider, (previous, next) {
       if (previous?.length != next.length) {
         _scrollToBottom();
       }
     });
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => context.pop(),
-        ),
-        title: Row(
-          children: [
-            // User Avatar
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(color: Colors.grey[300], shape: BoxShape.circle),
-              child: const Icon(Icons.person, color: Colors.grey, size: 20),
-            ),
-            const SizedBox(width: 12),
-            // User Name
-            Expanded(
-              child: Text(
-                widget.userName,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+    return CustomSafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.kWhite,
+        appBar: AppBar(
+          backgroundColor: AppColors.kWhite,
+          elevation: 0,
+          leading: CustomIconButton(
+            onTap: () => context.pop(),
+            icon: Icons.arrow_back_ios_new,
+            iconColor: AppColors.kBlack,
+          ),
+          title: Row(
+            children: [
+              // User Avatar
+              Container(
+                width: context.w(10),
+                height: context.h(8),
+                decoration: BoxDecoration(color: AppColors.kGrey, shape: BoxShape.circle),
+                child: Icon(Icons.person, color: AppColors.kBlack.withAlpha(150), size: context.h(3)),
               ),
+              SizedBox(width: context.w(3)),
+              // User Name
+              Expanded(child: Text(widget.userName, style: AppTextStyle.kSectionTitle)),
+            ],
+          ),
+          actions: [
+            // Audio Call Button
+            CustomIconButton(
+              onTap: _isInitiatingCall
+                  ? null
+                  : () async {
+                      setState(() => _isInitiatingCall = true);
+                      try {
+                        // Request Mic & Camera Permissions
+                        final statuses = await [Permission.microphone, Permission.camera].request();
+
+                        if (statuses[Permission.microphone] != PermissionStatus.granted) {
+                          throw Exception('Microphone permission is required to place a call.');
+                        }
+                        await StreamVideoService.instance.initiateAudioCall(
+                          ref: ref,
+                          receiverUid: widget.userId,
+                          receiverName: widget.userName,
+                          receiverAvatar: null,
+                        );
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text('Failed to start call: $e')));
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() => _isInitiatingCall = false);
+                        }
+                      }
+                    },
+              icon: _isInitiatingCall
+                  ? Icons.wifi_protected_setup_rounded
+                  : Icons.published_with_changes_outlined,
+              iconColor: AppColors.kBlack,
+              iconSize: context.h(3),
+            ),
+            //Video Call Button
+            CustomIconButton(
+              onTap: () {
+                final currentUser = ref.read(currentUserProvider);
+                // 1. Create a CallModel for this session
+                final callModel = CallModel(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  callerUid: currentUser?.id ?? '',
+                  receiverUid: widget.userId,
+                  contactName: widget.userName,
+                  callType: CallType.video,
+                  status: CallStatus.answeredOutgoing,
+                  timestamp: DateTime.now(),
+                );
+                // 2. Start the call in the provider
+                ref.read(activeCallProvider.notifier).startCall(callModel);
+                context.push(Routes.videoCall);
+              },
+              icon: Icons.videocam_rounded,
+              iconColor: AppColors.kBlack,
+              iconSize: context.h(4),
             ),
           ],
         ),
-        actions: [
-          // Audio Call Button
-          IconButton(
-            icon: _isInitiatingCall
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
-                  )
-                : const Icon(Icons.call, color: Colors.black),
-            onPressed: _isInitiatingCall
-                ? null
-                : () async {
-                    setState(() => _isInitiatingCall = true);
-
-                    try {
-                      // Request Mic & Camera Permissions
-                      final statuses = await [Permission.microphone, Permission.camera].request();
-
-                      if (statuses[Permission.microphone] != PermissionStatus.granted) {
-                        throw Exception('Microphone permission is required to place a call.');
-                      }
-                      await StreamVideoService.instance.initiateAudioCall(
-                        ref: ref,
-                        receiverUid: widget.userId,
-                        receiverName: widget.userName,
-                        receiverAvatar: null,
-                      );
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text('Failed to start call: $e')));
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() => _isInitiatingCall = false);
-                      }
-                    }
-                  },
-          ),
-          //Video Call Button
-          IconButton(
-            icon: const Icon(Icons.videocam, color: Colors.black),
-            onPressed: () {
-              final currentUser = ref.read(currentUserProvider);
-              // 1. Create a CallModel for this session
-              final callModel = CallModel(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
-                callerUid: currentUser?.id ?? '',
-                receiverUid: widget.userId,
-                contactName: widget.userName,
-                callType: CallType.video,
-                status: CallStatus.answeredOutgoing,
-                timestamp: DateTime.now(),
-              );
-
-              // 2. Start the call in the provider
-              ref.read(activeCallProvider.notifier).startCall(callModel);
-              context.push(Routes.videoCall);
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Messages List
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                return _buildMessageBubble(message);
-              },
+        body: Column(
+          children: [
+            // Messages List
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(16),
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[index];
+                  return _buildMessageBubble(message);
+                },
+              ),
             ),
-          ),
-
-          // Bottom Input Area
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                // Text Field
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Type a message...',
-                      hintStyle: TextStyle(color: Colors.grey[500]),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    onSubmitted: (_) async => _sendMessage(),
+            // Bottom Input Area
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: context.w(3), vertical: context.h(1.5)),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(context.w(8)),
+                color: AppColors.kGrey.withAlpha(150),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.kBlack.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
                   ),
-                ),
-                const SizedBox(width: 8),
-                // Send Button
-                CustomIconButton(
-                  splashColor: AppColors.kGrey,
-                  highlightColor: AppColors.kGrey,
-                  onTap: _sendMessage,
-                  icon: Icons.send,
-                  iconColor: AppColors.kBlack,
-                  iconSize: context.w(6.5),
-                ),
-              ],
-            ),
-          ),
-        ],
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Text Field
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        hintText: 'Type a message...',
+                        hintStyle: TextStyle(color: AppColors.kBlack.withAlpha(150)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(context.w(6)),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.kWhite,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: context.w(3),
+                          vertical: context.h(1.5),
+                        ),
+                      ),
+                      onSubmitted: (_) async => _sendMessage(),
+                    ),
+                  ),
+                  SizedBox(width: context.w(2)),
+                  // Send Button
+                  CustomIconButton(
+                    splashColor: AppColors.kGrey,
+                    highlightColor: AppColors.kGrey,
+                    onTap: _sendMessage,
+                    icon: Icons.send_rounded,
+                    iconColor: AppColors.kBlack,
+                    iconSize: context.w(8),
+                    usedInAppBar: false,
+                  ),
+                ],
+              ),
+            ).padAll(context.w(3)),
+          ],
+        ),
       ),
     );
   }
@@ -265,32 +267,41 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      // Main Container
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        margin: EdgeInsets.only(bottom: context.h(1)),
+        padding: EdgeInsets.symmetric(horizontal: context.w(5), vertical: context.h(1.5)),
+        constraints: BoxConstraints(maxWidth: context.w(75)),
         decoration: BoxDecoration(
-          color: isMe ? Colors.black : Colors.grey[100], // Theme colors
+          color: isMe ? AppColors.kBlack : AppColors.kGrey.withAlpha(150), // Theme colors
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isMe ? 16 : 4),
-            bottomRight: Radius.circular(isMe ? 4 : 16),
+            topLeft: Radius.circular(context.w(5)),
+            topRight: Radius.circular(context.w(5)),
+            bottomLeft: Radius.circular(isMe ? context.w(5) : context.w(2)),
+            bottomRight: Radius.circular(isMe ? context.w(0.5) : context.w(5)),
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Message Text
             Text(
               message.text,
-              style: TextStyle(color: isMe ? Colors.white : Colors.black87, fontSize: 15, height: 1.4),
+              style: AppTextStyle.kBodyMedium.copyWith(
+                color: isMe ? AppColors.kGrey : AppColors.kBlack,
+                fontSize: context.h(2),
+              ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: context.h(0.75)),
+            // Formatted Time
             Align(
               alignment: Alignment.bottomRight,
               child: Text(
                 _formatTime(message.time),
-                style: TextStyle(color: isMe ? Colors.white70 : Colors.grey[600], fontSize: 11),
+                style: AppTextStyle.kBodySmall.copyWith(
+                  color: isMe ? AppColors.kWhite : AppColors.kGrey,
+                  fontSize: context.h(1.25),
+                ),
               ),
             ),
           ],

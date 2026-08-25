@@ -21,7 +21,7 @@ class ChatListItem extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: context.w(3), vertical: context.h(1.75)),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(context.w(5)),
-          border: Border.all(color: AppColors.kBlue, width: context.w(0.5)),
+          border: Border.all(color: AppColors.kGrey, width: context.w(0.5)),
         ),
         child: Row(
           children: [
@@ -64,7 +64,10 @@ class ChatListItem extends StatelessWidget {
                         ),
                       ),
                       // Time - e.g; 3d ago
-                      Text(message.formattedTime, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      Text(
+                        message.formattedTime,
+                        style: AppTextStyle.kBodySmall.copyWith(color: AppColors.kBlack.withAlpha(150)),
+                      ),
                     ],
                   ),
                   SizedBox(height: context.h(1)),

@@ -142,6 +142,7 @@ class ChatScreen extends ConsumerWidget {
 
   // Chat List
   Widget _buildChatList(WidgetRef ref, chatState, BuildContext context) {
+    // Loading...
     if (chatState.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -150,6 +151,7 @@ class ChatScreen extends ConsumerWidget {
     final List<UserModel> matchingUsers = chatState.matchingUsers;
     final bool isSearching = chatState.searchQuery.isNotEmpty;
 
+    // Empty State
     if (messages.isEmpty && (!isSearching || matchingUsers.isEmpty)) {
       return _buildEmptyState(
         context: context,
@@ -159,6 +161,7 @@ class ChatScreen extends ConsumerWidget {
       );
     }
 
+    // Actual Chat List
     return ListView(
       children: [
         if (isSearching && matchingUsers.isNotEmpty) ...[
@@ -215,10 +218,13 @@ class ChatScreen extends ConsumerWidget {
 
   // Calls List
   Widget _buildCallsList(callsState, BuildContext context) {
+    // Loading...
     if (callsState.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
     final calls = callsState.filteredCalls;
+
+    // Empty State
     if (calls.isEmpty) {
       return _buildEmptyState(
         context: context,
@@ -228,6 +234,7 @@ class ChatScreen extends ConsumerWidget {
       );
     }
 
+    // Call List Item
     return ListView.separated(
       itemCount: calls.length,
       separatorBuilder: (_, __) => Divider(color: AppColors.kGrey, height: context.h(0.05)),
