@@ -27,9 +27,9 @@ class ChatListItem extends StatelessWidget {
           children: [
             // Avatar
             Container(
-              width: context.w(15),
+              width: context.w(13),
               height: context.h(6),
-              decoration: BoxDecoration(color: Colors.grey[300], shape: BoxShape.circle),
+              decoration: BoxDecoration(color: AppColors.kGrey, shape: BoxShape.circle),
               child: message.senderAvatar != null
                   ? ClipOval(
                       child: Image.network(

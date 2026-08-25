@@ -237,12 +237,12 @@ class ChatScreen extends ConsumerWidget {
     // Call List Item
     return ListView.separated(
       itemCount: calls.length,
-      separatorBuilder: (_, __) => Divider(color: AppColors.kGrey, height: context.h(0.05)),
+      separatorBuilder: (_, __) => SizedBox(),
       itemBuilder: (context, index) {
         final call = calls[index];
-        return CallListItem(call: call, onCallBack: () {});
+        return CallListItem(call: call, onCallBack: () {}).padBottom(context.h(0.5));
       },
-    );
+    ).padAll(context.w(3));
   }
 
   // Empty State
