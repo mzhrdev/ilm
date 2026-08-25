@@ -1,6 +1,9 @@
 // lib/features/messages/presentation/widgets/message_list_item.dart
 
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 
 import '../../data/model/chat_model.dart';
 
@@ -15,49 +18,35 @@ class ChatListItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: context.w(3), vertical: context.h(1.75)),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.grey[200]!, width: 1)),
+          borderRadius: BorderRadius.circular(context.w(5)),
+          border: Border.all(color: AppColors.kBlue, width: context.w(0.5)),
         ),
         child: Row(
           children: [
             // Avatar
-            Stack(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(color: Colors.grey[300], shape: BoxShape.circle),
-                  child: message.senderAvatar != null
-                      ? ClipOval(
-                          child: Image.network(
-                            message.senderAvatar!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.person, color: Colors.grey, size: 30);
-                            },
-                          ),
-                        )
-                      : const Icon(Icons.person, color: Colors.grey, size: 30),
-                ),
-                // Online indicator
-                if (message.isOnline)
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
+            Container(
+              width: context.w(15),
+              height: context.h(6),
+              decoration: BoxDecoration(color: Colors.grey[300], shape: BoxShape.circle),
+              child: message.senderAvatar != null
+                  ? ClipOval(
+                      child: Image.network(
+                        message.senderAvatar!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.person,
+                            color: AppColors.kBlack.withAlpha(150),
+                            size: context.w(8),
+                          );
+                        },
                       ),
-                    ),
-                  ),
-              ],
+                    )
+                  : Icon(Icons.person, color: AppColors.kBlack.withAlpha(150), size: context.w(8)),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: context.w(4)),
             // Message Content
             Expanded(
               child: Column(
@@ -66,44 +55,40 @@ class ChatListItem extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Sender Name
                       Expanded(
                         child: Text(
                           message.senderName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
+                          style: AppTextStyle.kSectionTitle.copyWith(fontWeight: FontWeight.w900),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      // Time - e.g; 3d ago
                       Text(message.formattedTime, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: context.h(1)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Last Text Sent
                       Expanded(
                         child: Text(
                           message.lastMessage,
-                          style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                          style: AppTextStyle.kBodyLarge.copyWith(color: AppColors.kBlack.withAlpha(90)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      // Message Count
                       if (message.unreadCount > 0)
                         Container(
-                          margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+                          margin: EdgeInsets.only(left: context.w(4)),
+                          padding: EdgeInsets.symmetric(horizontal: context.w(3), vertical: context.h(1)),
+                          decoration: const BoxDecoration(color: AppColors.kBlack, shape: BoxShape.circle),
                           child: Text(
                             message.unreadCount > 99 ? '99+' : '${message.unreadCount}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppTextStyle.kBodyLarge,
                           ),
                         ),
                     ],

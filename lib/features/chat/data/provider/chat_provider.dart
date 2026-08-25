@@ -35,6 +35,7 @@ class ChatState {
     this.matchingUsers = const [],
   });
 
+  // Getter Method for Filtered Messages
   List<ChatModel> get filteredMessages {
     final filtered = searchQuery.isEmpty
         ? messages
@@ -50,6 +51,7 @@ class ChatState {
     return filtered;
   }
 
+  // copyWith Method
   ChatState copyWith({
     List<ChatModel>? messages,
     MessageTab? currentTab,
@@ -81,6 +83,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
   StreamSubscription<List<ChatModel>>? _conversationsSubscription;
   List<UserModel> _allUsers = [];
 
+  // Initializing Chat List upon Authentication
   Future<void> _initialize() async {
     if (_user == null) {
       state = state.copyWith(messages: [], isLoading: false);
@@ -91,6 +94,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
     _subscribeToConversations(_user.id);
   }
 
+  // Getting Conversation for currentUser with another app User
   void _subscribeToConversations(String userId) {
     state = state.copyWith(isLoading: true);
 
@@ -112,12 +116,13 @@ class ChatNotifier extends StateNotifier<ChatState> {
         );
   }
 
+  // Chats -> Calls && Vice Versa
   void switchTab(MessageTab tab) {
     if (state.currentTab == tab) return;
     state = state.copyWith(currentTab: tab);
   }
 
-  // CHANGED — now also computes matchingUsers
+  // Search Query for Chats
   void setSearchQuery(String query) {
     final matches = query.isEmpty
         ? const <UserModel>[]
@@ -126,7 +131,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
     state = state.copyWith(searchQuery: query, matchingUsers: matches);
   }
 
-  // NEW
+  // Loading All Users
   Future<void> _loadAllUsers() async {
     try {
       final users = await _firestoreServices.getAllUsers();
@@ -137,6 +142,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
     }
   }
 
+  // Read Methods for Notification
   Future<void> markAsRead(String messageId) async {
     // messageId here is actually the conversation doc id (ChatModel.id)
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
@@ -144,12 +150,14 @@ class ChatNotifier extends StateNotifier<ChatState> {
     await _firestoreServices.markConversationRead(conversationId: messageId, userId: currentUserId);
   }
 
+  // Refresh Current Messages
   Future<void> refreshMessages() async {
     if (_user == null) return;
 
     _subscribeToConversations(_user.id);
   }
 
+  // Dispose Method
   @override
   void dispose() {
     _conversationsSubscription?.cancel();
@@ -157,6 +165,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
     super.dispose();
   }
 
+  // Clear Text in Search Field
   void clearSearch() {
     state.searchController.clear();
     state = state.copyWith(searchQuery: '', matchingUsers: const []);

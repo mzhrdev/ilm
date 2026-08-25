@@ -4,13 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/presentation/widgets/custom_text_field.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
-import 'package:lms/features/chat/data/model/chat_model.dart';
 import 'package:lms/features/calls/data/providers/call_provider.dart';
-import 'package:lms/features/chat/data/provider/chat_provider.dart';
 import 'package:lms/features/calls/presentation/widget/call_list_item.dart';
+import 'package:lms/features/chat/data/model/chat_model.dart';
+import 'package:lms/features/chat/data/provider/chat_provider.dart';
 import 'package:lms/features/chat/presentation/widget/chat_list_item.dart';
 
 class ChatScreen extends ConsumerWidget {
@@ -49,9 +50,10 @@ class ChatScreen extends ConsumerWidget {
     return AppBar(
       backgroundColor: AppColors.kWhite,
       elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.kBlack),
-        onPressed: () => context.go(Routes.home),
+      leading: CustomIconButton(
+        icon: Icons.arrow_back_ios_new,
+        iconColor: AppColors.kBlack,
+        onTap: () => context.go(Routes.home),
       ),
       title: const Text('Inbox', style: AppTextStyle.kHeading),
     );
@@ -83,7 +85,6 @@ class ChatScreen extends ConsumerWidget {
   // Tabs
   Widget _buildTabs(BuildContext context, WidgetRef ref, chatState, bool isChatTab) {
     final notifier = ref.read(chatProvider.notifier);
-
     return Container(
       height: context.h(7),
       decoration: BoxDecoration(
@@ -184,18 +185,21 @@ class ChatScreen extends ConsumerWidget {
                 '&name=${Uri.encodeComponent(message.senderName)}',
               );
             },
-          ),
+          ).padBottom(context.h(0.5)),
         ),
       ],
-    );
+    ).padAll(context.w(3));
   }
 
+  // Search Item Builder
   Widget _buildUserSearchItem(BuildContext context, UserModel user, WidgetRef ref) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: Colors.grey[300],
+        backgroundColor: AppColors.kGrey,
         backgroundImage: user.profileImageUrl != null ? NetworkImage(user.profileImageUrl!) : null,
-        child: user.profileImageUrl == null ? const Icon(Icons.person, color: Colors.grey) : null,
+        child: user.profileImageUrl == null
+            ? Icon(Icons.person, color: AppColors.kBlack.withAlpha(150))
+            : null,
       ),
       title: Text(user.name),
       onTap: () {

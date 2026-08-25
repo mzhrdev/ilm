@@ -25,27 +25,6 @@ class ChatModel {
     this.type = MessageType.chat,
   });
 
-  String get formattedTime {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inMinutes < 1) {
-      return 'Just now';
-    } else if (difference.inHours < 1) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      final hour = timestamp.hour;
-      final minute = timestamp.minute.toString().padLeft(2, '0');
-      final period = hour >= 12 ? 'PM' : 'AM';
-      final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-      return '$displayHour:$minute $period';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else {
-      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
-    }
-  }
-
   factory ChatModel.fromJson(Map<String, dynamic> json) {
     return ChatModel(
       id: json['id'] as String,
@@ -98,8 +77,8 @@ class ChatModel {
     );
   }
 
-  /// Build an inbox row from a `conversations/{id}` document, from the
-  /// perspective of [currentUserId].
+  // Build an inbox row from a `conversations/{id}` document, from the
+  // perspective of [currentUserId].
   factory ChatModel.fromConversationDoc(
     DocumentSnapshot<Map<String, dynamic>> doc, {
     required String currentUserId,
@@ -125,5 +104,27 @@ class ChatModel {
       unreadCount: (unreadCounts[currentUserId] as num?)?.toInt() ?? 0,
       isOnline: false, // presence isn't tracked yet — see note below
     );
+  }
+
+  // Helper Getter - Formatted Time
+  String get formattedTime {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inMinutes < 1) {
+      return 'Just now';
+    } else if (difference.inHours < 1) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      final hour = timestamp.hour;
+      final minute = timestamp.minute.toString().padLeft(2, '0');
+      final period = hour >= 12 ? 'PM' : 'AM';
+      final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+      return '$displayHour:$minute $period';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d ago';
+    } else {
+      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
+    }
   }
 }

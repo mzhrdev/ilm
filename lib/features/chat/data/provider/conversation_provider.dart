@@ -18,12 +18,10 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
   final FirebaseFirestoreServices _firestoreServices;
 
   StreamSubscription<List<DirectMessage>>? _messagesSubscription;
-  
 
   String? _conversationId;
-  
 
-  /// Start listening to a conversation.
+  // Start listening to a conversation.
   void startConversation(String otherUserId) {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     if (currentUserId == null) {
@@ -41,7 +39,7 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
         .listen((messages) => state = messages, onError: (error) {});
   }
 
-  /// Send a new message.
+  // Send a new message.
   Future<void> sendMessage({
     required String text,
     required String receiverId,
@@ -79,7 +77,7 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
     );
   }
 
-  /// Stop listening to the current conversation.
+  // Stop listening to the current conversation.
   void stopConversation() {
     _messagesSubscription?.cancel();
     _messagesSubscription = null;
@@ -87,6 +85,7 @@ class ConversationNotifier extends StateNotifier<List<DirectMessage>> {
     state = [];
   }
 
+  // Dispose Method
   @override
   void dispose() {
     _messagesSubscription?.cancel();
