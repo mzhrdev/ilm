@@ -14,7 +14,7 @@ class ReviewModel {
     required this.comment,
     required this.createdAt,
   });
-
+  // From Json Method
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
     return ReviewModel(
       id: json['id'] as String,
@@ -26,6 +26,7 @@ class ReviewModel {
     );
   }
 
+  // To Json Method
   Map<String, dynamic> toJson() {
     return {
       'id': id,

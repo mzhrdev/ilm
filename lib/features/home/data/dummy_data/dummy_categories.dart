@@ -1,8 +1,12 @@
-final List<String> mockCategories = [
-  'UI/UX',
-  'Graphics Design',
-  'Figma',
+const List<String> mockCategories = [
+  'All',
   'Development',
-  'Media',
+  'Design',
+  'Business',
   'Marketing',
+  'Data Science',
+  'AI & Machine Learning',
+  'Cyber Security',
+  'Photography',
+  'Music',
 ];

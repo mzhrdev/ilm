@@ -1,4 +1,7 @@
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/features/home/data/model/review_model.dart';
 
 class ReviewCard extends StatelessWidget {
@@ -9,9 +12,12 @@ class ReviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: context.h(2)),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: AppColors.kGrey.withAlpha(100),
+        borderRadius: BorderRadius.circular(context.w(4)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -27,20 +33,21 @@ class ReviewCard extends StatelessWidget {
                         child: Image.network(
                           review.userAvatar!,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.grey),
+                          errorBuilder: (_, __, ___) =>
+                              Icon(Icons.person, color: AppColors.kBlack.withAlpha(150)),
                         ),
                       )
-                    : const Icon(Icons.person, color: Colors.grey),
+                    : Icon(Icons.person, color: AppColors.kBlack.withAlpha(150)),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: context.w(4)),
               // Name and Label
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(review.userName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 2),
-                    Text('Student', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    Text(review.userName, style: AppTextStyle.kBodyLarge),
+                    SizedBox(height: context.h(0.5)),
+                    Text('Student', style: AppTextStyle.kBodyMedium),
                   ],
                 ),
               ),
@@ -50,8 +57,8 @@ class ReviewCard extends StatelessWidget {
                   ...List.generate(5, (index) {
                     return Icon(
                       index < review.rating.floor() ? Icons.star : Icons.star_border,
-                      color: Colors.amber[700],
-                      size: 18,
+                      color: AppColors.kAmber,
+                      size: context.h(4),
                     );
                   }),
                 ],
@@ -60,7 +67,7 @@ class ReviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           // Review Comment
-          Text(review.comment, style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.4)),
+          Text(review.comment, style: AppTextStyle.kBodySmall),
         ],
       ),
     );
