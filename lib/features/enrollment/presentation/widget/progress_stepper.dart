@@ -1,4 +1,7 @@
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 
 class ProgressStepper extends StatelessWidget {
   final int currentStep;
@@ -9,8 +12,11 @@ class ProgressStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-      decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+      padding: EdgeInsets.symmetric(vertical: context.h(3), horizontal: context.w(2)),
+      decoration: BoxDecoration(
+        color: AppColors.kGrey.withAlpha(90),
+        borderRadius: BorderRadius.circular(context.w(4)),
+      ),
       child: Stack(
         children: [
           // Background line connecting all steps
@@ -20,8 +26,12 @@ class ProgressStepper extends StatelessWidget {
             top: 20,
             child: Row(
               children: [
-                Expanded(child: Container(height: 2, color: Colors.grey[300])),
-                Expanded(child: Container(height: 2, color: Colors.grey[300])),
+                Expanded(
+                  child: Container(height: context.h(0.5), color: AppColors.kGrey),
+                ),
+                Expanded(
+                  child: Container(height: context.h(0.5), color: AppColors.kGrey),
+                ),
               ],
             ),
           ),
@@ -33,10 +43,16 @@ class ProgressStepper extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Container(height: 2, color: currentStep > 1 ? Colors.black : Colors.transparent),
+                  child: Container(
+                    height: context.h(0.5),
+                    color: currentStep > 1 ? AppColors.kBlack : AppColors.kTransparent,
+                  ),
                 ),
                 Expanded(
-                  child: Container(height: 2, color: currentStep > 2 ? Colors.black : Colors.transparent),
+                  child: Container(
+                    height: context.h(0.5),
+                    color: currentStep > 2 ? AppColors.kBlack : AppColors.kTransparent,
+                  ),
                 ),
               ],
             ),
@@ -55,26 +71,23 @@ class ProgressStepper extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isActive ? Colors.black : Colors.grey[300],
+                        color: isActive ? AppColors.kBlack : AppColors.kGrey,
                         shape: BoxShape.circle,
                       ),
                       child: Center(
                         child: Text(
                           '$stepNumber',
-                          style: TextStyle(
-                            color: isActive ? Colors.white : Colors.grey[600],
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                          style: AppTextStyle.kBodyLarge.copyWith(
+                            color: isActive ? AppColors.kWhite : AppColors.kBlack.withAlpha(150),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: context.h(1)),
                     Text(
                       steps[index],
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isActive ? Colors.black : Colors.grey[600],
+                      style: AppTextStyle.kBodySmall.copyWith(
+                        color: isActive ? AppColors.kBlack : AppColors.kBlack.withAlpha(100),
                         fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                       ),
                       textAlign: TextAlign.center,
