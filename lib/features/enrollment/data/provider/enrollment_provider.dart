@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
 import 'package:lms/features/courses/data/provider/continue_watching_provider.dart';
@@ -19,17 +20,17 @@ final enrollmentProvider = StateNotifierProvider<EnrollmentNotifier, EnrollmentM
 
 final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({String courseId, String? userId})>(
   (ref, args) async {
-    print('');
-    print('==================================================');
-    print('[enrollmentLookupProvider] LOOKUP START');
-    print('courseId=${args.courseId}');
-    print('userId=${args.userId ?? 'null'}');
-    print('==================================================');
+    debugPrint('');
+    debugPrint('==================================================');
+    debugPrint('[enrollmentLookupProvider] LOOKUP START');
+    debugPrint('courseId=${args.courseId}');
+    debugPrint('userId=${args.userId ?? 'null'}');
+    debugPrint('==================================================');
 
     final userId = args.userId;
 
     if (userId == null || userId.isEmpty) {
-      print('[enrollmentLookupProvider] No userId -> returning null');
+      debugPrint('[enrollmentLookupProvider] No userId -> returning null');
       return null;
     }
 
@@ -41,13 +42,13 @@ final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({Strin
           .limit(1)
           .get();
 
-      print(
+      debugPrint(
         '[enrollmentLookupProvider] '
         'documents found=${snapshot.docs.length}',
       );
 
       if (snapshot.docs.isEmpty) {
-        print(
+        debugPrint(
           '[enrollmentLookupProvider] '
           'NOT ENROLLED '
           'courseId=${args.courseId}',
@@ -58,7 +59,7 @@ final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({Strin
 
       final doc = snapshot.docs.first;
 
-      print(
+      debugPrint(
         '[enrollmentLookupProvider] '
         'ENROLLMENT FOUND '
         'documentId=${doc.id}',
@@ -66,34 +67,36 @@ final enrollmentLookupProvider = FutureProvider.family<EnrollmentModel?, ({Strin
 
       final enrollment = EnrollmentModel.fromFirestore(doc.data());
 
-      print(
+      debugPrint(
         '[enrollmentLookupProvider] '
         'courseId=${enrollment.courseId}',
       );
 
-      print(
+      debugPrint(
         '[enrollmentLookupProvider] '
         'userId=${enrollment.userId}',
       );
 
-      print(
+      debugPrint(
         '[enrollmentLookupProvider] '
         'progress=${enrollment.progress}',
       );
 
-      print(
+      debugPrint(
         '[enrollmentLookupProvider] '
         'paidAmount=${enrollment.paidAmount}',
       );
 
       return enrollment;
     } catch (error, stackTrace) {
-      print(
+      debugPrint(
         '[enrollmentLookupProvider] '
         'ERROR: $error',
       );
 
-      print(stackTrace);
+      if (kDebugMode) {
+        print(stackTrace);
+      }
 
       rethrow;
     }
@@ -114,14 +117,14 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
   // ---------------------------------------------------------------------------
 
   void initializeFromCourse(CourseModel course, {required String userId}) {
-    print('');
-    print('==================================================');
-    print('===== INITIALIZE ENROLLMENT =====');
-    print('==================================================');
+    debugPrint('');
+    debugPrint('==================================================');
+    debugPrint('===== INITIALIZE ENROLLMENT =====');
+    debugPrint('==================================================');
 
-    print('Course ID: ${course.id}');
-    print('Course Title: ${course.title}');
-    print('User ID: $userId');
+    debugPrint('Course ID: ${course.id}');
+    debugPrint('Course Title: ${course.title}');
+    debugPrint('User ID: $userId');
 
     const discountPercentage = 10.0;
 
@@ -140,10 +143,10 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
       progress: 0.0,
     );
 
-    print('[EnrollmentNotifier] Enrollment state initialized');
-    print('[EnrollmentNotifier] courseId=${state!.courseId}');
-    print('[EnrollmentNotifier] userId=${state!.userId}');
-    print('[EnrollmentNotifier] progress=${state!.progress}');
+    debugPrint('[EnrollmentNotifier] Enrollment state initialized');
+    debugPrint('[EnrollmentNotifier] courseId=${state!.courseId}');
+    debugPrint('[EnrollmentNotifier] userId=${state!.userId}');
+    debugPrint('[EnrollmentNotifier] progress=${state!.progress}');
   }
 
   // ---------------------------------------------------------------------------
@@ -157,15 +160,15 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
       throw StateError('Cannot save enrollment because enrollment state is null.');
     }
 
-    print('');
-    print('==================================================');
-    print('[EnrollmentNotifier] SAVE ENROLLMENT');
-    print('==================================================');
+    debugPrint('');
+    debugPrint('==================================================');
+    debugPrint('[EnrollmentNotifier] SAVE ENROLLMENT');
+    debugPrint('==================================================');
 
-    print('courseId=${enrollment.courseId}');
-    print('userId=${enrollment.userId}');
-    print('paidAmount=${enrollment.paidAmount}');
-    print('progress=${enrollment.progress}');
+    debugPrint('courseId=${enrollment.courseId}');
+    debugPrint('userId=${enrollment.userId}');
+    debugPrint('paidAmount=${enrollment.paidAmount}');
+    debugPrint('progress=${enrollment.progress}');
 
     try {
       final collection = FirebaseFirestore.instance.collection('enrollments');
@@ -176,22 +179,22 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
 
       final document = await collection.add(enrollment.toJson());
 
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'ENROLLMENT SAVED SUCCESSFULLY',
       );
 
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'documentId=${document.id}',
       );
 
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'courseId=${enrollment.courseId}',
       );
 
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'userId=${enrollment.userId}',
       );
@@ -200,8 +203,8 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
       // REFRESH ENROLLMENT LOOKUP
       // -----------------------------------------------------------------------
 
-      print('');
-      print(
+      debugPrint('');
+      debugPrint(
         '[EnrollmentNotifier] '
         'INVALIDATING ENROLLMENT LOOKUP',
       );
@@ -210,7 +213,7 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
       // REFRESH COURSE + ENROLLMENT DATA
       // -----------------------------------------------------------------------
 
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'INVALIDATING COURSE ENROLLMENTS',
       );
@@ -218,24 +221,26 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
       ref.invalidate(courseEnrollmentsProvider);
       ref.invalidate(continueWatchingProvider);
 
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'ENROLLMENT DATA REFRESH TRIGGERED',
       );
 
-      print('==================================================');
-      print('[EnrollmentNotifier] SAVE COMPLETED');
-      print('==================================================');
+      debugPrint('==================================================');
+      debugPrint('[EnrollmentNotifier] SAVE COMPLETED');
+      debugPrint('==================================================');
     } catch (error, stackTrace) {
-      print('');
-      print(
+      debugPrint('');
+      debugPrint(
         '[EnrollmentNotifier] '
         'FAILED TO SAVE ENROLLMENT',
       );
 
-      print('[EnrollmentNotifier] ERROR: $error');
-      print('[EnrollmentNotifier] STACK TRACE:');
-      print(stackTrace);
+      debugPrint('[EnrollmentNotifier] ERROR: $error');
+      debugPrint('[EnrollmentNotifier] STACK TRACE:');
+      if (kDebugMode) {
+        print(stackTrace);
+      }
 
       rethrow;
     }
@@ -253,7 +258,7 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
     if (state!.currentStep < 3) {
       final nextStep = state!.currentStep + 1;
 
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'Moving from step ${state!.currentStep} to step $nextStep',
       );
@@ -268,7 +273,7 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
 
   void previousStep() {
     if (state == null) {
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'previousStep called but state is null',
       );
@@ -279,7 +284,7 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
     if (state!.currentStep > 1) {
       final previousStep = state!.currentStep - 1;
 
-      print(
+      debugPrint(
         '[EnrollmentNotifier] '
         'Moving from step ${state!.currentStep} to step $previousStep',
       );
@@ -293,7 +298,7 @@ class EnrollmentNotifier extends StateNotifier<EnrollmentModel?> {
   // ---------------------------------------------------------------------------
 
   void reset() {
-    print(
+    debugPrint(
       '[EnrollmentNotifier] '
       'Resetting enrollment state',
     );

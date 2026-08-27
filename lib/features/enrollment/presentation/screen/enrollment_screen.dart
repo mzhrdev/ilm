@@ -1,8 +1,14 @@
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_assets.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/courses/data/model/course_model.dart';
 import 'package:lms/features/courses/data/provider/course_provider.dart';
@@ -20,8 +26,9 @@ class EnrollmentScreen extends ConsumerStatefulWidget {
 }
 
 class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
+  // Form Key
   final _formKey = GlobalKey<FormState>();
-
+  // Text Editing Controller
   final _nameOnCardController = TextEditingController();
   final _cardNumberController = TextEditingController();
   final _cvcController = TextEditingController();
@@ -29,6 +36,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
 
   String? _selectedPaymentMethodId;
 
+  // Dispose Method
   @override
   void dispose() {
     _nameOnCardController.dispose();
@@ -39,10 +47,11 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     super.dispose();
   }
 
+  // Build Function
   @override
   Widget build(BuildContext context) {
     final enrollment = ref.watch(enrollmentProvider);
-
+    // If Enrollment is Null
     if (enrollment == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -56,128 +65,122 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     return ref
         .watch(coursesProvider)
         .when(
+          // Loading...
           loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-
-          error: (error, stack) => Scaffold(
-            appBar: AppBar(title: const Text('Enrollment')),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 50, color: Colors.red),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Unable to load course',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(error.toString(), textAlign: TextAlign.center),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      ref.invalidate(coursesProvider);
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
+          // On Error
+          error: (error, stack) => CustomSafeArea(
+            child: Scaffold(
+              appBar: AppBar(title: const Text('Enrollment')),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: context.h(8), color: AppColors.kCallEndB),
+                    const SizedBox(height: 16),
+                    const Text('Unable to load course', style: AppTextStyle.kBodyLarge),
+                    SizedBox(height: context.h(2.5)),
+                    Text(error.toString(), textAlign: TextAlign.center),
+                    SizedBox(height: context.h(4)),
+                    CustomElevatedButton(
+                      title: 'Retry',
+                      onPress: () => ref.invalidate(coursesProvider),
+                      elevation: 2,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-
+          // Actual Course Data
           data: (courses) {
             CourseModel? course;
-            print('===== COURSES LOADED IN ENROLLMENT SCREEN =====');
-            print('Enrollment courseId: ${enrollment.courseId}');
 
+            // Debug Statements and Loops
+            debugPrint('===== COURSES LOADED IN ENROLLMENT SCREEN =====');
+            debugPrint('Enrollment courseId: ${enrollment.courseId}');
             for (final course in courses) {
-              print(
+              debugPrint(
                 'Course ID: ${course.id} | '
                 'Title: ${course.title}',
               );
             }
-
             for (final item in courses) {
               if (item.id == enrollment.courseId) {
                 course = item;
                 break;
               }
             }
-
+            // NO Course Available
             if (course == null) {
               return Scaffold(
-                appBar: AppBar(title: const Text('Enrollment')),
-                body: const Center(
-                  child: Text(
-                    'Course not found.',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                ),
+                appBar: AppBar(title: const Text('Enrollment', style: AppTextStyle.kHeading)),
+                body: const Center(child: Text('Course not found.', style: AppTextStyle.kSectionTitle)),
               );
             }
-
+            // Enrollment Screen Builder Method Called
             return _buildEnrollmentScreen(enrollment: enrollment, course: course);
           },
         );
   }
 
+  // Enrollment Screen Builder Method Definition
   Widget _buildEnrollmentScreen({required EnrollmentModel enrollment, required CourseModel course}) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-
-      appBar: AppBar(
+    return CustomSafeArea(
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
 
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () {
-            if (enrollment.currentStep > 1) {
-              ref.read(enrollmentProvider.notifier).previousStep();
-            } else {
-              context.pop();
-            }
-          },
+        appBar: AppBar(
+          backgroundColor: AppColors.kWhite,
+          elevation: 0,
+          leading: CustomIconButton(
+            onTap: () {
+              if (enrollment.currentStep > 1) {
+                ref.read(enrollmentProvider.notifier).previousStep();
+              } else {
+                context.pop();
+              }
+            },
+            icon: Icons.arrow_back_ios_new,
+            iconColor: AppColors.kBlack,
+            paddingAroundIcon: context.w(4.5),
+          ),
+
+          title: const Text('Enrollment', style: AppTextStyle.kHeading),
         ),
 
-        title: const Text(
-          'Enrollment',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-      ),
-
-      body: SafeArea(
-        child: Column(
+        body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ProgressStepper(
-                currentStep: enrollment.currentStep,
-                steps: const ['Overview', 'Payment Method', 'Confirmation'],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
+            // Current Step Showing (e.g; currently at Overview Tab)
+            ProgressStepper(
+              currentStep: enrollment.currentStep,
+              steps: const ['Overview', 'Payment Method', 'Confirmation'],
+            ).padSymmetric(horizontal: context.w(6)),
+            SizedBox(height: context.h(3)),
+            // Content of Current Step Builder Method Called
             Expanded(
               child: _buildStepContent(enrollment: enrollment, course: course),
             ),
           ],
         ),
+        // Bottom Button
+        bottomNavigationBar: _buildBottomButton(enrollment),
       ),
-
-      bottomNavigationBar: _buildBottomButton(enrollment),
     );
   }
 
+  // Content of Current Step Builder Method Definition
   Widget _buildStepContent({required EnrollmentModel enrollment, required CourseModel course}) {
     switch (enrollment.currentStep) {
       case 1:
+        // OverView Tab Builder Method Called
         return _buildOverviewStep(enrollment, course);
 
       case 2:
+        // Payment Tab Builder Method Called
         return _buildPaymentMethodStep(enrollment);
 
       case 3:
+        // Completed Tab Builder Method Called
         return _buildTransactionCompletedStep(enrollment);
 
       default:
@@ -185,45 +188,46 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // STEP 1 - OVERVIEW
-  // ---------------------------------------------------------------------------
-
+  // OverView Tab Builder Method Definition
   Widget _buildOverviewStep(EnrollmentModel enrollment, CourseModel course) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(context.w(4)),
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Overview', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-
-          const SizedBox(height: 24),
-
+          // Overview Heading
+          const Text('Overview', style: AppTextStyle.kDisplayTitle),
+          SizedBox(height: context.h(2)),
+          // Course Info Card
           Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+            padding: EdgeInsets.all(context.w(4)),
+            decoration: BoxDecoration(
+              color: AppColors.kGrey,
+              borderRadius: BorderRadius.circular(context.w(5)),
+            ),
 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Course Name: ${course.title}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-
-                const SizedBox(height: 16),
+                // Course Name
+                Text('Course Name: ${course.title}', style: AppTextStyle.kSectionTitle),
+                SizedBox(height: context.h(1.5)),
 
                 Row(
                   children: [
+                    // Lectures & Certificate
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.play_circle_outline, color: Colors.grey[700], size: 20),
+                          Icon(
+                            Icons.play_circle_outline,
+                            color: AppColors.kBlack.withAlpha(160),
+                            size: context.h(2.75),
+                          ),
+                          SizedBox(width: context.w(2)),
 
-                          const SizedBox(width: 8),
-
-                          Text('${course.totalLessons} Lectures'),
+                          Text('${course.totalLessons} Lectures', style: AppTextStyle.kBodyMedium),
                         ],
                       ),
                     ),
@@ -232,29 +236,33 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                       Expanded(
                         child: Row(
                           children: [
-                            Icon(Icons.verified_user, color: Colors.grey[700], size: 20),
+                            Icon(
+                              Icons.verified_user,
+                              color: AppColors.kBlack.withAlpha(160),
+                              size: context.h(2.75),
+                            ),
 
-                            const SizedBox(width: 8),
+                            SizedBox(width: context.w(2)),
 
-                            const Text('Certificate'),
+                            const Text('Certificate', style: AppTextStyle.kBodyMedium),
                           ],
                         ),
                       ),
                   ],
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: context.h(1.5)),
 
                 Row(
                   children: [
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.schedule, color: Colors.grey[700], size: 20),
+                          Icon(Icons.schedule, color: AppColors.kBlack.withAlpha(160), size: context.h(2.75)),
 
-                          const SizedBox(width: 8),
+                          SizedBox(width: context.w(2)),
 
-                          Text(_formatDuration(course.totalDurationMinutes)),
+                          Text(_formatDuration(course.totalDurationMinutes), style: AppTextStyle.kBodyMedium),
                         ],
                       ),
                     ),
@@ -262,11 +270,18 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.local_offer, color: Colors.grey[700], size: 20),
+                          Icon(
+                            Icons.local_offer,
+                            color: AppColors.kBlack.withAlpha(160),
+                            size: context.h(2.75),
+                          ),
 
-                          const SizedBox(width: 8),
+                          SizedBox(width: context.w(2)),
 
-                          Text('${enrollment.discountPercentage.toInt()}% Off'),
+                          Text(
+                            '${enrollment.discountPercentage.toInt()}% Off',
+                            style: AppTextStyle.kBodyMedium,
+                          ),
                         ],
                       ),
                     ),
@@ -276,20 +291,16 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
             ),
           ),
 
-          const SizedBox(height: 24),
-
+          SizedBox(height: context.h(3)),
+          // Course Detail Column
           _buildDetailRow('Course Rating', course.rating.toStringAsFixed(1)),
-
-          const SizedBox(height: 12),
-
+          SizedBox(height: context.h(1.5)),
           _buildDetailRow('Course Time', _formatDuration(course.totalDurationMinutes)),
-
-          const SizedBox(height: 12),
-
+          SizedBox(height: context.h(1.5)),
           _buildDetailRow('Course Trainer', course.instructorName),
-
-          const SizedBox(height: 24),
-
+          SizedBox(height: context.h(3)),
+          
+          // Purchase Details Card
           PurchaseDetailsCard(
             date: enrollment.formattedDate,
             originalPrice: enrollment.originalPrice,
@@ -710,17 +721,11 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
 
   Widget _buildDetailRow(String label, String value) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-
       children: [
-        SizedBox(
-          width: 120,
-
-          child: Text('$label:', style: const TextStyle(fontSize: 16, color: Colors.black87)),
-        ),
+        Text('$label: ', style: AppTextStyle.kBodyLarge),
 
         Expanded(
-          child: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          child: Text(value, style: AppTextStyle.kBodyMedium.copyWith(fontWeight: FontWeight.w800)),
         ),
       ],
     );

@@ -1,6 +1,9 @@
 // lib/features/enrollment/presentation/widgets/purchase_details_card.dart
 
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 
 class PurchaseDetailsCard extends StatelessWidget {
   final String date;
@@ -19,38 +22,37 @@ class PurchaseDetailsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(context.w(4)),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.kBlack.withAlpha(150)),
+        borderRadius: BorderRadius.circular(context.w(4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          // Purchase Details Heading
+          Text(
             'Purchase Details',
-            style: TextStyle(fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
+            style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kBlack.withAlpha(100)),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.h(1.5)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Date: $date', style: const TextStyle(fontSize: 14)),
-              Text(
-                'Price: ${originalPrice.toStringAsFixed(0)}\$',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
+              // Date
+              Text('Date: $date', style: AppTextStyle.kBodyMedium),
+              // Price (before applying coupon)
+              Text('Price: ${originalPrice.toStringAsFixed(0)}\$', style: AppTextStyle.kBodyMedium),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: context.h(1.25)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Coupon: $couponCode', style: TextStyle(fontSize: 14, color: Colors.green[700])),
-              Text(
-                'Final Price: ${finalPrice.toStringAsFixed(0)}\$',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-              ),
+              // Coupon (e.g; 10% off)
+              Text('Coupon: $couponCode', style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kGreen)),
+              // Final Price (after applying coupon)
+              Text('Final Price: ${finalPrice.toStringAsFixed(0)}\$', style: AppTextStyle.kBodyMedium),
             ],
           ),
         ],
