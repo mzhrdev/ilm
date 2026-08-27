@@ -188,7 +188,9 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     }
   }
 
+  // -----
   // OverView Tab Builder Method Definition
+  // -----
   Widget _buildOverviewStep(EnrollmentModel enrollment, CourseModel course) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(context.w(4)),
@@ -299,7 +301,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
           SizedBox(height: context.h(1.5)),
           _buildDetailRow('Course Trainer', course.instructorName),
           SizedBox(height: context.h(3)),
-          
+
           // Purchase Details Card
           PurchaseDetailsCard(
             date: enrollment.formattedDate,
@@ -312,37 +314,32 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // STEP 2 - PAYMENT
-  // ---------------------------------------------------------------------------
-
+  // -----
+  // Payment Tab Builder Method Definition
+  // -----
   Widget _buildPaymentMethodStep(EnrollmentModel enrollment) {
     final savedMethods = ref.watch(paymentMethodsProvider).methods;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(context.w(4.5)),
 
       child: Form(
         key: _formKey,
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Select Payment Method', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-
-            const SizedBox(height: 24),
-
+            // Title Text
+            Text('Select Payment Method', style: AppTextStyle.kSectionTitle),
+            SizedBox(height: context.h(1.75)),
+            // Saved Methods
             if (savedMethods.isNotEmpty) ...[
-              const Text(
+              Text(
                 'Saved Methods',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey),
+                style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kBlack.withAlpha(135)),
               ),
-
-              const SizedBox(height: 12),
-
+              SizedBox(height: context.h(1.5)),
               ...savedMethods.map((method) {
                 final isSelected = _selectedPaymentMethodId == method.id;
-
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -351,53 +348,47 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                   },
 
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-
-                    padding: const EdgeInsets.all(16),
-
+                    margin: EdgeInsets.only(bottom: context.h(1.5)),
+                    padding: EdgeInsets.all(context.w(4)),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue[50] : Colors.grey[100],
-
-                      borderRadius: BorderRadius.circular(12),
-
-                      border: Border.all(color: isSelected ? Colors.blue : Colors.transparent, width: 1.5),
+                      color: isSelected ? AppColors.kBlue.withAlpha(80) : AppColors.kGrey.withAlpha(150),
+                      borderRadius: BorderRadius.circular(context.w(4)),
+                      border: Border.all(
+                        color: isSelected ? AppColors.kBlue : AppColors.kTransparent,
+                        width: context.h(0.35),
+                      ),
                     ),
-
                     child: Row(
                       children: [
-                        Icon(method.icon, color: Colors.black87, size: 24),
-
-                        const SizedBox(width: 16),
-
+                        // Method Icon
+                        Icon(method.icon, color: AppColors.kBlack.withAlpha(170), size: context.w(7)),
+                        SizedBox(width: context.w(4)),
+                        // Payment (Title+ Number)
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                method.typeLabel,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                              ),
-
-                              const SizedBox(height: 4),
-
+                              // Method Label
+                              Text(method.typeLabel, style: AppTextStyle.kBodyLarge),
+                              SizedBox(height: context.h(1)),
+                              // Method Number
                               Text(
                                 method.displayName,
-                                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                                style: AppTextStyle.kBodySmall.copyWith(
+                                  color: AppColors.kBlack.withAlpha(100),
+                                ),
                               ),
                             ],
                           ),
                         ),
-
-                        if (isSelected) const Icon(Icons.check_circle, color: Colors.blue),
+                        if (isSelected) const Icon(Icons.check_circle, color: AppColors.kBlue),
                       ],
                     ),
                   ),
                 );
               }),
-
-              const SizedBox(height: 16),
+              SizedBox(height: context.h(2.5)),
             ],
-
             // Add new card
             GestureDetector(
               onTap: () {
@@ -405,48 +396,43 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                   _selectedPaymentMethodId = null;
                 });
               },
-
               child: Container(
-                padding: const EdgeInsets.all(16),
-
+                padding: EdgeInsets.all(context.w(4)),
                 decoration: BoxDecoration(
-                  color: _selectedPaymentMethodId == null ? Colors.blue[50] : Colors.grey[100],
-
-                  borderRadius: BorderRadius.circular(12),
+                  color: _selectedPaymentMethodId == null
+                      ? AppColors.kBlue.withAlpha(80)
+                      : AppColors.kGrey.withAlpha(150),
+                  borderRadius: BorderRadius.circular(context.w(4)),
 
                   border: Border.all(
-                    color: _selectedPaymentMethodId == null ? Colors.blue : Colors.transparent,
+                    color: _selectedPaymentMethodId == null ? AppColors.kBlue : AppColors.kTransparent,
 
-                    width: 1.5,
+                    width: context.h(0.35),
                   ),
                 ),
 
                 child: Row(
                   children: [
-                    const Icon(Icons.add_circle_outline, size: 24),
-
-                    const SizedBox(width: 16),
-
-                    const Text(
-                      'Add New Credit Card',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-
+                    // Add Button
+                    Icon(Icons.add_circle_outline, size: context.w(7)),
+                    SizedBox(width: context.w(4)),
+                    // Explanatory Text
+                    const Text('Add New Credit Card', style: AppTextStyle.kBodyLarge),
                     const Spacer(),
-
-                    if (_selectedPaymentMethodId == null) const Icon(Icons.check_circle, color: Colors.blue),
+                    // Tick
+                    if (_selectedPaymentMethodId == null)
+                      const Icon(Icons.check_circle, color: AppColors.kBlue),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: context.h(3)),
 
             if (_selectedPaymentMethodId == null) ...[
-              const Text('Card Details', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-
-              const SizedBox(height: 16),
-
+              const Text('Card Details', style: AppTextStyle.kSectionTitle),
+              SizedBox(height: context.h(1.5)),
+              // Name Text Field
               _buildTextField(
                 controller: _nameOnCardController,
                 label: 'Name on Card',
@@ -459,9 +445,8 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                   return null;
                 },
               ),
-
-              const SizedBox(height: 12),
-
+              SizedBox(height: context.h(1.5)),
+              // Card Number
               _buildTextField(
                 controller: _cardNumberController,
                 label: 'Card Number',
@@ -471,27 +456,24 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly, CardNumberInputFormatter()],
                 validator: (value) {
                   final cardNumber = value?.replaceAll(' ', '') ?? '';
-
                   if (cardNumber.isEmpty) {
                     return 'Please enter card number';
                   }
-
                   if (cardNumber.length < 16) {
                     return 'Please enter a valid card number';
                   }
-
                   return null;
                 },
               ),
-
-              const SizedBox(height: 12),
-
+              SizedBox(height: context.h(1.5)),
+              // CVC Number + Expiry Date
               Row(
                 children: [
+                  // CVC Number
                   Expanded(
                     child: _buildTextField(
                       controller: _cvcController,
-                      label: 'CVC Number',
+                      label: 'CVC Num',
                       icon: Icons.lock_outline,
                       keyboardType: TextInputType.number,
                       maxLength: 3,
@@ -500,18 +482,15 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Required';
                         }
-
                         if (value.length < 3) {
                           return 'Invalid CVC';
                         }
-
                         return null;
                       },
                     ),
                   ),
-
-                  const SizedBox(width: 12),
-
+                  SizedBox(width: context.w(2)),
+                  // Expiry Date
                   Expanded(
                     child: _buildTextField(
                       controller: _expiryDateController,
@@ -525,11 +504,9 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Required';
                         }
-
                         if (value.length < 5) {
                           return 'Invalid date';
                         }
-
                         return null;
                       },
                     ),
@@ -537,9 +514,8 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
                 ],
               ),
             ],
-
-            const SizedBox(height: 24),
-
+            SizedBox(height: context.h(2)),
+            // Purchase Detail Screen Card
             PurchaseDetailsCard(
               date: enrollment.formattedDate,
               originalPrice: enrollment.originalPrice,
@@ -552,9 +528,7 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // TEXT FIELD
-  // ---------------------------------------------------------------------------
+  // textField builder method definition
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -570,22 +544,19 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
 
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
+        color: AppColors.kGrey.withAlpha(120),
+        borderRadius: BorderRadius.circular(context.w(4)),
+        border: Border.all(color: AppColors.kBlack.withAlpha(150)),
       ),
 
       child: TextFormField(
         controller: controller,
-
         decoration: InputDecoration(
           labelText: label,
           hintText: hintText,
           border: InputBorder.none,
-
-          prefixIcon: Icon(icon, color: Colors.grey[600], size: 20),
+          prefixIcon: Icon(icon, color: AppColors.kBlack.withAlpha(150), size: context.h(3.5)),
         ),
-
         keyboardType: keyboardType,
         maxLength: maxLength,
         inputFormatters: inputFormatters,
@@ -594,136 +565,114 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // STEP 3
-  // ---------------------------------------------------------------------------
+  // -----
+  // Transaction Completed Tab Builder Method Definition
+  // -----
 
   Widget _buildTransactionCompletedStep(EnrollmentModel enrollment) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-
+      padding: EdgeInsets.all(context.w(3)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-
         children: [
-          const SizedBox(height: 20),
-
-          const Text('Transaction Completed!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-
-          const SizedBox(height: 40),
-
+          // Transaction Completed Text
+          Text('Transaction Completed!', style: AppTextStyle.kHeading),
+          SizedBox(height: context.h(2)),
+          // Success Image
           Center(child: Image(image: AssetImage(AppIcons.transactionSuccess))),
         ],
       ),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // BOTTOM BUTTON
-  // ---------------------------------------------------------------------------
-
+  //  bottom button builder method definition
   Widget _buildBottomButton(EnrollmentModel enrollment) {
     String buttonText;
-
     switch (enrollment.currentStep) {
       case 1:
         buttonText = 'Continue to Payment';
         break;
-
       case 2:
         buttonText = 'Pay & Enroll';
         break;
-
       case 3:
         buttonText = 'Start Learning';
         break;
-
       default:
         buttonText = 'Continue';
     }
-
     return Container(
-      padding: const EdgeInsets.all(16),
-
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-
+        color: AppColors.kWhite,
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -2)),
+          BoxShadow(
+            color: AppColors.kBlack.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -1),
+          ),
         ],
       ),
 
-      child: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          height: 50,
+      child: SizedBox(
+        width: context.w(80),
+        height: context.h(6),
+        child: CustomElevatedButton(
+          title: buttonText,
+          fontSize: context.h(2),
+          textColor: AppColors.kWhite,
+          borderRadius: context.w(3.5),
+          onPress: () async {
+            final notifier = ref.read(enrollmentProvider.notifier);
 
-          child: ElevatedButton(
-            onPressed: () async {
-              final notifier = ref.read(enrollmentProvider.notifier);
+            if (enrollment.currentStep == 1) {
+              notifier.nextStep();
+              return;
+            }
 
-              if (enrollment.currentStep == 1) {
-                notifier.nextStep();
-                return;
-              }
-
-              if (enrollment.currentStep == 2) {
-                if (_selectedPaymentMethodId == null) {
-                  if (!_formKey.currentState!.validate()) {
-                    return;
-                  }
+            if (enrollment.currentStep == 2) {
+              if (_selectedPaymentMethodId == null) {
+                if (!_formKey.currentState!.validate()) {
+                  return;
                 }
-
-                /*
-                 * IMPORTANT:
-                 * This is currently where the real payment service
-                 * should be called.
-                 *
-                 * After successful payment:
-                 * 1. Create Enrollment in Firestore.
-                 * 2. Move to step 3.
-                 */
-                await notifier.saveEnrollment();
-                notifier.nextStep();
-                return;
               }
 
-              if (enrollment.currentStep == 3) {
-                context.go(Routes.home);
+              /*
+               * IMPORTANT:
+               * This is currently where the real payment service
+               * should be called.
+               *
+               * After successful payment:
+               * 1. Create Enrollment in Firestore.
+               * 2. Move to step 3.
+               */
+              await notifier.saveEnrollment();
+              notifier.nextStep();
+              return;
+            }
 
-                Future.delayed(const Duration(milliseconds: 100), () {
-                  if (mounted) {
-                    notifier.reset();
-                  }
-                });
-              }
-            },
+            if (enrollment.currentStep == 3) {
+              context.go(Routes.home);
 
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-
-            child: Text(
-              buttonText,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-          ),
+              Future.delayed(const Duration(milliseconds: 100), () {
+                if (mounted) {
+                  notifier.reset();
+                }
+              });
+            }
+          },
         ),
       ),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // HELPERS
-  // ---------------------------------------------------------------------------
-
+  // detail row helper method definition
   Widget _buildDetailRow(String label, String value) {
     return Row(
       children: [
+        // Label Text 
         Text('$label: ', style: AppTextStyle.kBodyLarge),
-
+        // Detail Info
         Expanded(
           child: Text(value, style: AppTextStyle.kBodyMedium.copyWith(fontWeight: FontWeight.w800)),
         ),
@@ -747,29 +696,21 @@ class _EnrollmentScreenState extends ConsumerState<EnrollmentScreen> {
   }
 }
 
-// -----------------------------------------------------------------------------
-// CARD NUMBER FORMATTER
-// -----------------------------------------------------------------------------
+// card number formatter helper method definition
 
 class CardNumberInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     final text = newValue.text;
-
     final buffer = StringBuffer();
-
     for (int i = 0; i < text.length; i++) {
       buffer.write(text[i]);
-
       final position = i + 1;
-
       if (position % 4 == 0 && position != text.length) {
         buffer.write(' ');
       }
     }
-
     final formatted = buffer.toString();
-
     return newValue.copyWith(
       text: formatted,
       selection: TextSelection.collapsed(offset: formatted.length),
@@ -777,19 +718,14 @@ class CardNumberInputFormatter extends TextInputFormatter {
   }
 }
 
-// -----------------------------------------------------------------------------
-// EXPIRY DATE FORMATTER
-// -----------------------------------------------------------------------------
-
+// expiry date formatter helper method definition
 class ExpiryDateInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     var text = newValue.text;
-
     if (text.length == 2 && oldValue.text.length == 1) {
       text += '/';
     }
-
     return newValue.copyWith(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),
