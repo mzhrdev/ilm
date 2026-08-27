@@ -245,9 +245,7 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
             onTap: () {
               // TODO: Launch phone dialer
               context.pop();
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Opening phone dialer...')));
+              ShowSnackbar1.success(context, 'Opening phone dialer....');
             },
           ),
           // LIVE CHAT
@@ -258,9 +256,7 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
             onTap: () {
               context.pop();
               // TODO: Navigate to live chat screen
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Live Chat coming soon!')));
+              ShowSnackbar1.success(context, 'Live Chat coming soon!.');
             },
           ),
           SizedBox(height: context.h(4)),
