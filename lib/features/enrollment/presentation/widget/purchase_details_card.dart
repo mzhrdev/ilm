@@ -1,5 +1,3 @@
-// lib/features/enrollment/presentation/widgets/purchase_details_card.dart
-
 import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:lms/core/constants/app_colors.dart';

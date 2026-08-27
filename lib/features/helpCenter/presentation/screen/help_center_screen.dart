@@ -1,15 +1,21 @@
 // lib/features/settings/presentation/screens/help_center_screen.dart
-
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_fonts.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
+import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
+import 'package:lms/core/presentation/widgets/custom_text_field.dart';
+import 'package:lms/core/presentation/widgets/snackbar.dart';
 import 'package:lms/features/helpCenter/data/dummy_data/faq_list.dart';
 import 'package:lms/features/helpCenter/data/dummy_data/help_categories.dart';
 
 class HelpCenterScreen extends ConsumerStatefulWidget {
   const HelpCenterScreen({super.key});
-
   @override
   ConsumerState<HelpCenterScreen> createState() => _HelpCenterScreenState();
 }
@@ -17,167 +23,108 @@ class HelpCenterScreen extends ConsumerStatefulWidget {
 class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
   final _searchController = TextEditingController();
   int? _expandedQuestionIndex;
-
+  // Dispose Method
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
 
+  // Build Method
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => context.pop(),
+    return CustomSafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.kWhite,
+          elevation: 0,
+          leading: CustomIconButton(
+            onTap: () => context.pop(),
+            icon: Icons.arrow_back_ios_new,
+            iconColor: AppColors.kBlack,
+            paddingAroundIcon: context.w(4),
+          ),
+          title: const Text('Help Center', style: AppTextStyle.kHeading),
         ),
-        title: const Text(
-          'Help Center',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
+        body: Column(
+          children: [
+            // Search Bar
+            CustomTextField(
               controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'How can we help you?',
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.grey),
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                          });
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              onChanged: (value) {
-                setState(() {});
+              hintText: 'How can we help you?',
+              hintTextColor: AppColors.kBlack.withAlpha(150),
+              isPrefixIconEnabled: true,
+              preFixIcon: Icons.search,
+              labelText: null,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.search,
+              validator: FieldValidator.required(),
+              fillColor: AppColors.kGrey.withAlpha(50),
+              filled: true,
+              enabledBorderColor: AppColors.kGrey,
+              contentPadding: EdgeInsets.symmetric(horizontal: context.w(3), vertical: context.h(2)),
+              onChanged: (val) {
+                //TODO: Apply Search Filter functionality
+              },
+            ).padAll(context.w(4.5)),
+
+            // Contact Support Button
+            CustomElevatedButton(
+              borderRadius: context.w(4),
+              bWidth: context.w(93),
+              elevation: 0,
+              fontFamily: AppFonts.kBold,
+              title: 'Contact Support',
+              onPress: () {
+                _showContactSupportDialog();
               },
             ),
-          ),
+            SizedBox(height: context.h(2.5)),
 
-          // Contact Support Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  _showContactSupportDialog();
-                },
-                icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
-                label: const Text(
-                  'Contact Support',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.kWhite),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Help Categories
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Browse Categories',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Categories Grid
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.5,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
+            // Help Categories
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: context.w(4)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Browse Categories', style: AppTextStyle.kSectionTitle),
+                    SizedBox(height: context.h(1.5)),
+                    // Categories Grid
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 1.5,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: helpCategories.length,
+                      itemBuilder: (context, index) {
+                        final category = helpCategories[index];
+                        // category Card Builder Method
+                        return _buildCategoryCard(category);
+                      },
                     ),
-                    itemCount: helpCategories.length,
-                    itemBuilder: (context, index) {
-                      final category = helpCategories[index];
-                      return _buildCategoryCard(category);
-                    },
-                  ),
 
-                  const SizedBox(height: 32),
+                    SizedBox(height: context.h(4.25)),
 
-                  // FAQ Section
-                  const Text(
-                    'Frequently Asked Questions',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                  const SizedBox(height: 16),
+                    // FAQ Section
+                    const Text('Frequently Asked Questions', style: AppTextStyle.kSectionTitle),
+                    SizedBox(height: context.h(1)),
 
-                  ...faqList.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final faq = entry.value;
-                    return _buildFAQItem(faq['question']!, faq['answer']!, index);
-                  }),
+                    ...faqList.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final faq = entry.value;
+                      // FAQ Item Builder Method
+                      return _buildFAQItem(faq['question']!, faq['answer']!, index);
+                    }),
 
-                  const SizedBox(height: 80), // Space for bottom nav
-                ],
+                    SizedBox(height: context.h(6)), // Space for bottom nav
+                  ],
+                ),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryCard(Map<String, dynamic> category) {
-    return GestureDetector(
-      onTap: () {
-        // Navigate to category-specific help
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${category['title']} coming soon!')));
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(category['icon'] as IconData, color: category['color'] as Color, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              category['title'] as String,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
             ),
           ],
         ),
@@ -185,29 +132,54 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
     );
   }
 
+  // Category Card Builder Method Definition
+  Widget _buildCategoryCard(Map<String, dynamic> category) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to category-specific help
+        ShowSnackbar1.success(context, '${category['title']} coming soon!');
+      },
+      child: Container(
+        padding: EdgeInsets.all(context.w(4)),
+        decoration: BoxDecoration(
+          color: AppColors.kGrey.withAlpha(80),
+          borderRadius: BorderRadius.circular(context.w(4)),
+          border: Border.all(color: AppColors.kBlack.withAlpha(50)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(category['icon'] as IconData, color: category['color'] as Color, size: context.h(4)),
+            SizedBox(height: context.h(1.25)),
+            Text(category['title'] as String, style: AppTextStyle.kBodyMedium),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // FAQ item Builder Method Definition
   Widget _buildFAQItem(String question, String answer, int index) {
     final isExpanded = _expandedQuestionIndex == index;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: context.h(1.5)),
       child: Material(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.kGrey.withAlpha(80),
+        borderRadius: BorderRadius.circular(context.w(4)),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[200]!),
+            border: Border.all(color: AppColors.kBlack.withAlpha(80)),
           ),
           child: Column(
             children: [
               ListTile(
-                title: Text(
-                  question,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
-                ),
+                title: Text(question, style: AppTextStyle.kBodyLarge),
                 trailing: Icon(
                   isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  color: Colors.grey[600],
+                  color: AppColors.kBlack.withAlpha(150),
                 ),
                 onTap: () {
                   setState(() {
@@ -216,10 +188,10 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
                 },
               ),
               if (isExpanded)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Text(answer, style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5)),
-                ),
+                Text(
+                  answer,
+                  style: AppTextStyle.kBodyMedium,
+                ).padOnly(left: context.w(3.5), right: context.w(3.5), bottom: context.h(2)),
             ],
           ),
         ),
@@ -227,71 +199,77 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
     );
   }
 
+  // Bottom Sheet for Contact Support Builder Method Definition
   void _showContactSupportDialog() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(context.w(5)))),
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: context.w(30),
+              height: context.h(0.5),
+              decoration: BoxDecoration(
+                color: AppColors.kBlack.withAlpha(150),
+                borderRadius: BorderRadius.circular(context.w(3)),
               ),
             ),
-            const SizedBox(height: 24),
-            const Text('Contact Support', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text('Choose your preferred method to reach us', style: TextStyle(color: Colors.grey[600])),
-            const SizedBox(height: 24),
-            _buildContactOption(
-              icon: Icons.email_outlined,
-              title: 'Email Us',
-              subtitle: 'support@lmsapp.com',
-              onTap: () {
-                // TODO: Launch email app
-                context.pop();
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Opening email app...')));
-              },
-            ),
-            _buildContactOption(
-              icon: Icons.phone_outlined,
-              title: 'Call Us',
-              subtitle: '+92 300 1234567',
-              onTap: () {
-                // TODO: Launch phone dialer
-                context.pop();
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Opening phone dialer...')));
-              },
-            ),
-            _buildContactOption(
-              icon: Icons.chat_bubble_outline,
-              title: 'Live Chat',
-              subtitle: 'Chat with our support team',
-              onTap: () {
-                context.pop();
-                // TODO: Navigate to live chat screen
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('Live Chat coming soon!')));
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+          ),
+          SizedBox(height: context.h(3.5)),
+          const Text('Contact Support', style: AppTextStyle.kSectionTitle),
+          SizedBox(height: context.h(1.5)),
+          Text(
+            'Choose your preferred method to reach us',
+            style: AppTextStyle.kBodySmall.copyWith(color: AppColors.kBlack.withAlpha(150)),
+          ),
+          SizedBox(height: context.h(2)),
+          // EMAIL US
+          _buildContactOption(
+            icon: Icons.email_outlined,
+            title: 'Email Us',
+            subtitle: 'support@lmsapp.com',
+            onTap: () {
+              // TODO: Launch email app
+              context.pop();
+              ShowSnackbar1.success(context, 'Opening email app...');
+            },
+          ),
+          // CALL US
+          _buildContactOption(
+            icon: Icons.phone_outlined,
+            title: 'Call Us',
+            subtitle: '+92 300 1234567',
+            onTap: () {
+              // TODO: Launch phone dialer
+              context.pop();
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Opening phone dialer...')));
+            },
+          ),
+          // LIVE CHAT
+          _buildContactOption(
+            icon: Icons.chat_bubble_outline,
+            title: 'Live Chat',
+            subtitle: 'Chat with our support team',
+            onTap: () {
+              context.pop();
+              // TODO: Navigate to live chat screen
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Live Chat coming soon!')));
+            },
+          ),
+          SizedBox(height: context.h(4)),
+        ],
+      ).padAll(context.w(5)),
     );
   }
 
+  // Contact Option Card Builder Method Definition
   Widget _buildContactOption({
     required IconData icon,
     required String title,
@@ -301,29 +279,35 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: EdgeInsets.only(bottom: context.h(2)),
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(
+          color: AppColors.kGrey.withAlpha(80),
+          borderRadius: BorderRadius.circular(context.w(4)),
+          border: Border.all(color: AppColors.kBlack.withAlpha(100)),
+        ),
         child: Row(
           children: [
+            // Icon Container
             Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
-              child: Icon(icon, color: Colors.black87),
+              width: context.w(10),
+              height: context.h(5),
+              decoration: BoxDecoration(color: AppColors.kWhite, shape: BoxShape.circle),
+              child: Icon(icon, color: AppColors.kBlack),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: context.w(3)),
+            // Text (Email/Call/Chat + Detail(e.g: number == 15428471436))
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(subtitle, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                  Text(title, style: AppTextStyle.kBodyLarge),
+                  SizedBox(height: context.h(0.5)),
+                  Text(subtitle, style: AppTextStyle.kBodySmall),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
+            Icon(Icons.chevron_right, color: AppColors.kBlack.withAlpha(150)),
           ],
         ),
       ),
