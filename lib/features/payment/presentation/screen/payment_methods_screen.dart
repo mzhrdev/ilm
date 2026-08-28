@@ -1,12 +1,16 @@
 import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
+import 'package:lms/core/presentation/widgets/snackbar.dart';
 import 'package:lms/features/payment/data/provider/payment_method_provider.dart';
 import 'package:lms/features/payment/presentation/widget/payment_method_tile_widget.dart';
+
+// THIS PAYMENT METHOD SCREEN IS PRESENT IN THE SETTINGS SCREEN
 
 class PaymentMethodsScreen extends ConsumerWidget {
   const PaymentMethodsScreen({super.key});
@@ -20,7 +24,9 @@ class PaymentMethodsScreen extends ConsumerWidget {
           backgroundColor: AppColors.kWhite,
           elevation: 0,
           leading: CustomIconButton(
-            onTap: () {},
+            onTap: () {
+              context.pop();
+            },
             icon: Icons.arrow_back_ios_new,
             iconColor: AppColors.kBlack,
             paddingAroundIcon: context.w(4.75),
@@ -60,9 +66,7 @@ class PaymentMethodsScreen extends ConsumerWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         ref.read(paymentMethodsProvider.notifier).addNewMethod();
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(const SnackBar(content: Text('Add Card Screen coming soon!')));
+                        ShowSnackbar1.error(context, 'Add Card Screen coming soon!');
                       },
                       icon: Icon(Icons.add, color: AppColors.kWhite, size: context.h(3)),
                       label: Text(
