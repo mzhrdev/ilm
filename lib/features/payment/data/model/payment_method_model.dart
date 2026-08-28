@@ -19,6 +19,7 @@ class PaymentMethodModel {
     this.isDefault = false,
   });
 
+  // Display Name Getter Method
   String get displayName {
     switch (type) {
       case PaymentType.creditCard:
@@ -30,6 +31,7 @@ class PaymentMethodModel {
     }
   }
 
+  // Icon Getter Method
   IconData get icon {
     switch (type) {
       case PaymentType.creditCard:
@@ -41,6 +43,7 @@ class PaymentMethodModel {
     }
   }
 
+  // Type Label Getter Method
   String get typeLabel {
     switch (type) {
       case PaymentType.creditCard:

@@ -1,7 +1,10 @@
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
+import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
+import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
 import 'package:lms/features/payment/data/provider/payment_method_provider.dart';
 import 'package:lms/features/payment/presentation/widget/payment_method_tile_widget.dart';
 
@@ -11,53 +14,49 @@ class PaymentMethodsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(paymentMethodsProvider);
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => context.pop(),
+    return CustomSafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.kWhite,
+          elevation: 0,
+          leading: CustomIconButton(
+            onTap: () {},
+            icon: Icons.arrow_back_ios_new,
+            iconColor: AppColors.kBlack,
+            paddingAroundIcon: context.w(4.75),
+          ),
+          title: const Text('Payment Methods', style: AppTextStyle.kHeading),
         ),
-        title: const Text(
-          'Payment Methods',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-      ),
-      body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : state.methods.isEmpty
-          ? _buildEmptyState(ref)
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: state.methods.length,
-                    itemBuilder: (context, index) {
-                      final method = state.methods[index];
-                      return PaymentMethodTile(
-                        method: method,
-                        isSelected: method.isDefault,
-                        onTap: () {
-                          ref.read(paymentMethodsProvider.notifier).setDefaultMethod(method.id);
-                        },
-                        onDelete: () {
-                          ref.read(paymentMethodsProvider.notifier).removeMethod(method.id);
-                        },
-                      );
-                    },
+        body: state.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : state.methods.isEmpty
+            ? _buildEmptyState(ref, context)
+            : Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.all(context.h(2)),
+                      itemCount: state.methods.length,
+                      itemBuilder: (context, index) {
+                        final method = state.methods[index];
+                        return PaymentMethodTile(
+                          method: method,
+                          isSelected: method.isDefault,
+                          onTap: () {
+                            ref.read(paymentMethodsProvider.notifier).setDefaultMethod(method.id);
+                          },
+                          onDelete: () {
+                            ref.read(paymentMethodsProvider.notifier).removeMethod(method.id);
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
 
-                // Add New Method Button
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SizedBox(
+                  // Add New Method Button
+                  SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: context.h(6),
                     child: ElevatedButton.icon(
                       onPressed: () {
                         ref.read(paymentMethodsProvider.notifier).addNewMethod();
@@ -65,58 +64,59 @@ class PaymentMethodsScreen extends ConsumerWidget {
                           context,
                         ).showSnackBar(const SnackBar(content: Text('Add Card Screen coming soon!')));
                       },
-                      icon: const Icon(Icons.add, color: Colors.white),
-                      label: const Text(
+                      icon: Icon(Icons.add, color: AppColors.kWhite, size: context.h(3)),
+                      label: Text(
                         'Add New Payment Method',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.kWhite),
+                        style: AppTextStyle.kSectionTitle.copyWith(color: AppColors.kWhite),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        backgroundColor: AppColors.kBlack,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.w(4))),
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ),
+                  ).padAll(context.w(4)),
+                ],
+              ),
+      ),
     );
   }
 
-  Widget _buildEmptyState(WidgetRef ref) {
+  // Empty State Builder
+  Widget _buildEmptyState(WidgetRef ref, BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.credit_card_off, size: 80, color: Colors.grey[300]),
-            const SizedBox(height: 16),
-            const Text(
-              'No payment methods',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Add a card or wallet to make payments easily.',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => ref.read(paymentMethodsProvider.notifier).addNewMethod(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Add Payment Method', style: TextStyle(color: Colors.white)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.credit_card_off, size: context.h(8), color: AppColors.kGrey),
+          SizedBox(height: context.h(2)),
+          Text(
+            'No payment methods',
+            style: AppTextStyle.kBodyLarge.copyWith(color: AppColors.kBlack.withAlpha(170)),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Add a card or wallet to make payments easily.',
+            style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kBlack.withAlpha(120)),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: context.h(2)),
+          SizedBox(
+            width: double.infinity,
+            height: context.h(6),
+            child: ElevatedButton(
+              onPressed: () => ref.read(paymentMethodsProvider.notifier).addNewMethod(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.kBlack,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.w(4))),
+              ),
+              child: Text(
+                'Add Payment Method',
+                style: AppTextStyle.kSectionTitle.copyWith(color: AppColors.kWhite),
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        ],
+      ).padAll(context.w(5)),
     );
   }
 }

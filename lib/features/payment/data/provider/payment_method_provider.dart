@@ -25,13 +25,14 @@ class PaymentMethodsNotifier extends StateNotifier<PaymentMethodsState> {
     _loadMethods();
   }
 
- 
+  // Load Payment  Methods Function Definition
   Future<void> _loadMethods() async {
     state = state.copyWith(isLoading: true);
     await Future.delayed(const Duration(milliseconds: 500));
     state = state.copyWith(methods: mockMethods, isLoading: false);
   }
 
+  // Set Default Payment Method Function Definition
   void setDefaultMethod(String methodId) {
     state = state.copyWith(
       methods: state.methods.map((method) {
@@ -47,10 +48,12 @@ class PaymentMethodsNotifier extends StateNotifier<PaymentMethodsState> {
     );
   }
 
+  // Remove Payment Method Function Definition
   void removeMethod(String methodId) {
     state = state.copyWith(methods: state.methods.where((method) => method.id != methodId).toList());
   }
 
+  // Add New Payment Method Function Definition
   void addNewMethod() {
     // TODO: Navigate to Add Card Screen
     // For now, we just add a mock method
