@@ -6,7 +6,6 @@ import 'package:lms/features/home/data/model/review_model.dart';
 
 class ReviewCard extends StatelessWidget {
   final ReviewModel review;
-
   const ReviewCard({super.key, required this.review});
 
   @override
