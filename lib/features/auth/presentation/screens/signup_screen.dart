@@ -160,7 +160,9 @@ class SignupScreen extends ConsumerWidget {
                   title: "Sign Up With Facebook",
                   textColor: AppColors.kWhite,
                   fontFamily: AppFonts.kLight,
-                  onPress: () {},
+                  onPress: () {
+                    ShowSnackbar1.error(context, 'Facebook Implementation Not Available!');
+                  },
                   buttonColor: AppColors.kBlack,
                 ).padBottom(context.h(3)),
 

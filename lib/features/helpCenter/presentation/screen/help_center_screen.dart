@@ -137,7 +137,7 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
     return GestureDetector(
       onTap: () {
         // Navigate to category-specific help
-        ShowSnackbar1.success(context, '${category['title']} coming soon!');
+        ShowSnackbar1.error(context, '${category['title']} coming soon!');
       },
       child: Container(
         padding: EdgeInsets.all(context.w(4)),

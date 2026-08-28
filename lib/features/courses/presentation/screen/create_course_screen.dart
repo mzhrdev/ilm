@@ -55,7 +55,9 @@ class CreateCourseScreen extends ConsumerWidget {
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
                 validator: FieldValidator.required(),
-                onChanged: notifier.setTitle,
+                onChanged: (val) {
+                  notifier.setTitle;
+                },
               ),
               SizedBox(height: context.h(2)),
               // Course Description
@@ -67,7 +69,9 @@ class CreateCourseScreen extends ConsumerWidget {
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
                 validator: FieldValidator.required(),
-                onChanged: notifier.setDescription,
+                onChanged: (val) {
+                  notifier.setDescription;
+                },
                 maxLength: 2,
               ),
               SizedBox(height: context.h(2)),
@@ -80,7 +84,9 @@ class CreateCourseScreen extends ConsumerWidget {
                 keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
                 validator: FieldValidator.required(),
-                onChanged: notifier.setCategory,
+                onChanged: (val) {
+                  notifier.setCategory;
+                },
                 maxLength: 2,
               ),
               SizedBox(height: context.h(2)),
@@ -164,7 +170,7 @@ class CreateCourseScreen extends ConsumerWidget {
                               );
                             }),
 
-                          const SizedBox(height: 8),
+                          SizedBox(height: context.h(3)),
                         ],
                       ),
                     );

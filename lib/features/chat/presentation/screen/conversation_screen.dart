@@ -6,10 +6,8 @@ import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/presentation/widgets/custom_icon_button.dart';
 import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
-import 'package:lms/core/routing/app_routing.dart';
+import 'package:lms/core/presentation/widgets/snackbar.dart';
 import 'package:lms/features/auth/data/providers/current_user_provider.dart';
-import 'package:lms/features/calls/data/model/call_model.dart';
-import 'package:lms/features/calls/data/providers/active_call_provider.dart';
 import 'package:lms/features/calls/data/services/stream_video_service.dart';
 import 'package:lms/features/chat/data/model/direct_message.dart';
 import 'package:lms/features/chat/data/provider/conversation_provider.dart';
@@ -168,20 +166,21 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
             //Video Call Button
             CustomIconButton(
               onTap: () {
-                final currentUser = ref.read(currentUserProvider);
-                // 1. Create a CallModel for this session
-                final callModel = CallModel(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  callerUid: currentUser?.id ?? '',
-                  receiverUid: widget.userId,
-                  contactName: widget.userName,
-                  callType: CallType.video,
-                  status: CallStatus.answeredOutgoing,
-                  timestamp: DateTime.now(),
-                );
-                // 2. Start the call in the provider
-                ref.read(activeCallProvider.notifier).startCall(callModel);
-                context.push(Routes.videoCall);
+                ShowSnackbar1.error(context, 'Video Call Functionality Not Available Right Now!');
+                // final currentUser = ref.read(currentUserProvider);
+                // // 1. Create a CallModel for this session
+                // final callModel = CallModel(
+                //   id: DateTime.now().millisecondsSinceEpoch.toString(),
+                //   callerUid: currentUser?.id ?? '',
+                //   receiverUid: widget.userId,
+                //   contactName: widget.userName,
+                //   callType: CallType.video,
+                //   status: CallStatus.answeredOutgoing,
+                //   timestamp: DateTime.now(),
+                // );
+                // // 2. Start the call in the provider
+                // ref.read(activeCallProvider.notifier).startCall(callModel);
+                // context.push(Routes.videoCall);
               },
               icon: Icons.videocam_rounded,
               iconColor: AppColors.kBlack,

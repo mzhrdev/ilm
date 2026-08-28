@@ -6,6 +6,7 @@ import 'package:lms/core/constants/app_colors.dart';
 import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/core/presentation/widgets/custom_elevated_button.dart';
 import 'package:lms/core/presentation/widgets/custom_safe_area.dart';
+import 'package:lms/core/presentation/widgets/snackbar.dart';
 import 'package:lms/core/routing/app_routing.dart';
 import 'package:lms/features/auth/data/providers/current_user_provider.dart';
 import 'package:lms/features/courses/data/model/lesson_model.dart';
@@ -143,16 +144,21 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
         Stack(
           children: [
             // Video Thumbnail
-            Container(
-              height: context.h(35),
-              width: double.infinity,
-              color: AppColors.kGrey,
+            GestureDetector(
+              onTap: () {
+                ShowSnackbar1.error(context, 'This is mock video. Not Playable!');
+              },
               child: Container(
-                width: context.w(20),
-                height: context.h(10),
-                decoration: BoxDecoration(color: AppColors.kWhite, shape: BoxShape.circle),
-                child: Icon(Icons.play_arrow, color: AppColors.kBlack, size: context.h(5)),
-              ).centerWidget,
+                height: context.h(35),
+                width: double.infinity,
+                color: AppColors.kGrey,
+                child: Container(
+                  width: context.w(20),
+                  height: context.h(10),
+                  decoration: BoxDecoration(color: AppColors.kWhite, shape: BoxShape.circle),
+                  child: Icon(Icons.play_arrow, color: AppColors.kBlack, size: context.h(5)),
+                ).centerWidget,
+              ),
             ),
             Positioned(
               top: context.h(2),
@@ -175,7 +181,9 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> with Si
                   ),
                   // Bookmark Button
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      ShowSnackbar1.error(context, 'Bookmark Functionality Not Available');
+                    },
                     child: Container(
                       padding: EdgeInsets.all(context.w(2.18)),
                       decoration: BoxDecoration(

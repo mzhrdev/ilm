@@ -35,7 +35,6 @@ class SettingsScreen extends ConsumerWidget {
             paddingAroundIcon: context.w(4.5),
             iconColor: AppColors.kBlack,
           ),
-
           title: const Text('Settings', style: AppTextStyle.kHeading),
         ),
         body: settingsState.isLoading
@@ -51,7 +50,7 @@ class SettingsScreen extends ConsumerWidget {
                         // Settings Card
                         Container(
                           padding: EdgeInsets.only(
-                            top: context.h(4),
+                            top: context.h(6),
                             left: context.w(3),
                             right: context.w(3),
                             bottom: context.h(2),
@@ -80,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                                       context.push(Routes.helpCenter);
                                       break;
                                     case SettingsMenuItemType.invite:
-                                      //_shareInvite(context);
+                                      ShowSnackbar1.error(context, 'Invite Functionality Coming Soon!');
                                       break;
                                     case SettingsMenuItemType.logout:
                                       _showLogoutDialog(context, ref);
@@ -101,7 +100,7 @@ class SettingsScreen extends ConsumerWidget {
                               width: context.w(30),
                               height: context.h(12),
                               decoration: BoxDecoration(
-                                color: AppColors.kGrey.withAlpha(150),
+                                color: AppColors.kGrey,
                                 shape: BoxShape.circle,
                                 border: Border.all(color: AppColors.kWhite, width: context.h(0.5)),
                                 boxShadow: [
@@ -118,7 +117,7 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: context.h(2)),
+                    SizedBox(height: context.h(4)),
                   ],
                 ),
               ),
@@ -143,7 +142,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  // Show Logout Dialog Method Definition 
+  // Show Logout Dialog Method Definition
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
