@@ -19,12 +19,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
     Timer(const Duration(seconds: 3), () {
       if (!mounted) return;
-
       final isLoggedIn = ref.read(authProvider.notifier).isLoggedIn();
-
       if (isLoggedIn) {
         context.go(Routes.home);
       } else {
