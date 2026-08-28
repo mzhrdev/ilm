@@ -13,6 +13,7 @@ class TwoButtonRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        // SIGN IN BUTTON
         CustomElevatedButton(
           elevation: 0,
           borderRadius: context.h(1.2),
@@ -22,6 +23,7 @@ class TwoButtonRow extends StatelessWidget {
           title: 'SIGN IN',
           onPress: () => context.go(Routes.signin),
         ),
+        // SIGN UP BUTTON
         CustomElevatedButton(
           elevation: 0,
           borderRadius: context.h(1.2),
@@ -30,7 +32,6 @@ class TwoButtonRow extends StatelessWidget {
           bWidth: context.w(43.6),
           borderSide: BorderSide(color: AppColors.kPrimary),
           textColor: AppColors.kPrimary,
-
           title: 'SIGN UP',
           onPress: () => context.go(Routes.signup),
         ),

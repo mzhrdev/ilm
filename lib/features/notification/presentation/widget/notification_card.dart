@@ -1,7 +1,10 @@
 // lib/features/notifications/presentation/widgets/notification_card.dart
 
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 
 import '../../data/model/notification_model.dart';
 import '../../data/provider/notification_provider.dart';
@@ -13,6 +16,7 @@ class NotificationCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Getter Icon Method Definition
     IconData getIcon() {
       switch (notification.type) {
         case NotificationType.success:
@@ -26,11 +30,12 @@ class NotificationCard extends ConsumerWidget {
       }
     }
 
+    // Getter Icon Color Method Definition
     Color getIconBackgroundColor() {
       if (notification.isRead) {
-        return Colors.grey[300]!;
+        return AppColors.kGrey;
       }
-      return Colors.black;
+      return AppColors.kBlack;
     }
 
     return GestureDetector(
@@ -38,43 +43,46 @@ class NotificationCard extends ConsumerWidget {
         ref.read(notificationsProvider.notifier).markAsRead(notification.id);
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: context.h(1.5)),
+        padding: EdgeInsets.all(context.w(4)),
         decoration: BoxDecoration(
-          color: notification.isRead ? Colors.grey[100] : Colors.blue[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: notification.isRead ? Colors.grey[200]! : Colors.blue[200]!),
+          color: notification.isRead ? AppColors.kGrey.withAlpha(100) : AppColors.kBlue.withAlpha(50),
+          borderRadius: BorderRadius.circular(context.w(4)),
+          border: Border.all(color: notification.isRead ? AppColors.kBlack : AppColors.kBlue),
         ),
         child: Row(
           children: [
             // Icon
             Container(
-              width: 40,
-              height: 40,
+              width: context.w(12),
+              height: context.h(6),
               decoration: BoxDecoration(color: getIconBackgroundColor(), shape: BoxShape.circle),
-              child: Icon(getIcon(), color: notification.isRead ? Colors.grey[600] : Colors.white, size: 20),
+              child: Icon(
+                getIcon(),
+                color: notification.isRead ? AppColors.kBlack.withAlpha(150) : AppColors.kWhite,
+                size: context.h(3),
+              ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: context.w(3)),
             // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(notification.title, style: AppTextStyle.kSectionTitle),
+                  SizedBox(height: context.h(1)),
                   Text(
-                    notification.title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w600,
-                      color: Colors.black87,
-                    ),
+                    notification.description,
+                    style: AppTextStyle.kBodyMedium.copyWith(color: AppColors.kBlack.withAlpha(120)),
                   ),
-                  const SizedBox(height: 4),
-                  Text(notification.description, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                 ],
               ),
             ),
             // Time
-            Text(notification.timeAgo, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+            Text(
+              notification.timeAgo,
+              style: AppTextStyle.kBodySmall.copyWith(color: AppColors.kBlack.withAlpha(150)),
+            ),
           ],
         ),
       ),
