@@ -7,22 +7,19 @@ import 'package:lms/core/data/services/firebase_storage_service.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
 import 'package:lms/features/auth/data/providers/auth_provider.dart';
 
+// Profile Provider
 final profileProvider = StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
   final firestoreServices = ref.watch(firestoreServicesProvider);
   final storageService = ref.watch(firebaseStorageServiceProvider);
-
   return ProfileNotifier(firestoreServices, storageService);
 });
 
 class ProfileState {
   const ProfileState({this.userProfile, this.isLoading = false, this.error});
-
   final UserModel? userProfile;
   final bool isLoading;
   final String? error;
-
   static const Object _unset = Object();
-
   ProfileState copyWith({UserModel? userProfile, bool? isLoading, Object? error = _unset}) {
     return ProfileState(
       userProfile: userProfile ?? this.userProfile,
@@ -39,6 +36,8 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 
   final FirebaseFirestoreServices _firestoreServices;
   final FirebaseStorageService _storageService;
+
+  // Update Profile Image Method Definition
   Future<void> updateProfileImage(File imageFile) async {
     final currentUser = state.userProfile;
 
@@ -50,25 +49,26 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      // 1. Upload image to Firebase Storage
+      /// 1. Upload image to Firebase Storage
       final downloadUrl = await _storageService.uploadProfileImage(
         userId: currentUser.id,
         imageFile: imageFile,
       );
 
-      // 2. Create updated UserModel
+      /// 2. Create updated UserModel
       final updatedUser = currentUser.copyWith(profileImageUrl: downloadUrl);
 
-      // 3. Save updated UserModel to Firestore
+      /// 3. Save updated UserModel to Firestore
       await _firestoreServices.saveUser(updatedUser, onlyIfNew: false);
 
-      // 4. Update Riverpod state
+      /// 4. Update Riverpod state
       state = state.copyWith(userProfile: updatedUser, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
+  // Load Profile Method Definition
   Future<void> _loadProfile() async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -80,8 +80,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     }
   }
 
-  /// Persists an edited profile to Firestore, then updates local state.
-  /// Uses merge semantics so partial edits never wipe unrelated fields.
+  // Update profile Method Definition 
   Future<void> updateProfile(UserModel updatedUser) async {
     state = state.copyWith(isLoading: true, error: null);
     try {

@@ -182,6 +182,7 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
+  // Build Profile Image Method Definition
   Widget _buildProfileImage(String? imageUrl, BuildContext context) {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Icon(Icons.person, size: context.h(8), color: AppColors.kWhite);
