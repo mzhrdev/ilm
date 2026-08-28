@@ -1,12 +1,12 @@
-// lib/features/settings/presentation/widgets/settings_menu_item_tile.dart
-
+import 'package:extensions_kit/extensions_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:lms/core/constants/app_colors.dart';
+import 'package:lms/core/constants/app_text_styles.dart';
 import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
 
 class SettingsMenuItemTile extends StatelessWidget {
   final SettingsMenuItem item;
   final VoidCallback onTap;
-
   const SettingsMenuItemTile({super.key, required this.item, required this.onTap});
 
   @override
@@ -14,31 +14,34 @@ class SettingsMenuItemTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: context.w(3), vertical: context.h(2)),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.grey[200]!, width: 1)),
+          borderRadius: BorderRadius.circular(context.w(4)),
+          border: Border.all(color: AppColors.kWhite),
         ),
         child: Row(
           children: [
             // Icon
-            Icon(item.icon, color: item.isDestructive ? Colors.red : Colors.black87, size: 22),
-            const SizedBox(width: 12),
+            Icon(
+              item.icon,
+              color: item.isDestructive ? AppColors.kCallEndB : AppColors.kBlack,
+              size: context.h(3),
+            ),
+            SizedBox(width: context.w(4)),
             // Title
             Expanded(
               child: Text(
                 item.title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: item.isDestructive ? Colors.red : Colors.black87,
+                style: AppTextStyle.kBodyLarge.copyWith(
+                  color: item.isDestructive ? AppColors.kCallEndB : AppColors.kBlack,
                 ),
               ),
             ),
-            // Chevron
-            Icon(Icons.chevron_right, color: Colors.grey[400], size: 24),
+            // Chevron >
+            Icon(Icons.chevron_right, color: AppColors.kBlack.withAlpha(80), size: context.h(3.5)),
           ],
         ),
       ),
-    );
+    ).padOnly(bottom: context.h(0.5));
   }
 }

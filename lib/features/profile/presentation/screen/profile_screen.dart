@@ -26,6 +26,7 @@ class ProfileScreen extends ConsumerWidget {
           onTap: () => context.go(Routes.home),
           icon: Icons.arrow_back_ios_new,
           iconColor: AppColors.kBlack,
+          paddingAroundIcon: context.w(4),
         ),
       ),
       backgroundColor: Colors.white,

@@ -1,7 +1,6 @@
-// lib/features/settings/data/model/settings_menu_item.dart
-
 import 'package:flutter/material.dart';
 
+// Enum
 enum SettingsMenuItemType { profile, payment, terms, help, invite, logout }
 
 class SettingsMenuItem {
@@ -19,6 +18,7 @@ class SettingsMenuItem {
     this.isDestructive = false,
   });
 
+  // List Getter Menu Items
   static List<SettingsMenuItem> get menuItems => [
     const SettingsMenuItem(
       id: '1',

@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lms/features/auth/data/model/user_model.dart';
 import 'package:lms/features/settings/data/model/settings_menu_item_model.dart';
 
+
+// Settings Provider
 final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
   return SettingsNotifier();
 });
@@ -10,9 +12,7 @@ class SettingsState {
   final UserModel? userProfile;
   final List<SettingsMenuItem> menuItems;
   final bool isLoading;
-
   SettingsState({this.userProfile, required this.menuItems, this.isLoading = false});
-
   SettingsState copyWith({UserModel? userProfile, List<SettingsMenuItem>? menuItems, bool? isLoading}) {
     return SettingsState(
       userProfile: userProfile ?? this.userProfile,
@@ -27,6 +27,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     _loadUserProfile();
   }
 
+  // Load User Profile Method Definition
   Future<void> _loadUserProfile() async {
     state = state.copyWith(isLoading: true);
 
@@ -46,6 +47,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     );
   }
 
+  // Update Profile Method Definition
   Future<void> updateProfile(UserModel profile) async {
     state = state.copyWith(userProfile: profile);
   }
